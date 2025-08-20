@@ -1,0 +1,80 @@
+/**
+ * transcriptionRoutes.js
+ * @description :: routes for transcription operations
+ */
+
+const express = require('express');
+const router = express.Router();
+const transcriptionController = require('../../../controller/client/v1/transcriptionController');
+const auth = require('../../../middleware/auth');
+const { validateRegisterParams } = require('../../../utils/validation/userValidation');
+const { validateRequest } = require('../../../utils/validateRequest');
+const multer = require('multer');
+
+// Configure multer for file uploads
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 100 * 1024 * 1024 // 100MB limit
+  }
+});
+
+/**
+ * @description : transcribe audio using Ollama
+ * @param {Object} req : request for transcription
+ * @param {Object} res : response for transcription
+ * @return {Object} : transcription result
+ */
+router.post('/ollama-transcribe', 
+  auth.authenticateToken,
+  upload.single('audio'),
+  transcriptionController.ollamaAudioTranscription
+);
+
+/**
+ * @description : post-interview transcription processing
+ * @param {Object} req : request for post-interview transcription
+ * @param {Object} res : response for transcription
+ * @return {Object} : transcription result
+ */
+router.post('/post-interview', 
+  auth.authenticateToken,
+  upload.single('audio'),
+  transcriptionController.postInterviewTranscription
+);
+
+/**
+ * @description : improve existing transcription
+ * @param {Object} req : request for transcription improvement
+ * @param {Object} res : response for improved transcription
+ * @return {Object} : improved transcription result
+ */
+router.post('/improve', 
+  auth.authenticateToken,
+  transcriptionController.improveTranscription
+);
+
+/**
+ * @description : batch transcription processing
+ * @param {Object} req : request for batch transcription
+ * @param {Object} res : response for batch transcription
+ * @return {Object} : batch transcription results
+ */
+router.post('/batch', 
+  auth.authenticateToken,
+  upload.array('audioFiles', 10), // Max 10 files
+  transcriptionController.batchTranscription
+);
+
+/**
+ * @description : get transcription status
+ * @param {Object} req : request for transcription status
+ * @param {Object} res : response with transcription status
+ * @return {Object} : transcription status
+ */
+router.get('/status/:sessionId/:questionId', 
+  auth.authenticateToken,
+  transcriptionController.getTranscriptionStatus
+);
+
+module.exports = router;

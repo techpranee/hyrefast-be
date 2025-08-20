@@ -1,0 +1,147 @@
+/**
+ * application.js
+ * @description :: model of a database collection application
+ */
+
+const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
+let idValidator = require('mongoose-id-validator');
+const myCustomLabels = {
+  totalDocs: 'itemCount',
+  docs: 'data',
+  limit: 'perPage',
+  page: 'currentPage',
+  nextPage: 'next',
+  prevPage: 'prev',
+  totalPages: 'pageCount',
+  pagingCounter: 'slNo',
+  meta: 'paginator',
+};
+mongoosePaginate.paginate.options = { customLabels: myCustomLabels };
+const Schema = mongoose.Schema;
+const schema = new Schema(
+  {
+
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    },
+
+    job: {
+      type: Schema.Types.ObjectId,
+      ref: 'job'
+    },
+
+    // Session ID from original Supabase for migration mapping
+    sessionId: { type: String },
+
+    // Interview Session specific fields
+    templateId: {
+      type: Schema.Types.ObjectId,
+      ref: 'interviewTemplate'
+    },
+
+    title: { type: String },
+
+    status: {
+      type: String,
+      enum: ['pending', 'in_progress', 'completed', 'cancelled'],
+      default: 'pending'
+    },
+
+    scheduledAt: { type: Date },
+
+    startedAt: { type: Date },
+
+    completedAt: { type: Date },
+
+    currentQuestion: {
+      type: Number,
+      default: 0
+    },
+
+    totalQuestions: {
+      type: Number,
+      default: 0
+    },
+
+    voiceEnabled: {
+      type: Boolean,
+      default: true
+    },
+
+    aiModel: {
+      type: String,
+      default: 'default'
+    },
+
+    // Analysis data
+    candidateAnalysisStatus: {
+      type: String,
+      enum: ['pending', 'in_progress', 'completed', 'failed'],
+      default: 'pending'
+    },
+
+    candidateAnalysisData: { type: Schema.Types.Mixed },
+
+    transcriptionCoveragePercentage: {
+      type: Number,
+      default: 0
+    },
+
+    isDeleted: { type: Boolean },
+
+    isActive: { type: Boolean },
+
+    createdAt: { type: Date },
+
+    updatedAt: { type: Date },
+
+    addedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    },
+
+    updatedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    },
+
+    overall_score: { type: Schema.Types.Mixed }
+  }
+  , {
+    timestamps: {
+      createdAt: 'createdAt',
+      updatedAt: 'updatedAt'
+    }
+  }
+);
+schema.pre('save', async function (next) {
+  this.isDeleted = false;
+  this.isActive = true;
+  next();
+});
+
+schema.pre('insertMany', async function (next, docs) {
+  if (docs && docs.length) {
+    for (let index = 0; index < docs.length; index++) {
+      const element = docs[index];
+      element.isDeleted = false;
+      element.isActive = true;
+    }
+  }
+  next();
+});
+
+schema.method('toJSON', function () {
+  const {
+    _id, __v, ...object
+  } = this.toObject({ virtuals: true });
+  object.id = _id;
+
+  return object;
+});
+schema.plugin(mongoosePaginate);
+schema.plugin(idValidator);
+const application = mongoose.model('application', schema);
+module.exports = application;

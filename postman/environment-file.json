@@ -1,0 +1,19 @@
+{
+  "id": "58fd20c3-babd-48b5-a63a-8500c1ed3bcb",
+  "name": "hyrefast_environment",
+  "values": [
+    {
+      "key": "token",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxMWRlZDVjMGFjMjAxMmFjMDI4ODkxZiIsInVzZXJuYW1lIjoiYWRtaW4iLCJpYXQiOjE2MjkzNTEyNzAsImV4cCI6MTYyOTk1MTI3MH0.BJ-WKjNYeFDQ4pn8kfli5gwn6GLz_c3voFht20Agj9k",
+      "enabled": true
+    },
+    {
+      "key": "url",
+      "value": "http://localhost:5000",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2025-08-10T18:09:21.945Z",
+  "_postman_exported_using": "Postman"
+}
