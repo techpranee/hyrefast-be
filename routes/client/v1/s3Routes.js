@@ -6,15 +6,16 @@
 const express = require('express');
 const router = express.Router();
 const s3Controller = require('../../../controller/client/v1/s3Controller');
+const { PLATFORM } = require('../../../constants/authConstant');
 const auth = require('../../../middleware/auth');
 const multer = require('multer');
 
 // Configure multer for file uploads
-const upload = multer({ 
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 500 * 1024 * 1024 // 500MB limit
-  }
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 500 * 1024 * 1024 // 500MB limit
+    }
 });
 
 /**
@@ -23,10 +24,10 @@ const upload = multer({
  * @param {Object} res : response with upload result
  * @return {Object} : upload result
  */
-router.post('/upload', 
-  auth.authenticateToken,
-  upload.single('file'),
-  s3Controller.uploadFile
+router.post('/upload',
+    auth(PLATFORM.CLIENT),
+    upload.single('file'),
+    s3Controller.uploadFile
 );
 
 /**
@@ -35,10 +36,10 @@ router.post('/upload',
  * @param {Object} res : response with upload results
  * @return {Object} : upload results
  */
-router.post('/upload-multiple', 
-  auth.authenticateToken,
-  upload.array('files', 20), // Max 20 files
-  s3Controller.uploadMultipleFiles
+router.post('/upload-multiple',
+    auth(PLATFORM.CLIENT),
+    upload.array('files', 20), // Max 20 files
+    s3Controller.uploadMultipleFiles
 );
 
 /**
@@ -47,9 +48,9 @@ router.post('/upload-multiple',
  * @param {Object} res : response with signed URL
  * @return {Object} : signed URL
  */
-router.get('/signed-url/:fileKey', 
-  auth.authenticateToken,
-  s3Controller.getSignedUrl
+router.get('/signed-url/:fileKey',
+    auth(PLATFORM.CLIENT),
+    s3Controller.getSignedUrl
 );
 
 /**
@@ -58,9 +59,9 @@ router.get('/signed-url/:fileKey',
  * @param {Object} res : response with deletion result
  * @return {Object} : deletion result
  */
-router.delete('/delete/:fileKey', 
-  auth.authenticateToken,
-  s3Controller.deleteFile
+router.delete('/delete/:fileKey',
+    auth(PLATFORM.CLIENT),
+    s3Controller.deleteFile
 );
 
 /**
@@ -69,9 +70,9 @@ router.delete('/delete/:fileKey',
  * @param {Object} res : response with file list
  * @return {Object} : file list
  */
-router.get('/list', 
-  auth.authenticateToken,
-  s3Controller.listFiles
+router.get('/list',
+    auth(PLATFORM.CLIENT),
+    s3Controller.listFiles
 );
 
 /**
@@ -80,10 +81,10 @@ router.get('/list',
  * @param {Object} res : response with upload result
  * @return {Object} : video chunk upload result
  */
-router.post('/video-chunks', 
-  auth.authenticateToken,
-  upload.array('chunks', 100), // Max 100 chunks
-  s3Controller.uploadVideoChunks
+router.post('/video-chunks',
+    auth(PLATFORM.CLIENT),
+    upload.array('chunks', 100), // Max 100 chunks
+    s3Controller.uploadVideoChunks
 );
 
 /**
@@ -92,9 +93,9 @@ router.post('/video-chunks',
  * @param {Object} res : response with merge result
  * @return {Object} : video merge result
  */
-router.post('/video-merge', 
-  auth.authenticateToken,
-  s3Controller.mergeVideoChunks
+router.post('/video-merge',
+    auth(PLATFORM.CLIENT),
+    s3Controller.mergeVideoChunks
 );
 
 /**
@@ -103,9 +104,9 @@ router.post('/video-merge',
  * @param {Object} res : response with chunk status
  * @return {Object} : video chunk status
  */
-router.get('/video-status/:sessionId/:questionId', 
-  auth.authenticateToken,
-  s3Controller.getVideoChunkStatus
+router.get('/video-status/:sessionId/:questionId',
+    auth(PLATFORM.CLIENT),
+    s3Controller.getVideoChunkStatus
 );
 
 module.exports = router;

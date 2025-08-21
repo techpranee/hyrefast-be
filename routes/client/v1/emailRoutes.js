@@ -6,6 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const emailController = require('../../../controller/client/v1/emailController');
+const { PLATFORM } = require('../../../constants/authConstant');
 const auth = require('../../../middleware/auth');
 
 /**
@@ -25,7 +26,7 @@ router.post('/send-otp',
  * @return {Object} : invitation sending result
  */
 router.post('/send-interview-invitation', 
-  auth.authenticateToken,
+  auth(PLATFORM.CLIENT),
   emailController.sendInterviewInvitation
 );
 
@@ -36,7 +37,7 @@ router.post('/send-interview-invitation',
  * @return {Object} : notification sending result
  */
 router.post('/send-completion-notification', 
-  auth.authenticateToken,
+  auth(PLATFORM.CLIENT),
   emailController.sendCompletionNotification
 );
 
@@ -57,7 +58,7 @@ router.post('/send-password-reset',
  * @return {Object} : email sending result
  */
 router.post('/send-custom', 
-  auth.authenticateToken,
+  auth(PLATFORM.CLIENT),
   emailController.sendCustomEmail
 );
 
@@ -68,7 +69,7 @@ router.post('/send-custom',
  * @return {Object} : SES test result
  */
 router.get('/test-ses-config', 
-  auth.authenticateToken,
+  auth(PLATFORM.CLIENT),
   emailController.testSESConfig
 );
 

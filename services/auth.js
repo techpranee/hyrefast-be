@@ -580,6 +580,16 @@ const sendEmailForLoginOtp = async (user) => {
       }
     });
     
+    // Check if in development mode
+    if (process.env.EMAIL_DEV_MODE === 'true') {
+      console.log('=== DEVELOPMENT MODE ===');
+      console.log(`Email: ${user.email}`);
+      console.log(`OTP Code: ${otp}`);
+      console.log(`Expires: ${expireTime}`);
+      console.log('========================');
+      return true; // Skip actual email sending in dev mode
+    }
+    
     // Send OTP email
     const result = await sesService.sendOTPEmail(
       user.email,
@@ -592,10 +602,46 @@ const sendEmailForLoginOtp = async (user) => {
       return true;
     } else {
       console.error('Failed to send OTP email:', result.error);
+      
+      // In development, still return true and log the OTP
+      if (process.env.NODE_ENV === 'development') {
+        console.log('=== EMAIL FAILED - DEV FALLBACK ===');
+        console.log(`Email: ${user.email}`);
+        console.log(`OTP Code: ${otp}`);
+        console.log(`Use this OTP to login: ${otp}`);
+        console.log('===================================');
+        return true;
+      }
+      
       return false;
     }
   } catch (error) {
     console.error('Send Email OTP Error:', error);
+    
+    // In development mode, still try to save OTP and show it in console
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        const otp = sesService.generateOTP(6);
+        const expireTime = dayjs().add(10, 'minute').toISOString();
+        
+        await dbService.updateOne(User, { _id: user.id }, {
+          loginOTP: {
+            code: otp,
+            expireTime: expireTime
+          }
+        });
+        
+        console.log('=== EMAIL ERROR - DEV FALLBACK ===');
+        console.log(`Email: ${user.email}`);
+        console.log(`OTP Code: ${otp}`);
+        console.log(`Use this OTP to login: ${otp}`);
+        console.log('===================================');
+        return true;
+      } catch (fallbackError) {
+        console.error('Fallback OTP generation failed:', fallbackError);
+      }
+    }
+    
     return false;
   }
 };

@@ -6,6 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const aiChatController = require('../../../controller/client/v1/aiChatController');
+const { PLATFORM } = require('../../../constants/authConstant');
 const auth = require('../../../middleware/auth');
 
 /**
@@ -14,9 +15,9 @@ const auth = require('../../../middleware/auth');
  * @param {Object} res : response with analysis result
  * @return {Object} : analysis result
  */
-router.post('/analyze-response', 
-  auth.authenticateToken,
-  aiChatController.analyzeInterviewResponse
+router.post('/analyze-response',
+    auth(PLATFORM.CLIENT),
+    aiChatController.analyzeInterviewResponse
 );
 
 /**
@@ -25,9 +26,9 @@ router.post('/analyze-response',
  * @param {Object} res : response with generated questions
  * @return {Object} : follow-up questions
  */
-router.post('/generate-followup', 
-  auth.authenticateToken,
-  aiChatController.generateFollowUpQuestions
+router.post('/generate-followup',
+    auth(PLATFORM.CLIENT),
+    aiChatController.generateFollowUpQuestions
 );
 
 /**
@@ -36,9 +37,9 @@ router.post('/generate-followup',
  * @param {Object} res : response with generated questions
  * @return {Object} : interview questions
  */
-router.post('/generate-questions', 
-  auth.authenticateToken,
-  aiChatController.generateInterviewQuestions
+router.post('/generate-questions',
+    auth(PLATFORM.CLIENT),
+    aiChatController.generateInterviewQuestions
 );
 
 /**
@@ -47,9 +48,9 @@ router.post('/generate-questions',
  * @param {Object} res : response with scores
  * @return {Object} : scoring results
  */
-router.post('/score-responses', 
-  auth.authenticateToken,
-  aiChatController.scoreResponses
+router.post('/score-responses',
+    auth(PLATFORM.CLIENT),
+    aiChatController.scoreResponses
 );
 
 /**
@@ -58,9 +59,9 @@ router.post('/score-responses',
  * @param {Object} res : response with summary
  * @return {Object} : interview summary
  */
-router.post('/generate-summary', 
-  auth.authenticateToken,
-  aiChatController.generateInterviewSummary
+router.post('/generate-summary',
+    auth(PLATFORM.CLIENT),
+    aiChatController.generateInterviewSummary
 );
 
 /**
@@ -69,9 +70,9 @@ router.post('/generate-summary',
  * @param {Object} res : response with AI chat reply
  * @return {Object} : AI chat response
  */
-router.post('/chat', 
-  auth.authenticateToken,
-  aiChatController.chatWithAI
+router.post('/chat',
+    auth(PLATFORM.CLIENT),
+    aiChatController.chatWithAI
 );
 
 module.exports = router;
