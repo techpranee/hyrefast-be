@@ -98,8 +98,49 @@ const updateProfile = async (req, res) => {
     return res.internalServerError({ message:error.message });
   }
 };
+
+/**
+ * @description : toggle 2FA setting for user
+ * @param {Object} req : request including user credentials.
+ * @param {Object} res : response contains updated user document.
+ * @return {Object} : updated user document {status, message, data}
+ */
+const toggle2FA = async (req, res) => {
+  try {
+    if (!req.user.id) {
+      return res.badRequest({ message: 'User ID is required.' });
+    }
+    
+    const { enabled } = req.body;
+    if (typeof enabled !== 'boolean') {
+      return res.badRequest({ message: 'enabled field must be a boolean value.' });
+    }
+
+    const query = {
+      _id: req.user.id,
+      isDeleted: false,
+      isActive: true
+    };
+
+    const dataToUpdate = { twoFactorEnabled: enabled };
+
+    let updatedUser = await dbService.updateOne(User, query, dataToUpdate, { new: true });
+    if (!updatedUser) {
+      return res.recordNotFound();
+    }
+
+    return res.success({ 
+      message: `2FA ${enabled ? 'enabled' : 'disabled'} successfully.`,
+      data: { twoFactorEnabled: updatedUser.twoFactorEnabled }
+    });
+  } catch (error) {
+    return res.internalServerError({ message: error.message });
+  }
+};
+
 module.exports = {
   getLoggedInUserInfo,
   changePassword,
-  updateProfile    
+  updateProfile,
+  toggle2FA    
 };

@@ -95,6 +95,12 @@ const schema = new Schema(
 
     verifiedAt: { type: Date },
 
+    // 2FA settings
+    twoFactorEnabled: {
+      type: Boolean,
+      default: false
+    },
+
     profileData: { type: Schema.Types.Mixed },
 
     // Interview specific fields

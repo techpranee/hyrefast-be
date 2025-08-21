@@ -90,7 +90,26 @@ const sendOtpForTwoFA = async (req, res) => {
     if (result.flag) {
       return res.failure({ message: result.data });
     }
-    return res.success({ message: result.data });
+
+    // Check if direct login is possible (2FA disabled)
+    if (result.directLogin) {
+      // Proceed with login directly
+      let loginResult = await authService.loginWithOTP(params.username, params.password, authConstant.PLATFORM.CLIENT, false);
+      if (loginResult.flag) {
+        return res.failure({ message: loginResult.data });
+      }
+      return res.success({ 
+        message: 'Login successful', 
+        data: loginResult.data,
+        twoFactorRequired: false
+      });
+    }
+
+    // 2FA required, OTP sent
+    return res.success({ 
+      message: result.data,
+      twoFactorRequired: true
+    });
   } catch (error) {
     return res.internalServerError({ data: error.message });
   }

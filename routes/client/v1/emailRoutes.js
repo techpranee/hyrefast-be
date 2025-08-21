@@ -15,8 +15,8 @@ const auth = require('../../../middleware/auth');
  * @param {Object} res : response for OTP sending
  * @return {Object} : OTP sending result
  */
-router.post('/send-otp', 
-  emailController.sendOTP
+router.post('/send-otp',
+    emailController.sendOTP
 );
 
 /**
@@ -25,9 +25,9 @@ router.post('/send-otp',
  * @param {Object} res : response for invitation sending
  * @return {Object} : invitation sending result
  */
-router.post('/send-interview-invitation', 
-  auth(PLATFORM.CLIENT),
-  emailController.sendInterviewInvitation
+router.post('/send-interview-invitation',
+    auth(PLATFORM.CLIENT),
+    emailController.sendInterviewInvitation
 );
 
 /**
@@ -36,9 +36,9 @@ router.post('/send-interview-invitation',
  * @param {Object} res : response for notification sending
  * @return {Object} : notification sending result
  */
-router.post('/send-completion-notification', 
-  auth(PLATFORM.CLIENT),
-  emailController.sendCompletionNotification
+router.post('/send-completion-notification',
+    auth(PLATFORM.CLIENT),
+    emailController.sendCompletionNotification
 );
 
 /**
@@ -47,8 +47,8 @@ router.post('/send-completion-notification',
  * @param {Object} res : response for reset email sending
  * @return {Object} : reset email sending result
  */
-router.post('/send-password-reset', 
-  emailController.sendPasswordReset
+router.post('/send-password-reset',
+    emailController.sendPasswordReset
 );
 
 /**
@@ -57,9 +57,9 @@ router.post('/send-password-reset',
  * @param {Object} res : response for email sending
  * @return {Object} : email sending result
  */
-router.post('/send-custom', 
-  auth(PLATFORM.CLIENT),
-  emailController.sendCustomEmail
+router.post('/send-custom',
+    auth(PLATFORM.CLIENT),
+    emailController.sendCustomEmail
 );
 
 /**
@@ -68,9 +68,9 @@ router.post('/send-custom',
  * @param {Object} res : response for SES test
  * @return {Object} : SES test result
  */
-router.get('/test-ses-config', 
-  auth(PLATFORM.CLIENT),
-  emailController.testSESConfig
+router.get('/test-ses-config',
+    auth(PLATFORM.CLIENT),
+    emailController.testSESConfig
 );
 
 module.exports = router;
