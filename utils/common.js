@@ -234,6 +234,60 @@ const checkUniqueFieldsInDatabase = async (model, fieldsToCheck, data, operation
   return { isDuplicate : false };
 };
 
+/**
+ * paginationOptions : get pagination options from request
+ * @param {Object} body : request body containing pagination parameters
+ * @return {Object} : pagination options object
+ */
+function paginationOptions(body = {}) {
+  const options = {};
+  
+  // Set default values
+  const page = parseInt(body.page) || 1;
+  const limit = parseInt(body.limit) || 10;
+  const skip = (page - 1) * limit;
+  
+  options.skip = skip;
+  options.limit = limit;
+  options.page = page;
+  
+  // Handle sorting
+  if (body.sort) {
+    options.sort = body.sort;
+  } else {
+    options.sort = { createdAt: -1 }; // Default sort by creation date descending
+  }
+  
+  // Handle population
+  if (body.populate) {
+    options.populate = body.populate;
+  }
+  
+  // Handle selection
+  if (body.select) {
+    options.select = body.select;
+  }
+  
+  return options;
+}
+
+/**
+ * pickFromObject : pick specific fields from object
+ * @param {Object} obj : source object
+ * @param {Array} fields : array of field names to pick
+ * @return {Object} : object containing only specified fields
+ */
+function pickFromObject(obj, fields) {
+  const result = {};
+  fields.forEach(field => {
+    if (obj.hasOwnProperty(field)) {
+      result[field] = obj[field];
+    }
+  });
+  return result;
+}
+
+
 module.exports = {
   convertObjectToEnum,
   randomNumber,
@@ -242,5 +296,7 @@ module.exports = {
   getDifferenceOfTwoDatesInTime,
   getRoleAccessData,
   getSelectObject,
-  checkUniqueFieldsInDatabase
+  checkUniqueFieldsInDatabase,
+  paginationOptions,
+  pickFromObject
 };

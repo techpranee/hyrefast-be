@@ -17,7 +17,8 @@ router.route('/validate-otp').post(authController.validateResetPasswordOtp);
 router.route('/reset-password').put(authController.resetPassword);
 router.route('/logout').post(auth(PLATFORM.CLIENT), authController.logout);
 router.route('/push-notification/addPlayerId').post(authController.addPlayerId);
-router.route('/push-notification/removePlayerId').post(authController.removePlayerId);   
+router.route('/push-notification/removePlayerId').post(authController.removePlayerId);
+router.route('/profile/:userId').get(auth(PLATFORM.CLIENT), authController.getUserProfile);
 router.get('/login/google',(req,res)=>{
   req.session.platform = 'client';
   res.redirect(`http://localhost:${process.env.PORT}/auth/google`);

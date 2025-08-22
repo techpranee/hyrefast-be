@@ -15,6 +15,7 @@ const validation = require('../../../utils/validateRequest');
 const authConstant = require('../../../constants/authConstant');
 const authService = require('../../../services/auth');
 const common = require('../../../utils/common');
+const jwt = require('jsonwebtoken');
 
 /**
  * @description : user registration 
@@ -84,34 +85,64 @@ const sendOtpForTwoFA = async (req, res) => {
   try {
     let params = req.body;
     if (!params.username || !params.password) {
-      return res.badRequest({ message: 'Insufficient request parameters! username and password is required.' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Insufficient request parameters! username and password is required.' 
+      });
     }
+
     let result = await authService.sendLoginOTP(params.username, params.password);
     if (result.flag) {
-      return res.failure({ message: result.data });
+      return res.status(400).json({ 
+        success: false,
+        message: result.data 
+      });
     }
 
     // Check if direct login is possible (2FA disabled)
     if (result.directLogin) {
-      // Proceed with login directly
-      let loginResult = await authService.loginWithOTP(params.username, params.password, authConstant.PLATFORM.CLIENT, false);
-      if (loginResult.flag) {
-        return res.failure({ message: loginResult.data });
+      try {
+        // Proceed with login directly
+        let loginResult = await authService.loginWithOTP(params.username, params.password, authConstant.PLATFORM.CLIENT, false);
+        if (loginResult.flag) {
+          return res.status(400).json({ 
+            success: false,
+            message: loginResult.data 
+          });
+        }
+        return res.status(200).json({ 
+          success: true,
+          message: 'Login successful', 
+          data: loginResult.data,
+          twoFactorRequired: false
+        });
+      } catch (loginError) {
+        console.error('Direct login error:', loginError);
+        // Fall back to 2FA flow
+        return res.status(200).json({ 
+          success: true,
+          message: result.data || 'OTP sent successfully',
+          data: null,
+          twoFactorRequired: true
+        });
       }
-      return res.success({ 
-        message: 'Login successful', 
-        data: loginResult.data,
-        twoFactorRequired: false
-      });
     }
 
     // 2FA required, OTP sent
-    return res.success({ 
-      message: result.data,
+    return res.status(200).json({ 
+      success: true,
+      status: 'SUCCESS',
+      message: result.data || 'Please check your email for OTP',
+      data: null,
       twoFactorRequired: true
     });
   } catch (error) {
-    return res.internalServerError({ data: error.message });
+    console.error('sendOtpForTwoFA error:', error);
+    return res.status(500).json({ 
+      success: false,
+      message: 'Internal server error.',
+      data: error.message 
+    });
   }
 };
 
@@ -121,6 +152,11 @@ const sendOtpForTwoFA = async (req, res) => {
  * @param {Object} res : response for loginWithOTP
  * @return {Object} : response for loginWithOTP {status, message, data}
  */
+
+
+/**
+ * @description : login with OTP
+ */
 const loginWithTwoFA = async (req, res) => {
   try {
     const params = req.body;
@@ -128,34 +164,92 @@ const loginWithTwoFA = async (req, res) => {
     if (params.email) {
       params.username = params.email.toString().toLowerCase();
     }
-    console.log(params);
+    
     if (!params.code || !params.username || !params.password) {
-      return res.badRequest({ message: 'Insufficient request parameters! username,password and code is required.' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Insufficient request parameters! username, password and code is required.' 
+      });
     }
+
     let where = { 'email': params.username };
-    where.isActive = true; where.isDeleted = false; let user = await dbService.findOne(User, where);
-    if (!user || !user.loginOTP.expireTime) {
-      return res.badRequest({ message: 'Invalid Code' });
+    where.isActive = true; 
+    where.isDeleted = false; 
+    
+    let user = await dbService.findOne(User, where);
+    if (!user || !user.loginOTP || !user.loginOTP.expireTime) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid Code' 
+      });
     }
+    
     if (dayjs(new Date()).isAfter(dayjs(user.loginOTP.expireTime))) {
-      return res.badRequest({ message: 'Your reset password link is expired' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Your OTP has expired' 
+      });
     }
+    
     if (user.loginOTP.code !== params.code) {
-      return res.badRequest({ message: 'Invalid Code' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid Code' 
+      });
     }
-    let roleAccess = false;
-    if (req.body.includeRoleAccess) {
-      roleAccess = req.body.includeRoleAccess;
-    }
-    let result = await authService.loginWithOTP(params.username, params.password, authConstant.PLATFORM.CLIENT, roleAccess);
-    if (result.flag) {
-      return res.badRequest({ message: result.data });
-    }
-    return res.success({ data: result.data });
+
+    // Generate JWT token directly
+    const tokenPayload = {
+      userId: user.id,
+      email: user.email,
+      userType: user.userType,
+      platform: authConstant.PLATFORM.CLIENT
+    };
+
+    const access_token = jwt.sign(
+      tokenPayload, 
+      process.env.JWT_SECRET || 'your-secret-key', 
+      { expiresIn: '24h' }
+    );
+
+    // Store token in database
+    await dbService.create(userTokens, {
+      userId: user.id,
+      token: access_token,
+      tokenExpiredTime: dayjs().add(24, 'hour').toDate(),
+      isTokenExpired: false
+    });
+
+    // Clear OTP after successful login
+    await dbService.updateOne(User, user.id, { 
+      loginOTP: { code: null, expireTime: null } 
+    });
+
+    return res.status(200).json({ 
+      success: true,
+      data: {
+        access_token: access_token,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name || user.fullName,
+          userType: user.userType,
+          created_at: user.createdAt
+        }
+      }
+    });
+
   } catch (error) {
-    return res.internalServerError({ data: error.message });
+    console.error('loginWithTwoFA error:', error);
+    return res.status(500).json({ 
+      success: false,
+      message: 'Internal server error.',
+      data: error.message 
+    });
   }
 };
+
+
 
 /**
  * @description : send email or sms to user with OTP on forgot password
@@ -324,6 +418,59 @@ const removePlayerId = async (req, res) => {
   }
 };
 
+
+const getUserProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const user = await dbService.findOne(User, { 
+      _id: userId, 
+      isActive: true, 
+      isDeleted: false 
+    });
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Get user role
+    const userRoleData = await dbService.findOne(userRole, { userId: userId });
+    let roleName = 'candidate';
+    
+    if (userRoleData && userRoleData.roleId) {
+      const roleData = await dbService.findOne(role, { id: userRoleData.roleId });
+      if (roleData) {
+        roleName = roleData.name;
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        profile: {
+          id: user.id,
+          email: user.email,
+          full_name: user.name || user.fullName,
+          phone_number: user.mobileNo || null,
+          avatar_url: null,
+          created_at: user.createdAt,
+          updated_at: user.updatedAt
+        },
+        role: roleName
+      }
+    });
+  } catch (error) {
+    console.error('getUserProfile error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
 module.exports = {
   register,
   sendOtpForTwoFA,
@@ -333,5 +480,6 @@ module.exports = {
   resetPassword,
   logout,
   addPlayerId,
-  removePlayerId
+  removePlayerId,
+  getUserProfile
 };
