@@ -3,7 +3,7 @@
  * @description :: exports action methods for interview management.
  */
 
-const InterviewTemplate = require('../../../model/interviewTemplate');
+// const InterviewTemplate = require('../../../model/interviewTemplate');
 const Application = require('../../../model/application'); // Interview Session
 const Response = require('../../../model/response'); // Interview Response  
 const Job = require('../../../model/job');
