@@ -40,7 +40,11 @@ const schema = new Schema(
     updatedBy:{
       type:Schema.Types.ObjectId,
       ref:'user'
-    }
+    },
+
+    question_type:{ type:String },
+
+    evaluation_instructions:{ type:String }
   }
   ,{ 
     timestamps: { 

@@ -22,76 +22,65 @@ const Schema = mongoose.Schema;
 const schema = new Schema(
   {
 
-    // Session reference
-    sessionId: {
-      type: Schema.Types.ObjectId,
-      ref: 'application', // references the application model (interview session)
-      required: true
+    job:{
+      type:Schema.Types.ObjectId,
+      ref:'job'
     },
 
-    questionNumber: {
-      type: Number,
-      required: true
+    question:{
+      type:Schema.Types.ObjectId,
+      ref:'question'
     },
 
-    questionText: { type: String },
-
-    // Response content
-    responseText: { type: String },
-
-    responseAudioUrl: { type: String },
-
-    responseVideoUrl: { type: String },
-
-    responseDuration: {
-      type: Number // in seconds
+    candidate:{
+      type:Schema.Types.ObjectId,
+      ref:'user'
     },
 
-    // Transcription
-    transcriptionText: { type: String },
+    isDeleted:{ type:Boolean },
 
-    // AI Analysis
-    aiAnalysis: { type: Schema.Types.Mixed },
+    isActive:{ type:Boolean },
 
-    // Legacy fields (keeping for backward compatibility)
-    job: { type: String },
+    createdAt:{ type:Date },
 
-    question: { type: String },
+    updatedAt:{ type:Date },
 
-    user: { type: String },
-
-    isDeleted: { type: Boolean },
-
-    isActive: { type: Boolean },
-
-    createdAt: { type: Date },
-
-    updatedAt: { type: Date },
-
-    addedBy: {
-      type: Schema.Types.ObjectId,
-      ref: 'user'
+    addedBy:{
+      type:Schema.Types.ObjectId,
+      ref:'user'
     },
 
-    updatedBy: {
-      type: Schema.Types.ObjectId,
-      ref: 'user'
+    updatedBy:{
+      type:Schema.Types.ObjectId,
+      ref:'user'
     },
 
-    // Migration field to track Supabase ID
-    supabaseId: {
-      type: String,
-      unique: true,
-      sparse: true
+    score:{ type:String },
+
+    aiAnalysis:{ type:Schema.Types.Mixed },
+
+    sessionId:{
+      ref:'application',
+      type:Schema.Types.ObjectId
     },
 
-    score: { type: String }
+    questionNumber:{ type:Number },
+
+    questionText:{ type:String },
+
+    responseText:{ type:String },
+
+    responseAudioUrl:{ type:String },
+
+    responseVideoUrl:{ type:String },
+
+    transcriptionText:{ type:String }
   }
-  , {
-    timestamps: {
-      createdAt: 'createdAt',
-      updatedAt: 'updatedAt'
-    }
+  ,{ 
+    timestamps: { 
+      createdAt: 'createdAt', 
+      updatedAt: 'updatedAt' 
+    } 
   }
 );
 schema.pre('save', async function (next) {
@@ -101,7 +90,7 @@ schema.pre('save', async function (next) {
 });
 
 schema.pre('insertMany', async function (next, docs) {
-  if (docs && docs.length) {
+  if (docs && docs.length){
     for (let index = 0; index < docs.length; index++) {
       const element = docs[index];
       element.isDeleted = false;
@@ -113,13 +102,13 @@ schema.pre('insertMany', async function (next, docs) {
 
 schema.method('toJSON', function () {
   const {
-    _id, __v, ...object
-  } = this.toObject({ virtuals: true });
+    _id, __v, ...object 
+  } = this.toObject({ virtuals:true });
   object.id = _id;
-
+     
   return object;
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const response = mongoose.model('response', schema);
+const response = mongoose.model('response',schema);
 module.exports = response;

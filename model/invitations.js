@@ -1,6 +1,6 @@
 /**
- * recruiter.js
- * @description :: model of a database collection recruiter
+ * invitations.js
+ * @description :: model of a database collection invitations
  */
 
 const mongoose = require('mongoose');
@@ -22,14 +22,19 @@ const Schema = mongoose.Schema;
 const schema = new Schema(
   {
 
-    name:{ type:String },
-
     company:{
       type:Schema.Types.ObjectId,
       ref:'workspace'
     },
 
-    admin:{ type:String },
+    email:{ type:String },
+
+    phone:{ type:String },
+
+    user:{
+      type:Schema.Types.ObjectId,
+      ref:'user'
+    },
 
     isDeleted:{ type:Boolean },
 
@@ -83,5 +88,5 @@ schema.method('toJSON', function () {
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const recruiter = mongoose.model('recruiter',schema);
-module.exports = recruiter;
+const invitations = mongoose.model('invitations',schema);
+module.exports = invitations;

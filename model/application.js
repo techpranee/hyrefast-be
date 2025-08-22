@@ -22,7 +22,7 @@ const Schema = mongoose.Schema;
 const schema = new Schema(
   {
 
-    user: {
+    candidate: {
       type: Schema.Types.ObjectId,
       ref: 'user'
     },
@@ -32,28 +32,7 @@ const schema = new Schema(
       ref: 'job'
     },
 
-    // Session ID from original Supabase for migration mapping
-    sessionId: { type: String },
-
-    // Interview Session specific fields
-    templateId: {
-      type: Schema.Types.ObjectId,
-      ref: 'interviewTemplate'
-    },
-
-    title: { type: String },
-
-    status: {
-      type: String,
-      enum: ['pending', 'in_progress', 'completed', 'cancelled'],
-      default: 'pending'
-    },
-
-    scheduledAt: { type: Date },
-
-    startedAt: { type: Date },
-
-    completedAt: { type: Date },
+    status: { type: String },
 
     currentQuestion: {
       type: Number,
@@ -61,30 +40,6 @@ const schema = new Schema(
     },
 
     totalQuestions: {
-      type: Number,
-      default: 0
-    },
-
-    voiceEnabled: {
-      type: Boolean,
-      default: true
-    },
-
-    aiModel: {
-      type: String,
-      default: 'default'
-    },
-
-    // Analysis data
-    candidateAnalysisStatus: {
-      type: String,
-      enum: ['pending', 'in_progress', 'completed', 'failed'],
-      default: 'pending'
-    },
-
-    candidateAnalysisData: { type: Schema.Types.Mixed },
-
-    transcriptionCoveragePercentage: {
       type: Number,
       default: 0
     },

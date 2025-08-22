@@ -24,53 +24,15 @@ const schema = new Schema(
 
     title: { type: String },
 
-    description: { type: String },
-
-    requirements: { type: [String], default: [] },
-
     last_date: { type: String },
 
     salary: { type: String },
 
-    employmentType: {
-      type: String,
-      enum: ['full-time', 'part-time', 'contract', 'internship']
-    },
-
-    location: { type: String },
-
-    status: {
-      type: String,
-      enum: ['draft', 'active', 'paused', 'closed'],
-      default: 'active'
-    },
-
-    // Interview configuration
-    interviewTemplateId: {
-      type: Schema.Types.ObjectId,
-      ref: 'interviewTemplate'
-    },
-
-    interviewConfig: {
-      aiModel: { type: String, default: 'llama2' },
-      voiceEnabled: { type: Boolean, default: false },
-      timeLimit: Number,
-      autoAdvance: { type: Boolean, default: false }
-    },
-
-    // Public link settings
     publicLinkSettings: {
       enabled: { type: Boolean, default: false },
-      maxUses: Number,
-      expiresAt: Date,
+      maxUsers: { type: Number },
+      expiresAt: { type: Date },
       requireVerification: { type: Boolean, default: true }
-    },
-
-    // Pre-requisites for candidates
-    preRequisites: {
-      requiredFields: { type: [String], default: ['name', 'email', 'phone'] },
-      customFields: [String],
-      consentRequired: { type: Boolean, default: true }
     },
 
     isDeleted: { type: Boolean },
@@ -89,6 +51,14 @@ const schema = new Schema(
     updatedBy: {
       type: Schema.Types.ObjectId,
       ref: 'user'
+    },
+
+    questions: { type: Array },
+
+    workspace: {
+      ref: 'workspace',
+      type: Schema.Types.ObjectId,
+      required: true
     }
   }
   , {

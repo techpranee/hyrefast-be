@@ -1,6 +1,6 @@
 /**
- * recruiter.js
- * @description :: model of a database collection recruiter
+ * workspace.js
+ * @description :: model of a database collection workspace
  */
 
 const mongoose = require('mongoose');
@@ -24,12 +24,13 @@ const schema = new Schema(
 
     name:{ type:String },
 
-    company:{
-      type:Schema.Types.ObjectId,
-      ref:'workspace'
-    },
+    website:{ type:String },
 
-    admin:{ type:String },
+    legal_name:{ type:String },
+
+    logo:{ type:String },
+
+    address:{ type:String },
 
     isDeleted:{ type:Boolean },
 
@@ -47,6 +48,11 @@ const schema = new Schema(
     updatedBy:{
       type:Schema.Types.ObjectId,
       ref:'user'
+    },
+
+    admin:{
+      ref:'user',
+      type:Schema.Types.ObjectId
     }
   }
   ,{ 
@@ -83,5 +89,5 @@ schema.method('toJSON', function () {
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const recruiter = mongoose.model('recruiter',schema);
-module.exports = recruiter;
+const workspace = mongoose.model('workspace',schema);
+module.exports = workspace;
