@@ -23,4 +23,9 @@ router.route('/client/api/v1/response/updateBulk').put(auth(PLATFORM.CLIENT),che
 router.route('/client/api/v1/response/delete/:id').delete(auth(PLATFORM.CLIENT),checkRolePermission,responseController.deleteResponse);
 router.route('/client/api/v1/response/deleteMany').post(auth(PLATFORM.CLIENT),checkRolePermission,responseController.deleteManyResponse);
 
+router.post('/client/api/v1/response/interview-response',
+  auth(PLATFORM.CLIENT),
+  responseController.createInterviewResponse
+);
+
 module.exports = router;

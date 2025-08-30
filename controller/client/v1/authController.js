@@ -57,18 +57,18 @@ const register = async (req, res) => {
         });
       }
     }
-    if (isEmptyPassword && req.body.email) {
-      await authService.sendPasswordByEmail({
-        email: req.body.email,
-        password: req.body.password
-      });
-    }
-    if (isEmptyPassword && req.body.mobileNo) {
-      await authService.sendPasswordBySMS({
-        mobileNo: req.body.mobileNo,
-        password: req.body.password
-      });
-    }
+    // if (isEmptyPassword && req.body.email) {
+    //   await authService.sendPasswordByEmail({
+    //     email: req.body.email,
+    //     password: req.body.password
+    //   });
+    // }
+    // if (isEmptyPassword && req.body.mobileNo) {
+    //   await authService.sendPasswordBySMS({
+    //     mobileNo: req.body.mobileNo,
+    //     password: req.body.password
+    //   });
+    // }
     return res.success({ data: result });
   } catch (error) {
     return res.internalServerError({ data: error.message });
@@ -450,15 +450,7 @@ const getUserProfile = async (req, res) => {
     return res.status(200).json({
       success: true,
       data: {
-        profile: {
-          id: user.id,
-          email: user.email,
-          full_name: user.name || user.fullName,
-          phone_number: user.mobileNo || null,
-          avatar_url: null,
-          created_at: user.createdAt,
-          updated_at: user.updatedAt
-        },
+        profile: user,
         role: roleName
       }
     });

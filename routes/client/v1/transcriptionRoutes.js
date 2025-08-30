@@ -13,11 +13,19 @@ const { validateRegisterParams } = require('../../../utils/validation/userValida
 const { validateRequest } = require('../../../utils/validateRequest');
 const multer = require('multer');
 
-// Configure multer for file uploads
+// Configure multer for file uploads with better error handling
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
         fileSize: 100 * 1024 * 1024 // 100MB limit
+    },
+    fileFilter: (req, file, cb) => {
+        // Accept audio files
+        if (file.mimetype.startsWith('audio/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only audio files are allowed'), false);
+        }
     }
 });
 
@@ -28,8 +36,8 @@ const upload = multer({
  * @return {Object} : transcription result
  */
 router.post('/ollama-transcribe',
-    auth(PLATFORM.CLIENT),
-    upload.single('audio'),
+  
+    upload.single('audioFile'), // ✅ Changed from 'audio' to 'audioFile'
     transcriptionController.ollamaAudioTranscription
 );
 
@@ -41,7 +49,7 @@ router.post('/ollama-transcribe',
  */
 router.post('/post-interview',
     auth(PLATFORM.CLIENT),
-    upload.single('audio'),
+    upload.single('audioFile'), // ✅ Changed from 'audio' to 'audioFile'
     transcriptionController.postInterviewTranscription
 );
 
@@ -64,7 +72,7 @@ router.post('/improve',
  */
 router.post('/batch',
     auth(PLATFORM.CLIENT),
-    upload.array('audioFiles', 10), // Max 10 files
+    upload.array('audioFiles', 10), // This is correct for batch
     transcriptionController.batchTranscription
 );
 

@@ -22,5 +22,10 @@ router.route('/client/api/v1/job/addBulk').post(auth(PLATFORM.CLIENT),checkRoleP
 router.route('/client/api/v1/job/updateBulk').put(auth(PLATFORM.CLIENT),checkRolePermission,jobController.bulkUpdateJob);
 router.route('/client/api/v1/job/delete/:id').delete(auth(PLATFORM.CLIENT),checkRolePermission,jobController.deleteJob);
 router.route('/client/api/v1/job/deleteMany').post(auth(PLATFORM.CLIENT),checkRolePermission,jobController.deleteManyJob);
+router.route('/client/api/v1/job/create-with-questions').post(
+  auth(PLATFORM.CLIENT), 
+  checkRolePermission, 
+  jobController.createJobWithQuestions
+);
 
 module.exports = router;

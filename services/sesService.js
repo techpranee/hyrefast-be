@@ -485,7 +485,7 @@ class SESService {
      */
     async sendPasswordResetEmail(email, resetToken, userName = '') {
         try {
-            const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+            const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:8081'}/reset-password/${resetToken}`;
             const subject = 'Interview Portal - Password Reset Request';
 
             const html = `

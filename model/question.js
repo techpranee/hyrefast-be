@@ -6,6 +6,7 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 let idValidator = require('mongoose-id-validator');
+
 const myCustomLabels = {
   totalDocs: 'itemCount',
   docs: 'data',
@@ -18,41 +19,80 @@ const myCustomLabels = {
   meta: 'paginator',
 };
 mongoosePaginate.paginate.options = { customLabels: myCustomLabels };
+
 const Schema = mongoose.Schema;
 const schema = new Schema(
   {
-
-    title:{ type:String },
-
-    isDeleted:{ type:Boolean },
-
-    isActive:{ type:Boolean },
-
-    createdAt:{ type:Date },
-
-    updatedAt:{ type:Date },
-
-    addedBy:{
-      type:Schema.Types.ObjectId,
-      ref:'user'
+    title: { 
+      type: String,
+      required: true,
+      trim: true
     },
 
-    updatedBy:{
-      type:Schema.Types.ObjectId,
-      ref:'user'
+    question_type: { 
+      type: String,
+      enum: ['video', 'audio', 'text', 'multiple_choice'],
+      default: 'video'
     },
 
-    question_type:{ type:String },
+    evaluation_instructions: { 
+      type: String,
+      trim: true
+    },
 
-    evaluation_instructions:{ type:String }
-  }
-  ,{ 
+    // Additional fields for better functionality
+    timeLimit: {
+      type: Number,
+      default: 120 // seconds
+    },
+
+    allowRetry: {
+      type: Boolean,
+      default: false
+    },
+
+    tags: [{
+      type: String,
+      enum: ['Introduction', 'Background', 'Technical', 'Problem Solving', 'Behavioral']
+    }],
+
+    order: {
+      type: Number,
+      default: 1
+    },
+
+    isDeleted: { type: Boolean },
+
+    isActive: { type: Boolean },
+
+    createdAt: { type: Date },
+
+    updatedAt: { type: Date },
+
+    addedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    },
+
+    updatedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    },
+
+    workspace: {
+      ref: 'workspace',
+      type: Schema.Types.ObjectId,
+      required: true
+    }
+  },
+  { 
     timestamps: { 
       createdAt: 'createdAt', 
       updatedAt: 'updatedAt' 
     } 
   }
 );
+
 schema.pre('save', async function (next) {
   this.isDeleted = false;
   this.isActive = true;
@@ -60,7 +100,7 @@ schema.pre('save', async function (next) {
 });
 
 schema.pre('insertMany', async function (next, docs) {
-  if (docs && docs.length){
+  if (docs && docs.length) {
     for (let index = 0; index < docs.length; index++) {
       const element = docs[index];
       element.isDeleted = false;
@@ -73,12 +113,14 @@ schema.pre('insertMany', async function (next, docs) {
 schema.method('toJSON', function () {
   const {
     _id, __v, ...object 
-  } = this.toObject({ virtuals:true });
+  } = this.toObject({ virtuals: true });
   object.id = _id;
      
   return object;
 });
+
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const question = mongoose.model('question',schema);
+
+const question = mongoose.model('question', schema);
 module.exports = question;

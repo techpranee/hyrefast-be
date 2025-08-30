@@ -8,19 +8,40 @@ const transcriptionService = new TranscriptionService();
  */
 const ollamaAudioTranscription = async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.badRequest({ message: errors.array() });
+        console.log('🎯 Transcription request received:', {
+            hasFile: !!req.file,
+            fileFieldname: req.file?.fieldname,
+            fileSize: req.file?.size,
+            bodyKeys: Object.keys(req.body || {}),
+            hasContext: !!req.body.context
+        });
+
+        let audioInput;
+        let context = {};
+        
+        if (req.file && req.file.buffer) {
+            // ✅ File uploaded via FormData (this should be the primary path)
+            console.log('✅ Using uploaded file buffer, size:', req.file.size);
+            audioInput = req.file.buffer;
+            context = req.body.context ? JSON.parse(req.body.context) : {};
+        } else {
+            // ❌ This should not happen if FormData is sent correctly
+            console.log('❌ No file received in req.file');
+            console.log('📋 Full request body:', req.body);
+            
+            return res.status(400).json({
+                status: 'CLIENT_ERROR',
+                message: 'No audio file received in multipart form data',
+                data: {
+                    expectedField: 'audioFile',
+                    receivedFile: !!req.file,
+                    receivedBodyKeys: Object.keys(req.body),
+                    contentType: req.headers['content-type']
+                }
+            });
         }
 
-        const { audioFile, context } = req.body;
-
-        if (!audioFile && !req.file) {
-            return res.badRequest({ message: 'Audio file is required' });
-        }
-
-        // Use uploaded file if available, otherwise use provided audioFile
-        const audioInput = req.file ? req.file.buffer : audioFile;
+        console.log('🎯 Processing transcription with buffer...');
 
         const result = await transcriptionService.transcribeWithOllama(audioInput, {
             language: context?.language || 'en',
@@ -28,18 +49,34 @@ const ollamaAudioTranscription = async (req, res) => {
         });
 
         if (!result.success) {
-            return res.internalServerError({ message: result.error });
+            console.log('❌ Transcription service failed:', result.error);
+            return res.status(500).json({
+                status: 'SERVER_ERROR',
+                message: `Transcription failed: ${result.error}`,
+                data: null
+            });
         }
 
-        return res.success({
+        console.log('✅ Transcription successful:', {
+            transcriptionLength: result.transcription?.length,
+            confidence: result.confidence
+        });
+
+        return res.status(200).json({
+            status: 'SUCCESS',
             message: 'Audio transcribed successfully',
             data: result
         });
     } catch (error) {
-        console.error('Ollama transcription error:', error);
-        return res.internalServerError({ message: error.message });
+        console.error('❌ Transcription controller error:', error);
+        return res.status(500).json({
+            status: 'SERVER_ERROR',
+            message: `Controller error: ${error.message}`,
+            data: null
+        });
     }
 };
+
 
 /**
  * Post-interview transcription processing

@@ -40,6 +40,11 @@ const schema = new Schema(
 
     updatedAt:{ type:Date },
 
+    members:[{
+      type:Schema.Types.ObjectId,
+      ref:'user'
+    }],
+
     addedBy:{
       type:Schema.Types.ObjectId,
       ref:'user'

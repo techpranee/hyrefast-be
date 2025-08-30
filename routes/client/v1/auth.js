@@ -7,6 +7,7 @@ const express =  require('express');
 const router  =  express.Router();
 const auth = require('../../../middleware/auth');
 const authController =  require('../../../controller/client/v1/authController');
+const userController = require('../../../controller/client/v1/userController');
 const { PLATFORM } =  require('../../../constants/authConstant');   
 
 router.route('/register').post(authController.register);
@@ -19,6 +20,7 @@ router.route('/logout').post(auth(PLATFORM.CLIENT), authController.logout);
 router.route('/push-notification/addPlayerId').post(authController.addPlayerId);
 router.route('/push-notification/removePlayerId').post(authController.removePlayerId);
 router.route('/profile/:userId').get(auth(PLATFORM.CLIENT), authController.getUserProfile);
+router.route('/profile/update/:userId').put(auth(PLATFORM.CLIENT), userController.updateProfile);
 router.get('/login/google',(req,res)=>{
   req.session.platform = 'client';
   res.redirect(`http://localhost:${process.env.PORT}/auth/google`);

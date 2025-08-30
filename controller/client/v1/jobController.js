@@ -4,13 +4,137 @@
  */
 
 const Job = require('../../../model/job');
+const Question = require('../../../model/question'); // Add this import
 const jobSchemaKey = require('../../../utils/validation/jobValidation');
 const validation = require('../../../utils/validateRequest');
 const dbService = require('../../../utils/dbService');
 const ObjectId = require('mongodb').ObjectId;
 const deleteDependentService = require('../../../utils/deleteDependent');
 const utils = require('../../../utils/common');
-   
+
+// Add the JobCreationService class directly in the controller file
+// Replace the JobCreationService class in your jobController.js
+class JobCreationService {
+  async createJobWithQuestions(jobData, userId, workspaceId) {
+    try {
+      console.log('Received job data:', JSON.stringify(jobData, null, 2));
+      
+      const questionIds = [];
+      
+      // Create questions first if they exist
+      if (jobData.questions && jobData.questions.length > 0) {
+        for (const questionData of jobData.questions) {
+          const question = new Question({
+            title: questionData.title,
+            question_type: questionData.question_type || 'video',
+            evaluation_instructions: questionData.evaluation_instructions,
+            timeLimit: questionData.timeLimit || 120,
+            allowRetry: questionData.allowRetry || false,
+            tags: questionData.tags || [],
+            order: questionData.order || 1,
+            addedBy: userId,
+            workspace: workspaceId
+          });
+          
+          const savedQuestion = await dbService.create(Question, question);
+          questionIds.push(savedQuestion._id);
+        }
+      }
+
+      // Process interview links - THIS IS THE KEY FIX
+      const interviewLinks = [];
+      console.log('Processing interview links:', jobData.interviewLinks);
+      
+      if (jobData.interviewLinks && Array.isArray(jobData.interviewLinks) && jobData.interviewLinks.length > 0) {
+        for (const linkData of jobData.interviewLinks) {
+          console.log('Processing link:', linkData);
+          
+          const processedLink = {
+            name: linkData.name || `Interview Link ${interviewLinks.length + 1}`,
+            enabled: linkData.enabled !== undefined ? linkData.enabled : true,
+            maxUses: linkData.maxUses || 'Unlimited',
+            currentUses: 0,
+            expiresAt: linkData.expiresAt ? new Date(linkData.expiresAt) : null,
+            requireVerification: linkData.requireVerification !== undefined ? linkData.requireVerification : true,
+            isActive: true
+          };
+          
+          console.log('Processed link:', processedLink);
+          interviewLinks.push(processedLink);
+        }
+      } else {
+        // Create default interview link if none provided
+        console.log('No interview links provided, creating default');
+        interviewLinks.push({
+          name: 'Main Interview Link',
+          enabled: true,
+          maxUses: 'Unlimited',
+          currentUses: 0,
+          expiresAt: null,
+          requireVerification: true,
+          isActive: true
+        });
+      }
+
+      console.log('Final interview links to save:', interviewLinks);
+
+      // Create job with question references and interview links
+      const jobPayload = {
+        title: jobData.jobTitle,
+        description: jobData.jobDescription,
+        location: jobData.location,
+        employment_type: jobData.employmentType,
+        requirements: jobData.requirements || [],
+        salary: jobData.salaryRange,
+        last_date: jobData.applicationDeadline ? new Date(jobData.applicationDeadline) : null,
+        publicationStatus: jobData.publicationStatus || 'draft',
+        interviewLinks: interviewLinks, // THIS IS WHAT WAS MISSING
+        questions: questionIds,
+        addedBy: userId,
+        workspace: workspaceId
+      };
+
+      console.log('Job payload before save:', JSON.stringify(jobPayload, null, 2));
+
+      const job = new Job(jobPayload);
+      const savedJob = await dbService.create(Job, job);
+      
+      console.log('Saved job interview links:', savedJob.interviewLinks);
+      
+      // Populate questions for response
+      const populatedJob = await dbService.findOne(Job, { _id: savedJob._id }, { populate: 'questions' });
+      
+      return {
+        success: true,
+        data: {
+          job: populatedJob,
+          interviewLinks: savedJob.interviewLinks ? savedJob.interviewLinks.map(link => ({
+            id: link.linkId,
+            name: link.name,
+            url: `${process.env.BASE_URL || 'http://localhost:3000'}/interview/${link.linkId}`,
+            enabled: link.enabled,
+            maxUses: link.maxUses,
+            currentUses: link.currentUses,
+            expiresAt: link.expiresAt,
+            requireVerification: link.requireVerification,
+            isActive: link.isActive
+          })) : []
+        }
+      };
+    } catch (error) {
+      console.error('Job creation error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+}
+
+
+// Initialize the service
+const jobCreationService = new JobCreationService();
+
 /**
  * @description : create document of Job in mongodb collection.
  * @param {Object} req : request including body for creating document.
@@ -34,7 +158,52 @@ const addJob = async (req, res) => {
     return res.internalServerError({ message:error.message }); 
   }
 };
+
+/**
+ * @description : create job with questions
+ * @param {Object} req : request including body for creating job with questions
+ * @param {Object} res : response of created job
+ * @return {Object} : created Job with questions. {status, message, data}
+ */ 
+const createJobWithQuestions = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const workspaceId = req.body.workspaceId || req.user?.workspace;
     
+    if (!userId) {
+      return res.badRequest({ message: 'User authentication required' });
+    }
+    
+    if (!workspaceId) {
+      return res.badRequest({ message: 'Workspace ID is required' });
+    }
+
+    console.log('Creating job with questions:', {
+      userId,
+      workspaceId,
+      jobTitle: req.body.jobTitle,
+      questionsCount: req.body.questions?.length || 0
+    });
+
+    const result = await jobCreationService.createJobWithQuestions(
+      req.body, 
+      userId, 
+      workspaceId
+    );
+    
+    if (result.success) {
+      return res.success({ data: result.data });
+    } else {
+      return res.internalServerError({ message: result.error });
+    }
+  } catch (error) {
+    console.error('Controller error:', error);
+    return res.internalServerError({ message: error.message });
+  }
+};
+
+// ... rest of your existing functions remain the same ...
+
 /**
  * @description : create multiple documents of Job in mongodb collection.
  * @param {Object} req : request including body for creating documents.
@@ -60,7 +229,7 @@ const bulkInsertJob = async (req,res)=>{
     return res.internalServerError({ message:error.message });
   }
 };
-    
+
 /**
  * @description : find all documents of Job from collection based on query and options.
  * @param {Object} req : request including option and query. {query, options : {page, limit, pagination, populate}, isCountOnly}
@@ -98,7 +267,7 @@ const findAllJob = async (req,res) => {
     return res.internalServerError({ message:error.message });
   }
 };
-        
+
 /**
  * @description : find document of Job from table by id;
  * @param {Object} req : request including id in request params.
@@ -112,7 +281,7 @@ const getJob = async (req,res) => {
       return res.validationError({ message : 'invalid objectId.' });
     }
     query._id = req.params.id;
-    let options = {};
+    let options = { populate: 'questions' }; // Add populate to get questions
     let foundJob = await dbService.findOne(Job,query, options);
     if (!foundJob){
       return res.recordNotFound();
@@ -123,7 +292,7 @@ const getJob = async (req,res) => {
     return res.internalServerError({ message:error.message });
   }
 };
-    
+
 /**
  * @description : returns total number of documents of Job.
  * @param {Object} req : request including where object to apply filters in req body 
@@ -149,7 +318,7 @@ const getJobCount = async (req,res) => {
     return res.internalServerError({ message:error.message });
   }
 };
-    
+
 /**
  * @description : update document of Job with data by id.
  * @param {Object} req : request including id in request params and data in request body.
@@ -206,7 +375,7 @@ const bulkUpdateJob = async (req,res)=>{
     return res.internalServerError({ message:error.message }); 
   }
 };
-    
+
 /**
  * @description : partially update document of Job with data by id;
  * @param {obj} req : request including id in request params and data in request body.
@@ -240,7 +409,7 @@ const partialUpdateJob = async (req,res) => {
     return res.internalServerError({ message:error.message });
   }
 };
-    
+
 /**
  * @description : deactivate document of Job from table by id;
  * @param {Object} req : request including id in request params.
@@ -266,7 +435,7 @@ const softDeleteJob = async (req,res) => {
     return res.internalServerError({ message:error.message }); 
   }
 };
-    
+
 /**
  * @description : delete document of Job from table.
  * @param {Object} req : request including id as req param.
@@ -294,7 +463,7 @@ const deleteJob = async (req,res) => {
     return res.internalServerError({ message:error.message }); 
   }
 };
-    
+
 /**
  * @description : delete documents of Job in table by using ids.
  * @param {Object} req : request including array of ids in request body.
@@ -323,7 +492,7 @@ const deleteManyJob = async (req, res) => {
     return res.internalServerError({ message:error.message }); 
   }
 };
-    
+
 /**
  * @description : deactivate multiple documents of Job from table by ids;
  * @param {Object} req : request including array of ids in request body.
@@ -363,5 +532,6 @@ module.exports = {
   softDeleteJob,
   deleteJob,
   deleteManyJob,
-  softDeleteManyJob    
+  softDeleteManyJob,
+  createJobWithQuestions
 };

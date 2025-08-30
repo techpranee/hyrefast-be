@@ -63,7 +63,203 @@ class S3Service {
     }
 
     /**
-     * Upload video chunk to S3
+     * Initialize multipart upload
+     * @param {string} key - S3 object key
+     * @param {string} contentType - Content type
+     * @param {Object} metadata - Additional metadata
+     * @returns {Promise<Object>} Upload initiation result
+     */
+    async initiateMultipartUpload(key, contentType, metadata = {},isPublic) {
+        try {
+            const params = {
+                Bucket: this.bucketName,
+                Key: key,
+                ContentType: contentType,
+                 ACL: isPublic ? 'public-read' : 'private',
+                Metadata: {
+                    uploadType: 'multipart',
+                    createdAt: new Date().toISOString(),
+                    ...metadata
+                }
+            };
+
+            console.log('🔄 Initiating multipart upload:', { key, contentType });
+            const result = await this.s3.createMultipartUpload(params).promise();
+
+            return {
+                success: true,
+                data: {
+                    uploadId: result.UploadId,
+                    key: result.Key,
+                    bucket: result.Bucket
+                }
+            };
+        } catch (error) {
+            console.error('S3Service: Initiate multipart upload error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Generate presigned URL for part upload
+     * @param {string} key - S3 object key
+     * @param {string} uploadId - Upload ID
+     * @param {number} partNumber - Part number
+     * @param {number} expiresIn - URL expiration in seconds
+     * @returns {Promise<Object>} Presigned URL result
+     */
+    async generatePartUploadUrl(key, uploadId, partNumber, expiresIn = 900) {
+        try {
+            const params = {
+                Bucket: this.bucketName,
+                Key: key,
+                UploadId: uploadId,
+                PartNumber: parseInt(partNumber),
+                Expires: expiresIn
+            };
+
+            console.log(`🔗 Generating presigned URL for part ${partNumber}`);
+            const url = this.s3.getSignedUrl('uploadPart', params);
+
+            return {
+                success: true,
+                data: {
+                    url,
+                    partNumber: parseInt(partNumber),
+                    expires: expiresIn
+                }
+            };
+        } catch (error) {
+            console.error('S3Service: Generate part upload URL error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Complete multipart upload
+     * @param {string} key - S3 object key
+     * @param {string} uploadId - Upload ID
+     * @param {Array} parts - Array of parts with ETag and PartNumber
+     * @returns {Promise<Object>} Completion result
+     */
+    async completeMultipartUpload(key, uploadId, parts) {
+        try {
+            // Sort parts by PartNumber to ensure correct order
+            const sortedParts = parts.sort((a, b) => a.PartNumber - b.PartNumber);
+
+            const params = {
+                Bucket: this.bucketName,
+                Key: key,
+                UploadId: uploadId,
+                MultipartUpload: {
+                    Parts: sortedParts.map(part => ({
+                        ETag: part.ETag,
+                        PartNumber: part.PartNumber
+                    }))
+                }
+            };
+
+            console.log(`🎯 Completing multipart upload with ${sortedParts.length} parts`);
+            const result = await this.s3.completeMultipartUpload(params).promise();
+
+            return {
+                success: true,
+                data: {
+                    location: result.Location,
+                    url: result.Location,
+                    etag: result.ETag,
+                    key: result.Key,
+                    bucket: result.Bucket
+                }
+            };
+        } catch (error) {
+            console.error('S3Service: Complete multipart upload error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Abort multipart upload
+     * @param {string} key - S3 object key
+     * @param {string} uploadId - Upload ID
+     * @returns {Promise<Object>} Abort result
+     */
+    async abortMultipartUpload(key, uploadId) {
+        try {
+            const params = {
+                Bucket: this.bucketName,
+                Key: key,
+                UploadId: uploadId
+            };
+
+            console.log('🚫 Aborting multipart upload:', { uploadId, key });
+            await this.s3.abortMultipartUpload(params).promise();
+
+            return {
+                success: true,
+                data: {
+                    key,
+                    uploadId,
+                    status: 'aborted'
+                }
+            };
+        } catch (error) {
+            console.error('S3Service: Abort multipart upload error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * List parts of multipart upload
+     * @param {string} key - S3 object key
+     * @param {string} uploadId - Upload ID
+     * @returns {Promise<Object>} Parts list result
+     */
+    async listMultipartParts(key, uploadId) {
+        try {
+            const params = {
+                Bucket: this.bucketName,
+                Key: key,
+                UploadId: uploadId,
+                MaxParts: 1000
+            };
+
+            console.log('📋 Listing multipart parts:', { uploadId, key });
+            const result = await this.s3.listParts(params).promise();
+
+            return {
+                success: true,
+                data: {
+                    parts: result.Parts || [],
+                    uploadId: result.UploadId,
+                    key: result.Key,
+                    maxParts: result.MaxParts,
+                    isTruncated: result.IsTruncated
+                }
+            };
+        } catch (error) {
+            console.error('S3Service: List multipart parts error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Upload video chunk to S3 (legacy method - kept for compatibility)
      * @param {Buffer} chunkBuffer - Video chunk buffer
      * @param {string} sessionId - Interview session ID
      * @param {number} chunkIndex - Chunk index
@@ -106,51 +302,211 @@ class S3Service {
     }
 
     /**
-     * Assemble video chunks into final video
-     * @param {string} sessionId - Interview session ID
-     * @param {Array} chunkKeys - Array of chunk keys in order
-     * @returns {Promise<Object>} Assembly result
+     * Upload multiple chunks in batch with concurrency control
+     * @param {Array} chunks - Array of chunk objects {buffer, key, options}
+     * @param {number} concurrency - Maximum concurrent uploads
+     * @returns {Promise<Object>} Batch upload result
      */
-    async assembleVideoChunks(sessionId, chunkKeys) {
+    async uploadChunksBatch(chunks, concurrency = 3) {
         try {
-            // For video assembly, we would typically use FFmpeg or similar
-            // For now, we'll create a manifest file that lists all chunks
-            const manifestKey = `videos/${sessionId}/manifest.json`;
-            const manifest = {
-                sessionId: sessionId,
-                chunks: chunkKeys,
-                totalChunks: chunkKeys.length,
-                createdAt: new Date().toISOString(),
-                status: 'assembled'
-            };
+            const results = [];
+            let index = 0;
 
-            const manifestParams = {
+            // Process chunks in batches with concurrency control
+            const uploadPromises = [];
+            
+            for (let i = 0; i < Math.min(concurrency, chunks.length); i++) {
+                uploadPromises.push(this.processChunkQueue(chunks, index++, results));
+            }
+
+            await Promise.all(uploadPromises);
+
+            const successCount = results.filter(r => r.success).length;
+            const failCount = results.length - successCount;
+
+            return {
+                success: failCount === 0,
+                data: {
+                    results,
+                    summary: {
+                        total: results.length,
+                        successful: successCount,
+                        failed: failCount
+                    }
+                },
+                error: failCount > 0 ? `${failCount} chunks failed to upload` : null
+            };
+        } catch (error) {
+            console.error('Batch chunk upload error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Process chunk upload queue
+     * @param {Array} chunks - Chunks array
+     * @param {number} startIndex - Starting index
+     * @param {Array} results - Results array
+     */
+    async processChunkQueue(chunks, startIndex, results) {
+        let currentIndex = startIndex;
+        
+        while (currentIndex < chunks.length) {
+            const chunk = chunks[currentIndex];
+            
+            try {
+                const uploadParams = {
+                    Bucket: this.bucketName,
+                    Key: chunk.key,
+                    Body: chunk.buffer,
+                    ContentType: chunk.options?.contentType || 'application/octet-stream',
+                    Metadata: chunk.options?.metadata || {}
+                };
+
+                const result = await this.s3.upload(uploadParams).promise();
+                
+                results.push({
+                    success: true,
+                    chunkIndex: currentIndex,
+                    data: {
+                        key: result.Key,
+                        location: result.Location,
+                        etag: result.ETag,
+                        size: chunk.buffer.length
+                    }
+                });
+            } catch (error) {
+                console.error(`Chunk ${currentIndex} upload failed:`, error);
+                results.push({
+                    success: false,
+                    chunkIndex: currentIndex,
+                    error: error.message
+                });
+            }
+            
+            currentIndex += 3; // Skip by concurrency amount
+        }
+    }
+
+    /**
+     * Upload chunk using buffer
+     * @param {Buffer} buffer - Chunk buffer
+     * @param {string} key - S3 key for the chunk
+     * @param {Object} options - Upload options
+     * @returns {Promise<Object>} Upload result
+     */
+    async uploadChunk(buffer, key, options = {}) {
+        try {
+            const uploadParams = {
                 Bucket: this.bucketName,
-                Key: manifestKey,
-                Body: JSON.stringify(manifest, null, 2),
-                ContentType: 'application/json',
+                Key: key,
+                Body: buffer,
+                ContentType: options.contentType || 'application/octet-stream',
                 Metadata: {
-                    sessionId: sessionId,
-                    type: 'video-manifest'
+                    uploadedAt: new Date().toISOString(),
+                    ...options.metadata
                 }
             };
 
-            await this.s3.upload(manifestParams).promise();
-
-            // Generate signed URL for video access
-            const videoUrl = await this.generateSignedUrl(manifestKey, 86400); // 24 hours
+            const result = await this.s3.upload(uploadParams).promise();
 
             return {
                 success: true,
                 data: {
-                    manifestKey: manifestKey,
-                    videoUrl: videoUrl,
-                    totalChunks: chunkKeys.length,
-                    sessionId: sessionId
+                    key: result.Key,
+                    location: result.Location,
+                    etag: result.ETag,
+                    size: buffer.length
                 }
             };
         } catch (error) {
-            console.error('Video assembly error:', error);
+            console.error('Chunk upload error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Complete chunked upload by assembling chunks
+     * @param {string} uploadId - Upload session ID
+     * @param {string} uploadKey - Base upload key
+     * @param {Object} options - Completion options
+     * @returns {Promise<Object>} Assembly result
+     */
+    async completeChunkedUpload(uploadId, uploadKey, options = {}) {
+        try {
+            const { sessionId, questionNumber, totalChunks, fileName } = options;
+            
+            // List all chunks for this upload
+            const listParams = {
+                Bucket: this.bucketName,
+                Prefix: `${uploadKey}/chunk-`,
+                MaxKeys: 1000
+            };
+
+            const listResult = await this.s3.listObjectsV2(listParams).promise();
+            const chunks = listResult.Contents || [];
+
+            if (chunks.length === 0) {
+                throw new Error('No chunks found for this upload');
+            }
+
+            // Sort chunks by name to ensure correct order
+            chunks.sort((a, b) => a.Key.localeCompare(b.Key));
+
+            // Create final video file key
+            const finalKey = `interviews/videos/${sessionId}/question-${questionNumber}/${fileName || `video-${uploadId}.webm`}`;
+
+            // For actual video concatenation, you would use FFmpeg or similar
+            // For now, we'll create a manifest file that references all chunks
+            const manifest = {
+                uploadId,
+                sessionId,
+                questionNumber,
+                fileName,
+                chunks: chunks.map(chunk => ({
+                    key: chunk.Key,
+                    size: chunk.Size,
+                    lastModified: chunk.LastModified
+                })),
+                totalChunks: chunks.length,
+                totalSize: chunks.reduce((sum, chunk) => sum + chunk.Size, 0),
+                createdAt: new Date().toISOString(),
+                status: 'completed'
+            };
+
+            // Upload manifest
+            const manifestKey = `${finalKey}.manifest.json`;
+            await this.s3.upload({
+                Bucket: this.bucketName,
+                Key: manifestKey,
+                Body: JSON.stringify(manifest, null, 2),
+                ContentType: 'application/json'
+            }).promise();
+
+            // Generate signed URL for access
+            const videoUrl = await this.generateSignedUrl(finalKey, 86400); // 24 hours
+
+            return {
+                success: true,
+                data: {
+                    videoKey: finalKey,
+                    manifestKey: manifestKey,
+                    videoUrl: videoUrl,
+                    totalChunks: chunks.length,
+                    totalSize: manifest.totalSize,
+                    uploadId,
+                    sessionId,
+                    questionNumber
+                }
+            };
+        } catch (error) {
+            console.error('Complete chunked upload error:', error);
             return {
                 success: false,
                 error: error.message

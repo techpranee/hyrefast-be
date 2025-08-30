@@ -133,6 +133,7 @@ const generatePreSignedURL = async (req, res) => {
 
         let options = {
           Bucket: bucket,
+          //public-read
           Key: key,
           Expires: Number(process.env.AWS_URL_EXPIRATION) || 15 * 60 //in seconds,
         };
@@ -224,6 +225,7 @@ const uploadToS3 = async (file, fileName) => {
     Bucket: S3Config.AWS_S3_BUCKET_NAME,
     Body: fs.createReadStream(file.filepath),
     Key: fileName,
+    ACL: 'public-read'
   };
 
   const response = await new Promise(async (resolve, reject) => {
