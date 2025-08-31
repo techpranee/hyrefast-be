@@ -6,28 +6,28 @@
 const express = require('express');
 const router = express.Router();
 const purchaseController = require("../../../controller/client/v1/purchaseController")
-const { PLATFORM } =  require("../../../constants/authConstant"); 
+const { PLATFORM } = require("../../../constants/authConstant");
 const auth = require("../../../middleware/auth");
 const checkRolePermission = require('../../../middleware/checkRolePermission');
 
-router.route("/client/api/v1/purchase/create").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.addPurchase);
-router.route("/client/api/v1/purchase/list").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.findAllPurchase);
-router.route("/client/api/v1/purchase/count").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.getPurchaseCount);
-router.route("/client/api/v1/purchase/:id").get(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.getPurchase);
-router.route("/client/api/v1/purchase/update/:id").put(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.updatePurchase);    
-router.route("/client/api/v1/purchase/partial-update/:id").put(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.partialUpdatePurchase);
-router.route("/client/api/v1/purchase/softDelete/:id").put(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.softDeletePurchase);
-router.route("/client/api/v1/purchase/softDeleteMany").put(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.softDeleteManyPurchase);
-router.route("/client/api/v1/purchase/addBulk").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.bulkInsertPurchase);
-router.route("/client/api/v1/purchase/updateBulk").put(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.bulkUpdatePurchase);
-router.route("/client/api/v1/purchase/delete/:id").delete(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.deletePurchase);
-router.route("/client/api/v1/purchase/deleteMany").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.deleteManyPurchase);
+router.route("/client/api/v1/purchase/create").post(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.addPurchase);
+router.route("/client/api/v1/purchase/list").post(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.findAllPurchase);
+router.route("/client/api/v1/purchase/count").post(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.getPurchaseCount);
+router.route("/client/api/v1/purchase/:id").get(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.getPurchase);
+router.route("/client/api/v1/purchase/update/:id").put(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.updatePurchase);
+router.route("/client/api/v1/purchase/partial-update/:id").put(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.partialUpdatePurchase);
+router.route("/client/api/v1/purchase/softDelete/:id").put(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.softDeletePurchase);
+router.route("/client/api/v1/purchase/softDeleteMany").put(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.softDeleteManyPurchase);
+router.route("/client/api/v1/purchase/addBulk").post(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.bulkInsertPurchase);
+router.route("/client/api/v1/purchase/updateBulk").put(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.bulkUpdatePurchase);
+router.route("/client/api/v1/purchase/delete/:id").delete(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.deletePurchase);
+router.route("/client/api/v1/purchase/deleteMany").post(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.deleteManyPurchase);
 
 // Enhanced Purchase Management Routes
-router.route("/client/api/v1/purchase/create-order").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.createPurchaseOrder);
-router.route("/client/api/v1/purchase/verify-payment").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.verifyAndCompletePurchase);
-router.route("/client/api/v1/purchase/history/:workspaceId").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.getPurchaseHistory);
-router.route("/client/api/v1/purchase/history").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.getPurchaseHistory);
-router.route("/client/api/v1/purchase/cancel/:purchaseId").put(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.cancelPurchase);
+router.route("/client/api/v1/purchase/create-order").post(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.createPurchaseOrder);
+router.route("/client/api/v1/purchase/verify-payment").post(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.verifyAndCompletePurchase);
+router.route("/client/api/v1/purchase/history/:workspaceId").post(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.getPurchaseHistory);
+router.route("/client/api/v1/purchase/history").post(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.getPurchaseHistory);
+router.route("/client/api/v1/purchase/cancel/:purchaseId").put(auth(PLATFORM.CLIENT), checkRolePermission, purchaseController.cancelPurchase);
 
 module.exports = router;

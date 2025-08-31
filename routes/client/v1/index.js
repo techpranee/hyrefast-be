@@ -3,9 +3,9 @@
  * @description :: index route file of client platform.
  */
 
-const express =  require("express")
-const router =  express.Router()
-router.use("/client/auth",require("./auth"));
+const express = require("express")
+const router = express.Router()
+router.use("/client/auth", require("./auth"));
 router.use(require("./creditRoutes"));
 router.use(require("./paymentRoutes"));
 router.use(require("./planRoutes"));

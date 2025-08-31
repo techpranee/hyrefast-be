@@ -20,7 +20,7 @@ const CreditService = require('../../../services/creditService');
 const getWorkspaceDashboard = async (req, res) => {
   try {
     const workspaceId = req.params.workspaceId || req.user.workspace;
-    
+
     if (!workspaceId) {
       return res.badRequest({ message: 'Workspace ID is required' });
     }
@@ -48,7 +48,7 @@ const getWorkspaceDashboard = async (req, res) => {
 
     // Credit Overview
     const creditBalance = await CreditService.getCreditBalance(workspaceId);
-    
+
     // Interview Statistics
     const interviewStats = await Application.aggregate([
       {
@@ -121,20 +121,20 @@ const getWorkspaceDashboard = async (req, res) => {
       workspace: workspaceId,
       isDeleted: false
     })
-    .sort({ updatedAt: -1 })
-    .limit(5)
-    .populate('user', 'name email')
-    .populate('job', 'title')
-    .select('status user job createdAt completedAt credit_deducted');
+      .sort({ updatedAt: -1 })
+      .limit(5)
+      .populate('user', 'name email')
+      .populate('job', 'title')
+      .select('status user job createdAt completedAt credit_deducted');
 
     const recentPurchases = await Purchase.find({
       workspace: workspaceId,
       isDeleted: false
     })
-    .sort({ createdAt: -1 })
-    .limit(3)
-    .populate('plan', 'name')
-    .select('amount credits_amount status createdAt completed_at plan');
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .populate('plan', 'name')
+      .select('amount credits_amount status createdAt completed_at plan');
 
     // Job Performance
     const jobPerformance = await Job.aggregate([
@@ -239,8 +239,8 @@ const getWorkspaceDashboard = async (req, res) => {
         activeJobs: await Job.countDocuments({ workspace: workspaceId, status: 'active', isDeleted: false }),
         thisWeekInterviews: weeklyInterviews.reduce((sum, day) => sum + day.count, 0),
         thisMonthCreditsUsed: monthlyCreditUsage.reduce((sum, day) => sum + day.creditsUsed, 0),
-        completionRate: formattedInterviewStats.total > 0 
-          ? Math.round((formattedInterviewStats.completed / formattedInterviewStats.total) * 100) 
+        completionRate: formattedInterviewStats.total > 0
+          ? Math.round((formattedInterviewStats.completed / formattedInterviewStats.total) * 100)
           : 0
       }
     };
@@ -261,7 +261,7 @@ const getCreditAnalytics = async (req, res) => {
   try {
     const workspaceId = req.params.workspaceId || req.user.workspace;
     const { dateFrom, dateTo, granularity = 'daily' } = req.query;
-    
+
     if (!workspaceId) {
       return res.badRequest({ message: 'Workspace ID is required' });
     }
@@ -379,8 +379,8 @@ const getCreditAnalytics = async (req, res) => {
       metrics: {
         totalCreditsUsed: totalCreditsUsed,
         totalInterviews: totalInterviews,
-        averageCreditsPerDay: creditAnalytics.length > 0 
-          ? Math.round(totalCreditsUsed / creditAnalytics.length * 100) / 100 
+        averageCreditsPerDay: creditAnalytics.length > 0
+          ? Math.round(totalCreditsUsed / creditAnalytics.length * 100) / 100
           : 0,
         efficiency: totalInterviews > 0 ? Math.round((totalCreditsUsed / totalInterviews) * 100) / 100 : 0
       },
@@ -407,7 +407,7 @@ const getInterviewAnalytics = async (req, res) => {
   try {
     const workspaceId = req.params.workspaceId || req.user.workspace;
     const { dateFrom, dateTo, jobId } = req.query;
-    
+
     if (!workspaceId) {
       return res.badRequest({ message: 'Workspace ID is required' });
     }

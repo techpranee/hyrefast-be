@@ -308,7 +308,7 @@ const completeInterviewSession = async (req, res) => {
 
         // Import credit service
         const CreditService = require('../../../services/creditService');
-        
+
         // Get workspace
         const workspaceId = session.workspace || session.job?.workspace;
         if (!workspaceId) {

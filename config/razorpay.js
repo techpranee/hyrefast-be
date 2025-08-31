@@ -20,20 +20,20 @@ const razorpayConfig = {
   retry_count: 3,
   min_amount: 100, // Minimum amount in paise (1 INR)
   max_amount: 10000000, // Maximum amount in paise (100,000 INR)
-  
+
   // Payment methods allowed
   allowed_methods: ['card', 'netbanking', 'wallet', 'upi', 'emi'],
-  
+
   // Razorpay webhook events we handle
   webhook_events: [
     'payment.captured',
-    'payment.failed', 
+    'payment.failed',
     'payment.authorized',
     'order.paid',
     'refund.created',
     'refund.processed'
   ],
-  
+
   // Order notes template
   order_notes: {
     workspace_id: '',
@@ -73,8 +73,8 @@ const razorpayUtils = {
    * Validate amount limits
    */
   validateAmount: (amountInPaise) => {
-    return amountInPaise >= razorpayConfig.min_amount && 
-           amountInPaise <= razorpayConfig.max_amount;
+    return amountInPaise >= razorpayConfig.min_amount &&
+      amountInPaise <= razorpayConfig.max_amount;
   },
 
   /**

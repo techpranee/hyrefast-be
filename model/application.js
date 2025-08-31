@@ -22,59 +22,59 @@ mongoosePaginate.paginate.options = {
 };
 const Schema = mongoose.Schema;
 const schema = new Schema(
-{
+    {
 
-    candidate:{type:Schema.Types.ObjectId,ref:"user"},
+        candidate: { type: Schema.Types.ObjectId, ref: "user" },
 
-    job:{type:Schema.Types.ObjectId,ref:"job"},
+        job: { type: Schema.Types.ObjectId, ref: "job" },
 
-    isDeleted:{type:Boolean},
+        isDeleted: { type: Boolean },
 
-    isActive:{type:Boolean},
+        isActive: { type: Boolean },
 
-    createdAt:{type:Date},
+        createdAt: { type: Date },
 
-    updatedAt:{type:Date},
+        updatedAt: { type: Date },
 
-    addedBy:{type:Schema.Types.ObjectId,ref:"user"},
+        addedBy: { type: Schema.Types.ObjectId, ref: "user" },
 
-    updatedBy:{type:Schema.Types.ObjectId,ref:"user"},
+        updatedBy: { type: Schema.Types.ObjectId, ref: "user" },
 
-    overall_score:{type:Schema.Types.Mixed},
-    
-    credit_deduction_reference:{type:Schema.Types.ObjectId,ref:"credit"}
+        overall_score: { type: Schema.Types.Mixed },
+
+        credit_deduction_reference: { type: Schema.Types.ObjectId, ref: "credit" }
     }
-    ,{ 
-        timestamps: { 
-            createdAt: 'createdAt', 
-            updatedAt: 'updatedAt' 
-        } 
+    , {
+        timestamps: {
+            createdAt: 'createdAt',
+            updatedAt: 'updatedAt'
+        }
     }
 );
-schema.pre('save', async function(next) {
+schema.pre('save', async function (next) {
     this.isDeleted = false;
     this.isActive = true;
     next();
 });
 
 schema.pre('insertMany', async function (next, docs) {
-    if (docs && docs.length){
+    if (docs && docs.length) {
         for (let index = 0; index < docs.length; index++) {
-        const element = docs[index];
-        element.isDeleted = false;
-        element.isActive = true;
+            const element = docs[index];
+            element.isDeleted = false;
+            element.isActive = true;
         }
     }
     next();
 });
 
 schema.method("toJSON", function () {
-    const { _id, __v, ...object } = this.toObject({virtuals:true});
+    const { _id, __v, ...object } = this.toObject({ virtuals: true });
     object.id = _id;
-     
+
     return object;
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const application = mongoose.model("application",schema);
+const application = mongoose.model("application", schema);
 module.exports = application

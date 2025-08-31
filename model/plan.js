@@ -22,74 +22,74 @@ mongoosePaginate.paginate.options = {
 };
 const Schema = mongoose.Schema;
 const schema = new Schema(
-{
+    {
 
-    name:{type:String},
+        name: { type: String },
 
-    credits:{type:Number},
+        credits: { type: Number },
 
-    validity:{text:{type:String},days:{type:Number}},
+        validity: { text: { type: String }, days: { type: Number } },
 
-    amount:{type:Number},
+        amount: { type: Number },
 
-    currency:{type:String},
+        currency: { type: String },
 
-    // Enhanced plan features
-    plan_features:[{
-      feature_name:{type:String},
-      feature_value:{type:Schema.Types.Mixed},
-      feature_description:{type:String}
-    }],
-    discount_percentage:{type:Number,default:0},
-    is_popular:{type:Boolean,default:false},
+        // Enhanced plan features
+        plan_features: [{
+            feature_name: { type: String },
+            feature_value: { type: Schema.Types.Mixed },
+            feature_description: { type: String }
+        }],
+        discount_percentage: { type: Number, default: 0 },
+        is_popular: { type: Boolean, default: false },
 
-    bonus_credits:{type:Number,default:0},
-    is_enterprise_plan:{type:Boolean,default:false},
-    plan_description:{type:String},
+        bonus_credits: { type: Number, default: 0 },
+        is_enterprise_plan: { type: Boolean, default: false },
+        plan_description: { type: String },
 
-    isDeleted:{type:Boolean},
+        isDeleted: { type: Boolean },
 
-    isActive:{type:Boolean},
+        isActive: { type: Boolean },
 
-    createdAt:{type:Date},
+        createdAt: { type: Date },
 
-    updatedAt:{type:Date},
+        updatedAt: { type: Date },
 
-    addedBy:{type:Schema.Types.ObjectId,ref:"user"},
+        addedBy: { type: Schema.Types.ObjectId, ref: "user" },
 
-    updatedBy:{type:Schema.Types.ObjectId,ref:"user"}
+        updatedBy: { type: Schema.Types.ObjectId, ref: "user" }
     }
-    ,{ 
-        timestamps: { 
-            createdAt: 'createdAt', 
-            updatedAt: 'updatedAt' 
-        } 
+    , {
+        timestamps: {
+            createdAt: 'createdAt',
+            updatedAt: 'updatedAt'
+        }
     }
 );
-schema.pre('save', async function(next) {
+schema.pre('save', async function (next) {
     this.isDeleted = false;
     this.isActive = true;
     next();
 });
 
 schema.pre('insertMany', async function (next, docs) {
-    if (docs && docs.length){
+    if (docs && docs.length) {
         for (let index = 0; index < docs.length; index++) {
-        const element = docs[index];
-        element.isDeleted = false;
-        element.isActive = true;
+            const element = docs[index];
+            element.isDeleted = false;
+            element.isActive = true;
         }
     }
     next();
 });
 
 schema.method("toJSON", function () {
-    const { _id, __v, ...object } = this.toObject({virtuals:true});
+    const { _id, __v, ...object } = this.toObject({ virtuals: true });
     object.id = _id;
-     
+
     return object;
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const plan = mongoose.model("plan",schema);
+const plan = mongoose.model("plan", schema);
 module.exports = plan

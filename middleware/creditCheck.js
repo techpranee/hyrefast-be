@@ -17,7 +17,7 @@ const checkCreditsMiddleware = async (req, res, next) => {
 
     // Get workspace ID from user
     const workspace_id = req.user.workspace;
-    
+
     if (!workspace_id) {
       return res.badRequest({
         message: "User is not associated with any workspace",
@@ -27,7 +27,7 @@ const checkCreditsMiddleware = async (req, res, next) => {
 
     // Get current credit balance
     const balance_info = await creditService.getWorkspaceCreditBalance(workspace_id);
-    
+
     console.log('📊 Credit balance check result:', {
       workspace: workspace_id,
       available_credits: balance_info.total_available,
@@ -61,7 +61,7 @@ const checkCreditsMiddleware = async (req, res, next) => {
     if (balance_info.needs_alert) {
       res.set('X-Credit-Warning', 'low-credits');
       res.set('X-Available-Credits', balance_info.total_available.toString());
-      
+
       console.log('⚠️ Low credit warning for workspace:', {
         workspace: workspace_id,
         available: balance_info.total_available,
@@ -70,7 +70,7 @@ const checkCreditsMiddleware = async (req, res, next) => {
     }
 
     next();
-    
+
   } catch (error) {
     console.error('❌ Error in credit check middleware:', error);
     return res.internalServerError({
@@ -90,10 +90,10 @@ const checkCreditsMiddleware = async (req, res, next) => {
 const checkCreditsWarningOnly = async (req, res, next) => {
   try {
     const workspace_id = req.user.workspace;
-    
+
     if (workspace_id) {
       const balance_info = await creditService.getWorkspaceCreditBalance(workspace_id);
-      
+
       // Add credit info to request
       req.credit_info = {
         workspace_id: workspace_id,
@@ -109,7 +109,7 @@ const checkCreditsWarningOnly = async (req, res, next) => {
     }
 
     next();
-    
+
   } catch (error) {
     console.error('⚠️ Warning: Error in credit warning middleware:', error);
     // Don't block the request, just continue
@@ -127,7 +127,7 @@ const deductCreditAfterProcessing = async (req, res, next) => {
   try {
     // This middleware should be used after the main processing is complete
     // It expects application_id in req.body or req.params
-    
+
     const application_id = req.body.application_id || req.params.application_id || req.application_id;
     const workspace_id = req.credit_info?.workspace_id || req.user.workspace;
 
@@ -148,7 +148,7 @@ const deductCreditAfterProcessing = async (req, res, next) => {
 
     // Deduct credit
     const deduction_result = await creditService.deductCreditForInterview(
-      workspace_id, 
+      workspace_id,
       application_id
     );
 
@@ -167,7 +167,7 @@ const deductCreditAfterProcessing = async (req, res, next) => {
     }
 
     next();
-    
+
   } catch (error) {
     console.error('❌ Error deducting credit after processing:', error);
     // Don't fail the main request, but log the error

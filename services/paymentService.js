@@ -42,9 +42,9 @@ class PaymentService {
 
       // Calculate order amount in paise
       const order_amount = razorpayUtils.convertToPaise(plan.amount);
-      
+
       if (!razorpayUtils.validateAmount(order_amount)) {
-        throw new Error(`Invalid amount: ${plan.amount}. Must be between ₹${razorpayConfig.min_amount/100} and ₹${razorpayConfig.max_amount/100}`);
+        throw new Error(`Invalid amount: ${plan.amount}. Must be between ₹${razorpayConfig.min_amount / 100} and ₹${razorpayConfig.max_amount / 100}`);
       }
 
       // Create order notes
@@ -145,7 +145,7 @@ class PaymentService {
         .digest('hex');
 
       const is_valid = generated_signature === razorpay_signature;
-      
+
       console.log('🔍 Payment signature verification:', {
         razorpay_order_id,
         razorpay_payment_id,
@@ -257,12 +257,12 @@ class PaymentService {
 
     } catch (error) {
       console.error('❌ Error processing successful payment:', error);
-      
+
       // Update payment status to failed if we have the order ID
       if (paymentData.razorpay_order_id) {
         await Payment.updateOne(
           { 'razorpay.razorpay_order_id': paymentData.razorpay_order_id },
-          { 
+          {
             status: 'failed',
             'razorpay.failure_reason': error.message
           }

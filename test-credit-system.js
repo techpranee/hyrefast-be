@@ -47,8 +47,8 @@ const testCreditApis = async () => {
   // Test 1: Get Credit Balance
   try {
     const response = await api.get(`/client/api/v1/credit/balance/${TEST_WORKSPACE_ID}`);
-    const hasRequiredFields = response.data.data.availableCredits !== undefined && 
-                            response.data.data.totalCreditsUsed !== undefined;
+    const hasRequiredFields = response.data.data.availableCredits !== undefined &&
+      response.data.data.totalCreditsUsed !== undefined;
     logTest('Get Credit Balance', response.status === 200 && hasRequiredFields);
   } catch (error) {
     logTest('Get Credit Balance', false, error);
@@ -69,7 +69,7 @@ const testCreditApis = async () => {
   try {
     const response = await api.get(`/client/api/v1/credit/stats/${TEST_WORKSPACE_ID}`);
     const hasStats = response.data.data.currentBalance !== undefined &&
-                    response.data.data.monthlyUsage !== undefined;
+      response.data.data.monthlyUsage !== undefined;
     logTest('Get Credit Statistics', response.status === 200 && hasStats);
   } catch (error) {
     logTest('Get Credit Statistics', false, error);
@@ -147,7 +147,7 @@ const testInterviewApis = async () => {
     const sessionsResponse = await api.post('/api/v1/interview/session/list', {
       options: { page: 1, limit: 1 }
     });
-    
+
     if (sessionsResponse.data.data && sessionsResponse.data.data.docs.length > 0) {
       const sessionId = sessionsResponse.data.data.docs[0]._id;
       const analyticsResponse = await api.get(`/api/v1/interview/analytics/session/${sessionId}`);
@@ -167,9 +167,9 @@ const testDashboardApis = async () => {
   // Test 1: Get Workspace Dashboard
   try {
     const response = await api.get(`/client/api/v1/dashboard/workspace/${TEST_WORKSPACE_ID}`);
-    const hasDashboardData = response.data.data.workspace && 
-                           response.data.data.credits && 
-                           response.data.data.interviews;
+    const hasDashboardData = response.data.data.workspace &&
+      response.data.data.credits &&
+      response.data.data.interviews;
     logTest('Get Workspace Dashboard', response.status === 200 && hasDashboardData);
   } catch (error) {
     logTest('Get Workspace Dashboard', false, error);
@@ -205,7 +205,7 @@ const testCreditServices = async () => {
   try {
     const balanceResponse = await api.get(`/client/api/v1/credit/balance/${TEST_WORKSPACE_ID}`);
     const statsResponse = await api.get(`/client/api/v1/credit/stats/${TEST_WORKSPACE_ID}`);
-    
+
     const balanceMatch = balanceResponse.data.data.availableCredits === statsResponse.data.data.currentBalance;
     logTest('Credit Balance Consistency', balanceMatch);
   } catch (error) {
@@ -244,7 +244,7 @@ const testErrorHandling = async () => {
         'Content-Type': 'application/json'
       }
     });
-    
+
     await invalidApi.get(`/client/api/v1/credit/balance/${TEST_WORKSPACE_ID}`);
     logTest('Unauthorized Access Error', false); // Should have thrown error
   } catch (error) {
@@ -278,7 +278,7 @@ const runAllTests = async () => {
     console.log(`✅ Passed: ${testResults.passed}`);
     console.log(`❌ Failed: ${testResults.failed}`);
     console.log(`📊 Total: ${testResults.passed + testResults.failed}`);
-    
+
     if (testResults.failed > 0) {
       console.log('\n🐛 Failed Tests:');
       testResults.errors.forEach(error => {
@@ -316,10 +316,10 @@ const performanceTest = async () => {
     await Promise.all(promises);
     const endTime = Date.now();
     const totalTime = endTime - startTime;
-    
+
     console.log(`✅ Concurrent Requests: 5 requests completed in ${totalTime}ms`);
     console.log(`⚡ Average Response Time: ${totalTime / 5}ms per request`);
-    
+
     if (totalTime < 5000) {
       console.log('🚀 Performance: Excellent');
     } else if (totalTime < 10000) {

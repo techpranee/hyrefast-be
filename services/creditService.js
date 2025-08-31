@@ -18,7 +18,7 @@ class CreditService {
    */
   async addCreditsAfterPurchase(purchaseData, planData) {
     const session = await mongoose.startSession();
-    
+
     try {
       return await session.withTransaction(async () => {
         console.log('🔄 Starting credit addition after purchase:', {
@@ -116,7 +116,7 @@ class CreditService {
    */
   async deductCreditForInterview(workspace_id, application_id) {
     const session = await mongoose.startSession();
-    
+
     try {
       return await session.withTransaction(async () => {
         console.log('🔄 Starting credit deduction for interview:', {
@@ -131,7 +131,7 @@ class CreditService {
         }
 
         const current_balance = workspace.available_credits || 0;
-        
+
         if (current_balance < 1) {
           throw new Error(`Insufficient credits. Available: ${current_balance}, Required: 1`);
         }
@@ -241,10 +241,10 @@ class CreditService {
             }
 
             // Check if expiring soon
-            if (balance_item.expiry && 
-                balance_item.expiry <= thirty_days_from_now && 
-                balance_item.expiry > now &&
-                !balance_item.no_expiry) {
+            if (balance_item.expiry &&
+              balance_item.expiry <= thirty_days_from_now &&
+              balance_item.expiry > now &&
+              !balance_item.no_expiry) {
               credit_breakdown.expiring_soon += balance_item.credits;
             }
           }
@@ -341,7 +341,7 @@ class CreditService {
    */
   async processRefund(purchase_id, refund_amount, reason = 'Customer request') {
     const session = await mongoose.startSession();
-    
+
     try {
       return await session.withTransaction(async () => {
         // Get purchase details

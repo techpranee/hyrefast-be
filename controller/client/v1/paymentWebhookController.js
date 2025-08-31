@@ -32,15 +32,15 @@ const handleRazorpayWebhook = async (req, res) => {
       case 'payment.captured':
         await handlePaymentCaptured(payload.payment.entity);
         break;
-      
+
       case 'payment.failed':
         await handlePaymentFailed(payload.payment.entity);
         break;
-      
+
       case 'order.paid':
         await handleOrderPaid(payload.order.entity, payload.payment.entity);
         break;
-      
+
       default:
         console.log(`ℹ️ Unhandled webhook event: ${event}`);
     }
@@ -59,7 +59,7 @@ const handleRazorpayWebhook = async (req, res) => {
 const handlePaymentCaptured = async (payment) => {
   try {
     console.log(`✅ Payment captured: ${payment.id}`);
-    
+
     // Process the successful payment
     const result = await PaymentService.processSuccessfulPayment(
       payment.order_id,
@@ -69,7 +69,7 @@ const handlePaymentCaptured = async (payment) => {
 
     if (result.success) {
       console.log(`✅ Payment processed successfully: ${payment.id}`);
-      
+
       // Add credits to workspace
       if (result.purchase) {
         const creditResult = await CreditService.addCreditsAfterPurchase(
@@ -77,7 +77,7 @@ const handlePaymentCaptured = async (payment) => {
           result.purchase._id,
           result.purchase.credits_amount
         );
-        
+
         if (creditResult.success) {
           console.log(`✅ Credits added: ${result.purchase.credits_amount} credits to workspace ${result.purchase.workspace}`);
         } else {
@@ -99,7 +99,7 @@ const handlePaymentCaptured = async (payment) => {
 const handlePaymentFailed = async (payment) => {
   try {
     console.log(`❌ Payment failed: ${payment.id}`);
-    
+
     // Process the failed payment
     const result = await PaymentService.processFailedPayment(
       payment.order_id,
@@ -125,11 +125,11 @@ const handlePaymentFailed = async (payment) => {
 const handleOrderPaid = async (order, payment) => {
   try {
     console.log(`💰 Order paid: ${order.id}`);
-    
+
     // This is usually triggered after payment.captured
     // We can use this for additional order-level processing
     const result = await PaymentService.markOrderAsPaid(order.id, payment.id);
-    
+
     if (result.success) {
       console.log(`✅ Order marked as paid: ${order.id}`);
     } else {
@@ -149,7 +149,7 @@ const handleOrderPaid = async (order, payment) => {
 const verifyPaymentManually = async (req, res) => {
   try {
     const { paymentId } = req.params;
-    
+
     if (!paymentId) {
       return res.badRequest({ message: 'Payment ID is required' });
     }
@@ -160,7 +160,7 @@ const verifyPaymentManually = async (req, res) => {
     }
 
     const result = await PaymentService.verifyPaymentStatus(paymentId);
-    
+
     if (result.success) {
       return res.success({
         data: result.payment,
@@ -195,10 +195,10 @@ const getWebhookLogs = async (req, res) => {
     const payments = await Payment.find({
       'razorpay.webhook_received': { $exists: true }
     })
-    .sort({ updatedAt: -1 })
-    .limit(options.limit || 50)
-    .populate('workspace', 'name')
-    .populate('purchase', 'credits_amount');
+      .sort({ updatedAt: -1 })
+      .limit(options.limit || 50)
+      .populate('workspace', 'name')
+      .populate('purchase', 'credits_amount');
 
     const webhookStats = {
       totalWebhooks: payments.length,
