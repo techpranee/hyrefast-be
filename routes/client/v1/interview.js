@@ -21,7 +21,7 @@ router.route('/template/softDelete/:id').put(auth(PLATFORM.CLIENT), checkRolePer
 router.route('/template/delete/:id').delete(auth(PLATFORM.CLIENT), checkRolePermission, interviewController.deleteInterviewTemplate);
 
 // Interview Session routes
-router.route('/session/create').post(auth(PLATFORM.CLIENT), checkRolePermission, checkCreditsMiddleware(1), interviewController.addInterviewSession);
+router.route('/session/create').post(auth(PLATFORM.CLIENT), checkRolePermission, checkCreditsMiddleware, interviewController.addInterviewSession);
 router.route('/session/list').post(auth(PLATFORM.CLIENT), checkRolePermission, interviewController.findAllInterviewSession);
 router.route('/session/:id').get(auth(PLATFORM.CLIENT), checkRolePermission, interviewController.getInterviewSession);
 router.route('/session/update/:id').put(auth(PLATFORM.CLIENT), checkRolePermission, interviewController.updateInterviewSession);

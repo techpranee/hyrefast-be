@@ -1,34 +1,40 @@
-version: '3'
+version: '3.8'
 services:
   node-app:
-    container_name: node-app
-    image: node
-    user: root
-    command: ["/bin/bash","-lc","npm i && npm start"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hyrefast-backend
+    restart: unless-stopped
     ports:
       - '5000:5000'
-    depends_on:
-      - mongodb
-    working_dir: /home/node/app
-    volumes:
-      - ./:/home/node/app
-      - ./.env.docker:/home/node/app/.env
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - DB_URL=${MONGODB_CONNECTION_STRING}
+      - DB_TEST_URL=${MONGODB_CONNECTION_STRING}
+      - ALLOW_ORIGIN=*
+      - JWT_SECRET=${JWT_SECRET}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - AWS_SES_REGION=${AWS_SES_REGION}
+      - FROM_EMAIL=${FROM_EMAIL}
+      - OLLAMA_TRANSCRIBE_URL=${OLLAMA_TRANSCRIBE_URL}
+      - OLLAMA_API_URL=${OLLAMA_API_URL}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
     networks:
-      - node-network
-
-  mongodb:
-    container_name: mongodb
-    image: mongo
-    ports:
-      - '27019:27017'
-    volumes:
-      - dbdata:/data/db
-    networks:
-      - node-network
-
-volumes:
-  dbdata:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 networks:
-  node-network:
+  app-network:
     driver: bridge

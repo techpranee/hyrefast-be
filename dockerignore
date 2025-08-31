@@ -1,8 +1,56 @@
+# Development tools
 .vscode
 .dhiwise
 .git
+.gitignore
+*.md
+README.md
+
+# Docker files
 *Dockerfile*
 *DockerFile*
 *docker-compose*
+
+# Dependencies
 node_modules
-package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Test files
+test/
+tests/
+__tests__/
+coverage/
+.nyc_output/
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Build outputs
+dist/
+build/
+
+# Temporary files
+tmp/
+temp/
