@@ -40,7 +40,9 @@ const schema = new Schema(
 
     updatedBy:{type:Schema.Types.ObjectId,ref:"user"},
 
-    overall_score:{type:Schema.Types.Mixed}
+    overall_score:{type:Schema.Types.Mixed},
+    
+    credit_deduction_reference:{type:Schema.Types.ObjectId,ref:"credit"}
     }
     ,{ 
         timestamps: { 

@@ -22,69 +22,84 @@ mongoosePaginate.paginate.options = {
 };
 const Schema = mongoose.Schema;
 const schema = new Schema(
-{
+    {
 
-    user:{type:Schema.Types.ObjectId,ref:"user"},
+        user: { type: Schema.Types.ObjectId, ref: "user" },
 
-    workspace:{ref:"workspace",type:Schema.Types.ObjectId},
+        workspace: { ref: "workspace", type: Schema.Types.ObjectId },
 
-    data:{type:String},
+        data: { type: String },
 
-    status:{type:String},
+        status: { type: String },
 
-    is_subscription:{type:Boolean,default:false},
+        is_subscription: { type: Boolean, default: false },
 
-    currency:{type:String},
+        currency: { type: String },
 
-    platform:{type:String},
+        platform: { type: String },
 
-    location:{type:Schema.Types.Mixed},
+        location: { type: Schema.Types.Mixed },
 
-    ip:{type:String},
+        ip: { type: String },
 
-    isDeleted:{type:Boolean},
+        razorpay: {
+            razorpay_order_id: { type: String },
+            razorpay_payment_id: { type: String },
+            razorpay_signature: { type: String },
+            payment_method: { type: String, enum: ['card', 'netbanking', 'wallet', 'upi', 'emi'] },
+            failure_reason: { type: String },
+            refund_status: { type: String, enum: ['none', 'partial', 'full', 'processing'], default: 'none' },
+            refund_amount: { type: Number, default: 0 },
+            gateway_response: { type: Schema.Types.Mixed },
+            payment_notes: { type: Schema.Types.Mixed },
 
-    isActive:{type:Boolean},
+        },
 
-    createdAt:{type:Date},
+        // Enhanced Razorpay payment fields
 
-    updatedAt:{type:Date},
+        isDeleted: { type: Boolean },
 
-    addedBy:{type:Schema.Types.ObjectId,ref:"user"},
+        isActive: { type: Boolean },
 
-    updatedBy:{type:Schema.Types.ObjectId,ref:"user"}
+        createdAt: { type: Date },
+
+        updatedAt: { type: Date },
+
+        addedBy: { type: Schema.Types.ObjectId, ref: "user" },
+
+        updatedBy: { type: Schema.Types.ObjectId, ref: "user" }
     }
-    ,{ 
-        timestamps: { 
-            createdAt: 'createdAt', 
-            updatedAt: 'updatedAt' 
-        } 
+    , {
+        timestamps: {
+            createdAt: 'createdAt',
+            updatedAt: 'updatedAt'
+        }
     }
 );
-schema.pre('save', async function(next) {
+schema.pre('save', async function (next) {
     this.isDeleted = false;
     this.isActive = true;
     next();
 });
 
 schema.pre('insertMany', async function (next, docs) {
-    if (docs && docs.length){
+    if (docs && docs.length) {
         for (let index = 0; index < docs.length; index++) {
-        const element = docs[index];
-        element.isDeleted = false;
-        element.isActive = true;
+            const element = docs[index];
+            element.isDeleted = false;
+            element.isActive = true;
         }
     }
     next();
 });
 
 schema.method("toJSON", function () {
-    const { _id, __v, ...object } = this.toObject({virtuals:true});
+    const { _id, __v, ...object } = this.toObject({ virtuals: true });
     object.id = _id;
-     
+
     return object;
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const payment = mongoose.model("payment",schema);
+const payment = mongoose.model("payment", schema);
 module.exports = payment

@@ -48,6 +48,14 @@ const schema = new Schema(
 
     admin:{ref:"user",type:Schema.Types.ObjectId},
 
+    // Enhanced credit management fields
+    available_credits:{type:Number,default:0},
+    total_credits_purchased:{type:Number,default:0},
+    total_credits_used:{type:Number,default:0},
+    last_credit_update:{type:Date,default:Date.now},
+    credit_alert_threshold:{type:Number,default:10},
+    
+    // Legacy field - keeping for backward compatibility
     credit_balance:{type:Number}
     }
     ,{ 

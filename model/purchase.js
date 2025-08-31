@@ -22,73 +22,73 @@ mongoosePaginate.paginate.options = {
 };
 const Schema = mongoose.Schema;
 const schema = new Schema(
-{
+    {
 
-    workspace:{type:Schema.Types.ObjectId,ref:"workspace"},
+        workspace: { type: Schema.Types.ObjectId, ref: "workspace" },
 
-    plan:{type:Schema.Types.ObjectId,ref:"plan"},
+        plan: { type: Schema.Types.ObjectId, ref: "plan" },
 
-    payment:{type:Schema.Types.ObjectId,ref:"payment"},
+        payment: { type: Schema.Types.ObjectId, ref: "payment" },
 
-    status:{type:String},
+        status: { type: String },
 
-    promo_code:{type:String},
+        promo_code: { type: String },
 
-    is_affiliation:{default:false,type:Boolean},
+        is_affiliation: { default: false, type: Boolean },
 
-    is_first_time:{default:false,type:Boolean},
+        is_first_time: { default: false, type: Boolean },
 
-    is_subscription:{default:false,type:Boolean},
+        is_subscription: { default: false, type: Boolean },
 
-    invoice_number:{type:Number},
+        invoice_number: { type: Number },
 
-    amount:{type:Number},
+        amount: { type: Number },
 
-    currency:{type:String},
+        currency: { type: String },
 
-    isDeleted:{type:Boolean},
+        isDeleted: { type: Boolean },
 
-    isActive:{type:Boolean},
+        isActive: { type: Boolean },
 
-    createdAt:{type:Date},
+        createdAt: { type: Date },
 
-    updatedAt:{type:Date},
+        updatedAt: { type: Date },
 
-    addedBy:{type:Schema.Types.ObjectId,ref:"user"},
+        addedBy: { type: Schema.Types.ObjectId, ref: "user" },
 
-    updatedBy:{type:Schema.Types.ObjectId,ref:"user"}
+        updatedBy: { type: Schema.Types.ObjectId, ref: "user" }
     }
-    ,{ 
-        timestamps: { 
-            createdAt: 'createdAt', 
-            updatedAt: 'updatedAt' 
-        } 
+    , {
+        timestamps: {
+            createdAt: 'createdAt',
+            updatedAt: 'updatedAt'
+        }
     }
 );
-schema.pre('save', async function(next) {
+schema.pre('save', async function (next) {
     this.isDeleted = false;
     this.isActive = true;
     next();
 });
 
 schema.pre('insertMany', async function (next, docs) {
-    if (docs && docs.length){
+    if (docs && docs.length) {
         for (let index = 0; index < docs.length; index++) {
-        const element = docs[index];
-        element.isDeleted = false;
-        element.isActive = true;
+            const element = docs[index];
+            element.isDeleted = false;
+            element.isActive = true;
         }
     }
     next();
 });
 
 schema.method("toJSON", function () {
-    const { _id, __v, ...object } = this.toObject({virtuals:true});
+    const { _id, __v, ...object } = this.toObject({ virtuals: true });
     object.id = _id;
-     
+
     return object;
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const purchase = mongoose.model("purchase",schema);
+const purchase = mongoose.model("purchase", schema);
 module.exports = purchase

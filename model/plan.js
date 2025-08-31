@@ -34,6 +34,19 @@ const schema = new Schema(
 
     currency:{type:String},
 
+    // Enhanced plan features
+    plan_features:[{
+      feature_name:{type:String},
+      feature_value:{type:Schema.Types.Mixed},
+      feature_description:{type:String}
+    }],
+    discount_percentage:{type:Number,default:0},
+    is_popular:{type:Boolean,default:false},
+
+    bonus_credits:{type:Number,default:0},
+    is_enterprise_plan:{type:Boolean,default:false},
+    plan_description:{type:String},
+
     isDeleted:{type:Boolean},
 
     isActive:{type:Boolean},

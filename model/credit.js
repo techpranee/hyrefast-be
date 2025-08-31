@@ -34,7 +34,17 @@ const schema = new Schema(
 
     application:{type:Schema.Types.ObjectId,ref:"application"},
 
-    balance:[{_id:false,credits:{type:Number},expiry:{type:Date},is_promo:{type:Boolean,default:false},no_expiry:{type:Boolean,default:false}}],
+    transaction_type:{type:String,enum:['purchase','usage','refund','bonus','expiry','adjustment']},
+
+    balance:[{
+      _id:false,
+      credits:{type:Number},
+      expiry:{type:Date},
+      is_promo:{type:Boolean,default:false},
+      no_expiry:{type:Boolean,default:false},
+      credit_source:{type:String,default:'purchase'},
+      added_at:{type:Date,default:Date.now}
+    }],
 
     isDeleted:{type:Boolean},
 
