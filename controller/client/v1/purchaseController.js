@@ -354,11 +354,11 @@ const softDeleteManyPurchase = async (req, res) => {
  */
 const createPurchaseOrder = async (req, res) => {
   try {
-    const { planId, workspaceId, customCredits } = req.body;
+    const { planId, workspaceId } = req.body;
 
     // Validate required fields
-    if (!planId && !customCredits) {
-      return res.badRequest({ message: 'Plan ID or custom credits amount is required' });
+    if (!planId) {
+      return res.badRequest({ message: 'Plan ID is required' });
     }
 
     if (!workspaceId) {
@@ -379,92 +379,32 @@ const createPurchaseOrder = async (req, res) => {
       return res.recordNotFound({ message: 'Workspace not found or access denied' });
     }
 
-    let purchaseData = {};
-
-    if (planId) {
-      // Plan-based purchase
-      const plan = await Plan.findOne({ _id: planId, isDeleted: false });
-      if (!plan) {
-        return res.recordNotFound({ message: 'Plan not found' });
-      }
-
-      purchaseData = {
-        workspace: workspaceId,
-        plan: planId,
-        amount: plan.price,
-        credits_amount: plan.credits,
-        transaction_type: 'credit_purchase',
-        description: `Credits purchase - ${plan.name}`,
-        payment_method: 'razorpay',
-        addedBy: req.user.id
-      };
-    } else {
-      // Custom credits purchase
-      const creditRate = process.env.CREDIT_RATE || 10; // ₹10 per credit default
-      const amount = customCredits * creditRate;
-
-      purchaseData = {
-        workspace: workspaceId,
-        amount: amount,
-        credits_amount: customCredits,
-        transaction_type: 'credit_purchase',
-        description: `Custom credits purchase - ${customCredits} credits`,
-        payment_method: 'razorpay',
-        addedBy: req.user.id
-      };
+    // Validate plan exists
+    const plan = await Plan.findOne({ _id: planId, isDeleted: false });
+    if (!plan) {
+      return res.recordNotFound({ message: 'Plan not found' });
     }
 
-    // Get current workspace balance for tracking
-    const currentBalance = await CreditService.getWorkspaceCreditBalance(workspaceId);
-    purchaseData.balance_before = currentBalance.total_available;
-    purchaseData.balance_after = currentBalance.total_available + purchaseData.credits_amount;
-
-    // Create purchase record
-    const purchase = await dbService.create(Purchase, purchaseData);
-
-    // Create Razorpay order
-    const orderResult = await PaymentService.createOrder({
-      amount: purchaseData.amount,
-      currency: 'INR',
-      receipt: `purchase_${purchase._id}`,
-      notes: {
-        purchaseId: purchase._id.toString(),
-        workspaceId: workspaceId,
-        creditsAmount: purchaseData.credits_amount,
-        userId: req.user.id
-      }
-    });
+    // Create Razorpay order (this will also create purchase and payment records)
+    const orderResult = await PaymentService.createOrder(
+      planId,
+      workspaceId,
+      req.user.id,
+      { ip: req.ip }
+    );
 
     if (!orderResult.success) {
-      // Rollback purchase creation
-      await Purchase.findByIdAndUpdate(purchase._id, {
-        status: 'failed',
-        failure_reason: 'Order creation failed'
-      });
-      return res.internalServerError({ message: orderResult.message });
+      return res.internalServerError({ message: orderResult.message || 'Failed to create order' });
     }
-
-    // Update purchase with order details
-    await Purchase.findByIdAndUpdate(purchase._id, {
-      razorpay_order_id: orderResult.order.id,
-      status: 'pending'
-    });
 
     return res.success({
       data: {
-        purchaseId: purchase._id,
         orderId: orderResult.order.id,
-        amount: purchaseData.amount,
-        creditsAmount: purchaseData.credits_amount,
-        currency: 'INR',
-        workspace: {
-          id: workspace._id,
-          name: workspace.name
-        },
-        plan: planId ? {
-          id: planId,
-          name: purchaseData.plan?.name
-        } : null
+        amount: orderResult.order.amount,
+        currency: orderResult.order.currency,
+        purchaseId: orderResult.purchase_id,
+        plan: orderResult.plan,
+        razorpayKey: orderResult.razorpay_key
       },
       message: 'Purchase order created successfully'
     });
