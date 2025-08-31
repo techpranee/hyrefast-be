@@ -1,7 +1,7 @@
 /**
- * fileUploadController.js
- * @description :: exports all method related file upload
- */
+  * fileUploadController.js
+  * @description :: exports all method related file upload
+  */
 
 const fs = require('fs');
 const path = require('path');
@@ -19,11 +19,11 @@ let allowedFileTypes = [
 let maxFileSize = 200; //In Megabyte
 
 /**
- * @description : uploads file using formidable.
- * @param {Object} req : request of file upload API
- * @param {Object} res : response of file upload API.
- * @return {Object} : response of file upload. {status, message, data}
- */
+  * @description : uploads file using formidable.
+  * @param {Object} req : request of file upload API
+  * @param {Object} res : response of file upload API.
+  * @return {Object} : response of file upload. {status, message, data}
+  */
 const upload = async (req,res) => {
   try {
 
@@ -32,7 +32,7 @@ const upload = async (req,res) => {
       multiples : true,
       maxFileSize : 300 * 1024 * 1024, //300 MB
       maxFieldsSize : 100 * 1024 * 1024 //50 MB
-    };
+    }
     const form = new formidable.IncomingForm(options);
 
     const uploadFileRes = await new Promise(async (resolve, reject) => {
@@ -99,69 +99,68 @@ const upload = async (req,res) => {
     if (error.name && error.name == 'validationError') {
       return res.validationError({ message: error.message });
     } else {
-      return res.internalServerError({ message:error.message }); 
+      return res.internalServerError({message:error.message}); 
     }
   }
 };
 
 /**
- * @description : generate pre signed url for file
- * @param {string} uri : url of file
- * @return {Object} : response for generate pre signed url
- */
+  * @description : generate pre signed url for file
+  * @param {string} uri : url of file
+  * @return {Object} : response for generate pre signed url
+  */
 const generatePreSignedURL = async (req, res) => {
-  try {
-    if (req.body && req.body.uri){
-      let uri = req.body.uri;
-      let S3Config = {
-        AWS_S3_ACCESS_KEY_ID: process.env.AWS_S3_ACCESS_KEY_ID,
-        AWS_S3_SECRET_ACCESS_KEY: process.env.AWS_S3_SECRET_ACCESS_KEY,
-        AWS_S3_REGION: process.env.AWS_S3_REGION,
-        AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME,
-      };
+    try {
+        if (req.body && req.body.uri){
+          let uri = req.body.uri;
+            let S3Config = {
+                AWS_S3_ACCESS_KEY_ID: process.env.AWS_S3_ACCESS_KEY_ID,
+                AWS_S3_SECRET_ACCESS_KEY: process.env.AWS_S3_SECRET_ACCESS_KEY,
+                AWS_S3_REGION: process.env.AWS_S3_REGION,
+                AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME,
+            };
 
-      const s3 = new AWS.S3({
-        region: S3Config.AWS_S3_REGION,
-        accessKeyId: S3Config.AWS_S3_ACCESS_KEY_ID,
-        secretAccessKey: S3Config.AWS_S3_SECRET_ACCESS_KEY
-      });
+            const s3 = new AWS.S3({
+                region: S3Config.AWS_S3_REGION,
+                accessKeyId: S3Config.AWS_S3_ACCESS_KEY_ID,
+                secretAccessKey: S3Config.AWS_S3_SECRET_ACCESS_KEY
+            });
 
-      try {
-        const {
-          region, bucket, key
-        } = AmazonS3URI(uri);
+            try {
+              const {
+                region, bucket, key
+              } = AmazonS3URI(uri);
 
-        let options = {
-          Bucket: bucket,
-          //public-read
-          Key: key,
-          Expires: Number(process.env.AWS_URL_EXPIRATION) || 15 * 60 //in seconds,
-        };
+              let options = {
+                Bucket: bucket,
+                Key: key,
+                Expires: Number(process.env.AWS_URL_EXPIRATION) || 15 * 60 //in seconds,
+              };
 
-        await s3.getSignedUrl('getObject', options, (error, url) => {
-          if (error) {
-            return res.failure({ message: error });
-          } else {
-            return res.success({ data: url });
-          }
-        });
-      } catch (error) {
-        return res.failure({ message: `${uri} is not a valid S3 uri` });
-      }
-    } else {
-      return res.badRequest({ message : 'Insufficient request parameters! uri is required.' });
+              await s3.getSignedUrl('getObject', options, (error, url) => {
+                if (error) {
+                    return res.failure({message: error});
+                } else {
+                    return res.success({data: url });
+                }
+              });
+            } catch (error) {
+              return res.failure({ message: `${uri} is not a valid S3 uri` });
+            }
+        }else {
+            return res.badRequest({message : "Insufficient request parameters! uri is required."});
+        }
+    } catch (error) {
+        return res.internalServerError({message:error.message}); 
     }
-  } catch (error) {
-    return res.internalServerError({ message:error.message }); 
-  }
-};
+}
 /**
- * @description : upload files
- * @param {Object} file : file to upload
- * @param {Object} fields : fields for file
- * @param {number} fileCount : total number of files to upload
- * @return {Object} : response for file upload
- */
+  * @description : upload files
+  * @param {Object} file : file to upload
+  * @param {Object} fields : fields for file
+  * @param {number} fileCount : total number of files to upload
+  * @return {Object} : response for file upload
+  */
 const uploadFiles = async (file,fields,fileCount) => {
 
   let extension = path.extname(file.originalFilename);
@@ -169,7 +168,7 @@ const uploadFiles = async (file,fields,fileCount) => {
 
   fileType = file.mimetype;
 
-  if (allowedFileTypes.length == 0 || !allowedFileTypes.includes(extension)) {
+  if (allowedFileTypes.length==0 || !allowedFileTypes.includes(extension)) {
     return {
       status: false,
       message: 'Filetype not allowed.'
@@ -200,13 +199,13 @@ const uploadFiles = async (file,fields,fileCount) => {
 
   return response;
 
-};
+}
 /**
- * @description : upload file to AWS s3
- * @param {Object} file : file to upload
- * @param {string} fileName : name of file
- * @return {Object} : response for file upload to AWS s3
- */
+  * @description : upload file to AWS s3
+  * @param {Object} file : file to upload
+  * @param {string} fileName : name of file
+  * @return {Object} : response for file upload to AWS s3
+  */
 const uploadToS3 = async (file, fileName) => {
   let S3Config = {
     AWS_S3_ACCESS_KEY_ID: process.env.AWS_S3_ACCESS_KEY_ID,
@@ -225,7 +224,6 @@ const uploadToS3 = async (file, fileName) => {
     Bucket: S3Config.AWS_S3_BUCKET_NAME,
     Body: fs.createReadStream(file.filepath),
     Key: fileName,
-    ACL: 'public-read'
   };
 
   const response = await new Promise(async (resolve, reject) => {
@@ -245,8 +243,6 @@ const uploadToS3 = async (file, fileName) => {
   });
 
   return response;
-};
-module.exports = {
-  upload,
-  generatePreSignedURL
-};
+}
+module.exports = { upload,generatePreSignedURL};
+
