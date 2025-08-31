@@ -7,10 +7,10 @@ services:
     container_name: hyrefast-backend
     restart: unless-stopped
     ports:
-      - '6363:6363'
+      - '6365:6365'
     environment:
       - NODE_ENV=production
-      - PORT=6363
+      - PORT=6365
       - DB_URL=${DB_URL}
       - DB_TEST_URL=${DB_TEST_URL}
       - ALLOW_ORIGIN=*
