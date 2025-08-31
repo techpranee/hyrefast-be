@@ -11,8 +11,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=6363
-      - DB_URL=${MONGODB_CONNECTION_STRING}
-      - DB_TEST_URL=${MONGODB_CONNECTION_STRING}
+      - DB_URL=${DB_URL}
+      - DB_TEST_URL=${DB_TEST_URL}
       - ALLOW_ORIGIN=*
       - JWT_SECRET=${JWT_SECRET}
       - SESSION_SECRET=${SESSION_SECRET}
