@@ -48,6 +48,8 @@ const schema = new Schema(
 
         admin: { ref: "user", type: Schema.Types.ObjectId },
 
+        members: [{ ref: "user", type: Schema.Types.ObjectId }],
+
         // Enhanced credit management fields
         available_credits: { type: Number, default: 0 },
         total_credits_purchased: { type: Number, default: 0 },

@@ -7,11 +7,11 @@ const mongoose = require("mongoose");
 const mongoosePaginate = require('mongoose-paginate-v2');
 let idValidator = require('mongoose-id-validator');
 const bcrypt = require("bcrypt");
-const{USER_TYPES} = require("../constants/authConstant");
-const {convertObjectToEnum} = require("../utils/common")
-const authConstantEnum=require("../constants/authConstant")
-        
-        
+const { USER_TYPES } = require("../constants/authConstant");
+const { convertObjectToEnum } = require("../utils/common")
+const authConstantEnum = require("../constants/authConstant")
+
+
 const myCustomLabels = {
     totalDocs: 'itemCount',
     docs: 'data',
@@ -28,66 +28,66 @@ mongoosePaginate.paginate.options = {
 };
 const Schema = mongoose.Schema;
 const schema = new Schema(
-{
+    {
 
-    username:{type:String},
+        username: { type: String },
 
-    password:{type:String},
+        password: { type: String },
 
-    email:{type:String},
+        email: { type: String },
 
-    name:{type:String},
+        name: { type: String },
 
-    isActive:{type:Boolean},
+        isActive: { type: Boolean },
 
-    createdAt:{type:Date},
+        createdAt: { type: Date },
 
-    updatedAt:{type:Date},
+        updatedAt: { type: Date },
 
-    addedBy:{type:Schema.Types.ObjectId,ref:"user"},
+        addedBy: { type: Schema.Types.ObjectId, ref: "user" },
 
-    updatedBy:{type:Schema.Types.ObjectId,ref:"user"},
+        updatedBy: { type: Schema.Types.ObjectId, ref: "user" },
 
-    userType:{type:Number,enum:convertObjectToEnum(USER_TYPES),required:true},
+        userType: { type: Number, enum: convertObjectToEnum(USER_TYPES), required: true },
 
-    workspace:{ref:"workspace",type:Schema.Types.ObjectId},
+        workspace: { ref: "workspace", type: Schema.Types.ObjectId },
 
-    mobileNo:{type:String},
+        mobileNo: { type: String },
 
-    isDeleted:{type:Boolean},
+        isDeleted: { type: Boolean },
 
-    loginOTP:{code:String,expireTime:Date},
+        loginOTP: { code: String, expireTime: Date },
 
-    resetPasswordLink:{code:String,expireTime:Date},
+        resetPasswordLink: { code: String, expireTime: Date },
 
-    loginRetryLimit:{type:Number,default:0},
+        loginRetryLimit: { type: Number, default: 0 },
 
-    loginReactiveTime:{type:Date},
+        loginReactiveTime: { type: Date },
 
-    ssoAuth:{googleId:{type:String}}
+        ssoAuth: { googleId: { type: String } }
     }
-    ,{ 
-        timestamps: { 
-            createdAt: 'createdAt', 
-            updatedAt: 'updatedAt' 
-        } 
+    , {
+        timestamps: {
+            createdAt: 'createdAt',
+            updatedAt: 'updatedAt'
+        }
     }
 );
-schema.pre('save', async function(next) {
+schema.pre('save', async function (next) {
     this.isDeleted = false;
     this.isActive = true;
-    if(this.password){
+    if (this.password) {
         this.password = await bcrypt.hash(this.password, 8);
     }
     next();
 });
 
 schema.pre('insertMany', async function (next, docs) {
-    if (docs && docs.length){
+    if (docs && docs.length) {
         for (let index = 0; index < docs.length; index++) {
-        const element = docs[index];
-        element.isDeleted = false;
-        element.isActive = true;
+            const element = docs[index];
+            element.isDeleted = false;
+            element.isActive = true;
         }
     }
     next();
@@ -99,13 +99,13 @@ schema.methods.isPasswordMatch = async function (password) {
     return bcrypt.compare(password, user.password);
 };
 schema.method("toJSON", function () {
-    const { _id, __v, ...object } = this.toObject({virtuals:true});
+    const { _id, __v, ...object } = this.toObject({ virtuals: true });
     object.id = _id;
-                    delete object.password
-     
+    delete object.password
+
     return object;
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const user = mongoose.model("user",schema);
+const user = mongoose.model("user", schema);
 module.exports = user
