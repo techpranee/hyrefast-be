@@ -12,6 +12,7 @@ router.use(require("./planRoutes"));
 router.use(require("./purchaseRoutes"));
 router.use(require("./invitationsRoutes"));
 router.use(require("./workspaceRoutes"));
+router.use(require("./dashboardRoutes"));
 router.use(require("./responseRoutes"));
 router.use(require("./applicationRoutes"));
 router.use(require("./questionRoutes"));
@@ -23,5 +24,7 @@ router.use(require("./projectRouteRoutes"));
 router.use(require("./routeRoleRoutes"));
 router.use(require("./userRoleRoutes"));
 router.use(require("./uploadRoutes"));
+router.use("/api/v1/interview", require("./interview"));
+router.use("/api/v1/payment", require("./webhookRoutes"));
 
 module.exports = router;

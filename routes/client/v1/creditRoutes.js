@@ -23,4 +23,15 @@ router.route("/client/api/v1/credit/updateBulk").put(auth(PLATFORM.CLIENT),check
 router.route("/client/api/v1/credit/delete/:id").delete(auth(PLATFORM.CLIENT),checkRolePermission,creditController.deleteCredit);
 router.route("/client/api/v1/credit/deleteMany").post(auth(PLATFORM.CLIENT),checkRolePermission,creditController.deleteManyCredit);
 
+// Credit Management Routes
+router.route("/client/api/v1/credit/balance/:workspaceId").get(auth(PLATFORM.CLIENT),checkRolePermission,creditController.getCreditBalance);
+router.route("/client/api/v1/credit/balance").get(auth(PLATFORM.CLIENT),checkRolePermission,creditController.getCreditBalance);
+router.route("/client/api/v1/credit/history/:workspaceId").post(auth(PLATFORM.CLIENT),checkRolePermission,creditController.getCreditHistory);
+router.route("/client/api/v1/credit/history").post(auth(PLATFORM.CLIENT),checkRolePermission,creditController.getCreditHistory);
+router.route("/client/api/v1/credit/stats/:workspaceId").get(auth(PLATFORM.CLIENT),checkRolePermission,creditController.getCreditStats);
+router.route("/client/api/v1/credit/stats").get(auth(PLATFORM.CLIENT),checkRolePermission,creditController.getCreditStats);
+router.route("/client/api/v1/credit/alert-threshold/:workspaceId").put(auth(PLATFORM.CLIENT),checkRolePermission,creditController.updateCreditAlertThreshold);
+router.route("/client/api/v1/credit/alert-threshold").put(auth(PLATFORM.CLIENT),checkRolePermission,creditController.updateCreditAlertThreshold);
+router.route("/client/api/v1/credit/low-credit-workspaces").get(auth(PLATFORM.CLIENT),checkRolePermission,creditController.getLowCreditWorkspaces);
+
 module.exports = router;

@@ -4,11 +4,15 @@
  */
 
 const Purchase = require("../../../model/purchase")
+const Plan = require("../../../model/plan")
+const Workspace = require("../../../model/workspace")
 const purchaseSchemaKey = require("../../../utils/validation/purchaseValidation");
 const validation = require("../../../utils/validateRequest");
 const dbService = require("../../../utils/dbService");
 const ObjectId = require("mongodb").ObjectId
 const utils = require("../../../utils/common");
+const PaymentService = require("../../../services/paymentService");
+const CreditService = require("../../../services/creditService");
 
 
    
@@ -342,6 +346,331 @@ const softDeleteManyPurchase = async(req,res) => {
     }
 }
 
+/**
+ * @description : create purchase order (initiate payment)
+ * @param {Object} req : request including purchase details
+ * @param {Object} res : response with order details
+ * @return {Object} : created order. {status, message, data}
+ */
+const createPurchaseOrder = async (req, res) => {
+  try {
+    const { planId, workspaceId, customCredits } = req.body;
+    
+    // Validate required fields
+    if (!planId && !customCredits) {
+      return res.badRequest({ message: 'Plan ID or custom credits amount is required' });
+    }
+
+    if (!workspaceId) {
+      return res.badRequest({ message: 'Workspace ID is required' });
+    }
+
+    // Validate workspace access
+    const workspace = await Workspace.findOne({
+      _id: workspaceId,
+      $or: [
+        { addedBy: req.user.id },
+        { members: req.user.id }
+      ],
+      isDeleted: false
+    });
+
+    if (!workspace) {
+      return res.recordNotFound({ message: 'Workspace not found or access denied' });
+    }
+
+    let purchaseData = {};
+
+    if (planId) {
+      // Plan-based purchase
+      const plan = await Plan.findOne({ _id: planId, isDeleted: false });
+      if (!plan) {
+        return res.recordNotFound({ message: 'Plan not found' });
+      }
+
+      purchaseData = {
+        workspace: workspaceId,
+        plan: planId,
+        amount: plan.price,
+        credits_amount: plan.credits,
+        transaction_type: 'credit_purchase',
+        description: `Credits purchase - ${plan.name}`,
+        payment_method: 'razorpay',
+        addedBy: req.user.id
+      };
+    } else {
+      // Custom credits purchase
+      const creditRate = process.env.CREDIT_RATE || 10; // ₹10 per credit default
+      const amount = customCredits * creditRate;
+
+      purchaseData = {
+        workspace: workspaceId,
+        amount: amount,
+        credits_amount: customCredits,
+        transaction_type: 'credit_purchase',
+        description: `Custom credits purchase - ${customCredits} credits`,
+        payment_method: 'razorpay',
+        addedBy: req.user.id
+      };
+    }
+
+    // Get current workspace balance for tracking
+    const currentBalance = await CreditService.getCreditBalance(workspaceId);
+    purchaseData.balance_before = currentBalance.available_credits;
+    purchaseData.balance_after = currentBalance.available_credits + purchaseData.credits_amount;
+
+    // Create purchase record
+    const purchase = await dbService.create(Purchase, purchaseData);
+
+    // Create Razorpay order
+    const orderResult = await PaymentService.createOrder({
+      amount: purchaseData.amount,
+      currency: 'INR',
+      receipt: `purchase_${purchase._id}`,
+      notes: {
+        purchaseId: purchase._id.toString(),
+        workspaceId: workspaceId,
+        creditsAmount: purchaseData.credits_amount,
+        userId: req.user.id
+      }
+    });
+
+    if (!orderResult.success) {
+      // Rollback purchase creation
+      await Purchase.findByIdAndUpdate(purchase._id, { 
+        status: 'failed',
+        failure_reason: 'Order creation failed'
+      });
+      return res.internalServerError({ message: orderResult.message });
+    }
+
+    // Update purchase with order details
+    await Purchase.findByIdAndUpdate(purchase._id, {
+      razorpay_order_id: orderResult.order.id,
+      status: 'pending'
+    });
+
+    return res.success({
+      data: {
+        purchaseId: purchase._id,
+        orderId: orderResult.order.id,
+        amount: purchaseData.amount,
+        creditsAmount: purchaseData.credits_amount,
+        currency: 'INR',
+        workspace: {
+          id: workspace._id,
+          name: workspace.name
+        },
+        plan: planId ? {
+          id: planId,
+          name: purchaseData.plan?.name
+        } : null
+      },
+      message: 'Purchase order created successfully'
+    });
+  } catch (error) {
+    return res.internalServerError({ message: error.message });
+  }
+};
+
+/**
+ * @description : verify payment and complete purchase
+ * @param {Object} req : request including payment verification details
+ * @param {Object} res : response with verification result
+ * @return {Object} : verification result. {status, message, data}
+ */
+const verifyAndCompletePurchase = async (req, res) => {
+  try {
+    const { orderId, paymentId, signature, purchaseId } = req.body;
+
+    // Validate required fields
+    if (!orderId || !paymentId || !signature || !purchaseId) {
+      return res.badRequest({ message: 'All payment verification fields are required' });
+    }
+
+    // Find purchase record
+    const purchase = await Purchase.findOne({
+      _id: purchaseId,
+      razorpay_order_id: orderId,
+      addedBy: req.user.id,
+      isDeleted: false
+    }).populate('workspace');
+
+    if (!purchase) {
+      return res.recordNotFound({ message: 'Purchase record not found' });
+    }
+
+    if (purchase.status === 'completed') {
+      return res.badRequest({ message: 'Purchase already completed' });
+    }
+
+    // Verify payment with Razorpay
+    const verificationResult = await PaymentService.verifyPayment({
+      orderId,
+      paymentId,
+      signature
+    });
+
+    if (!verificationResult.success) {
+      // Mark purchase as failed
+      await Purchase.findByIdAndUpdate(purchaseId, {
+        status: 'failed',
+        failure_reason: 'Payment verification failed',
+        razorpay_payment_id: paymentId
+      });
+      return res.badRequest({ message: verificationResult.message });
+    }
+
+    // Process successful payment
+    const paymentResult = await PaymentService.processSuccessfulPayment(
+      orderId,
+      paymentId,
+      verificationResult.payment
+    );
+
+    if (!paymentResult.success) {
+      return res.internalServerError({ message: 'Payment processing failed' });
+    }
+
+    // Add credits to workspace
+    const creditResult = await CreditService.addCreditsAfterPurchase(
+      purchase.workspace._id,
+      purchase._id,
+      purchase.credits_amount
+    );
+
+    if (!creditResult.success) {
+      return res.internalServerError({ message: 'Credit addition failed' });
+    }
+
+    // Update purchase status
+    await Purchase.findByIdAndUpdate(purchaseId, {
+      status: 'completed',
+      completed_at: new Date(),
+      razorpay_payment_id: paymentId
+    });
+
+    return res.success({
+      data: {
+        purchaseId: purchase._id,
+        paymentId: paymentId,
+        creditsAdded: purchase.credits_amount,
+        newBalance: creditResult.workspace.available_credits,
+        workspace: {
+          id: purchase.workspace._id,
+          name: purchase.workspace.name
+        }
+      },
+      message: 'Purchase completed successfully and credits added'
+    });
+  } catch (error) {
+    return res.internalServerError({ message: error.message });
+  }
+};
+
+/**
+ * @description : get purchase history for workspace
+ * @param {Object} req : request including workspace ID and pagination
+ * @param {Object} res : response containing purchase history
+ * @return {Object} : purchase history. {status, message, data}
+ */
+const getPurchaseHistory = async (req, res) => {
+  try {
+    const workspaceId = req.params.workspaceId || req.user.workspace;
+    const options = utils.paginationOptions(req.body);
+
+    if (!workspaceId) {
+      return res.badRequest({ message: 'Workspace ID is required' });
+    }
+
+    // Validate workspace access
+    const workspace = await Workspace.findOne({
+      _id: workspaceId,
+      $or: [
+        { addedBy: req.user.id },
+        { members: req.user.id }
+      ],
+      isDeleted: false
+    });
+
+    if (!workspace) {
+      return res.recordNotFound({ message: 'Workspace not found or access denied' });
+    }
+
+    // Build query
+    let query = {
+      workspace: workspaceId,
+      isDeleted: false
+    };
+
+    // Add filters if provided
+    if (req.body.status) {
+      query.status = req.body.status;
+    }
+    if (req.body.dateFrom) {
+      query.createdAt = { $gte: new Date(req.body.dateFrom) };
+    }
+    if (req.body.dateTo) {
+      query.createdAt = { ...query.createdAt, $lte: new Date(req.body.dateTo) };
+    }
+
+    const purchases = await dbService.paginate(Purchase, query, options, {
+      populate: [
+        { path: 'plan', select: 'name price credits' },
+        { path: 'addedBy', select: 'name email' },
+        { path: 'workspace', select: 'name' }
+      ],
+      sort: { createdAt: -1 }
+    });
+
+    return res.success({ data: purchases });
+  } catch (error) {
+    return res.internalServerError({ message: error.message });
+  }
+};
+
+/**
+ * @description : cancel pending purchase
+ * @param {Object} req : request including purchase ID
+ * @param {Object} res : response with cancellation result
+ * @return {Object} : cancellation result. {status, message, data}
+ */
+const cancelPurchase = async (req, res) => {
+  try {
+    const { purchaseId } = req.params;
+
+    // Find purchase
+    const purchase = await Purchase.findOne({
+      _id: purchaseId,
+      addedBy: req.user.id,
+      isDeleted: false
+    });
+
+    if (!purchase) {
+      return res.recordNotFound({ message: 'Purchase not found' });
+    }
+
+    if (purchase.status !== 'pending') {
+      return res.badRequest({ message: 'Only pending purchases can be cancelled' });
+    }
+
+    // Update purchase status
+    await Purchase.findByIdAndUpdate(purchaseId, {
+      status: 'cancelled',
+      cancelled_at: new Date(),
+      failure_reason: 'Cancelled by user'
+    });
+
+    return res.success({
+      data: { purchaseId: purchase._id },
+      message: 'Purchase cancelled successfully'
+    });
+  } catch (error) {
+    return res.internalServerError({ message: error.message });
+  }
+};
+
 module.exports = {
-    addPurchase,bulkInsertPurchase,findAllPurchase,getPurchase,getPurchaseCount,updatePurchase,bulkUpdatePurchase,partialUpdatePurchase,softDeletePurchase,deletePurchase,deleteManyPurchase,softDeleteManyPurchase    
+    addPurchase,bulkInsertPurchase,findAllPurchase,getPurchase,getPurchaseCount,updatePurchase,bulkUpdatePurchase,partialUpdatePurchase,softDeletePurchase,deletePurchase,deleteManyPurchase,softDeleteManyPurchase,
+    createPurchaseOrder,verifyAndCompletePurchase,getPurchaseHistory,cancelPurchase    
 }

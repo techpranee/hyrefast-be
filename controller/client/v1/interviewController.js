@@ -292,7 +292,7 @@ const completeInterviewSession = async (req, res) => {
             query.user = req.user.id;
         }
 
-        const session = await Application.findOne(query);
+        const session = await Application.findOne(query).populate('workspace');
         if (!session) {
             return res.recordNotFound();
         }
@@ -301,17 +301,46 @@ const completeInterviewSession = async (req, res) => {
             return res.badRequest({ message: 'Session is already completed' });
         }
 
+        // Check if credit was already deducted for this application
+        if (session.credit_deducted) {
+            return res.badRequest({ message: 'Credit has already been deducted for this interview' });
+        }
+
+        // Import credit service
+        const CreditService = require('../../../services/creditService');
+        
+        // Get workspace
+        const workspaceId = session.workspace || session.job?.workspace;
+        if (!workspaceId) {
+            return res.badRequest({ message: 'Workspace not found for this interview' });
+        }
+
+        // Check and deduct credit
+        const creditResult = await CreditService.deductCreditForInterview(workspaceId, session._id);
+        if (!creditResult.success) {
+            return res.badRequest({ message: creditResult.message });
+        }
+
         let updatedInterviewSession = await dbService.updateOne(Application, query, {
             status: 'completed',
             completedAt: new Date(),
-            updatedBy: req.user.id
+            updatedBy: req.user.id,
+            credit_deducted: true,
+            credit_deducted_at: new Date(),
+            credit_deduction_reference: creditResult.transaction._id,
+            processing_started_at: new Date()
         });
 
         // TODO: Queue comprehensive analysis job
 
         return res.success({
             data: updatedInterviewSession,
-            message: 'Interview session completed successfully'
+            message: 'Interview session completed successfully and credit deducted',
+            creditInfo: {
+                creditsDeducted: 1,
+                remainingCredits: creditResult.workspace.available_credits,
+                transactionId: creditResult.transaction._id
+            }
         });
     } catch (error) {
         return res.internalServerError({ message: error.message });

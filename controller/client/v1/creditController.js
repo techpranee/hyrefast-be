@@ -4,11 +4,13 @@
  */
 
 const Credit = require("../../../model/credit")
+const Workspace = require("../../../model/workspace")
 const creditSchemaKey = require("../../../utils/validation/creditValidation");
 const validation = require("../../../utils/validateRequest");
 const dbService = require("../../../utils/dbService");
 const ObjectId = require("mongodb").ObjectId
 const utils = require("../../../utils/common");
+const CreditService = require("../../../services/creditService");
 
 
    
@@ -342,6 +344,277 @@ const softDeleteManyCredit = async(req,res) => {
     }
 }
 
+/**
+ * @description : get credit balance for workspace
+ * @param {Object} req : request including workspace ID
+ * @param {Object} res : response containing credit balance
+ * @return {Object} : credit balance data. {status, message, data}
+ */
+const getCreditBalance = async (req, res) => {
+  try {
+    const workspaceId = req.params.workspaceId || req.user.workspace;
+    
+    if (!workspaceId) {
+      return res.badRequest({ message: 'Workspace ID is required' });
+    }
+
+    // Check if user has access to this workspace
+    let workspaceQuery = { _id: workspaceId, isDeleted: false };
+    if (req.user.userType === 2) { // recruiter
+      workspaceQuery.$or = [
+        { addedBy: req.user.id },
+        { members: req.user.id }
+      ];
+    }
+
+    const workspace = await Workspace.findOne(workspaceQuery);
+    if (!workspace) {
+      return res.recordNotFound({ message: 'Workspace not found' });
+    }
+
+    const balance = await CreditService.getCreditBalance(workspaceId);
+    
+    return res.success({
+      data: {
+        workspaceId: workspaceId,
+        availableCredits: balance.available_credits,
+        totalCreditsUsed: balance.total_credits_used,
+        totalCreditsPurchased: balance.total_credits_purchased,
+        lastCreditUpdate: balance.last_credit_update,
+        creditAlertThreshold: balance.credit_alert_threshold
+      }
+    });
+  } catch (error) {
+    return res.internalServerError({ message: error.message });
+  }
+};
+
+/**
+ * @description : get credit transaction history for workspace
+ * @param {Object} req : request including workspace ID and pagination
+ * @param {Object} res : response containing transaction history
+ * @return {Object} : transaction history. {status, message, data}
+ */
+const getCreditHistory = async (req, res) => {
+  try {
+    const workspaceId = req.params.workspaceId || req.user.workspace;
+    const options = utils.paginationOptions(req.body);
+    
+    if (!workspaceId) {
+      return res.badRequest({ message: 'Workspace ID is required' });
+    }
+
+    // Check if user has access to this workspace
+    let workspaceQuery = { _id: workspaceId, isDeleted: false };
+    if (req.user.userType === 2) { // recruiter
+      workspaceQuery.$or = [
+        { addedBy: req.user.id },
+        { members: req.user.id }
+      ];
+    }
+
+    const workspace = await Workspace.findOne(workspaceQuery);
+    if (!workspace) {
+      return res.recordNotFound({ message: 'Workspace not found' });
+    }
+
+    const history = await CreditService.getCreditTransactionHistory(workspaceId, options);
+    
+    return res.success({ data: history });
+  } catch (error) {
+    return res.internalServerError({ message: error.message });
+  }
+};
+
+/**
+ * @description : get credit statistics for workspace
+ * @param {Object} req : request including workspace ID
+ * @param {Object} res : response containing credit statistics
+ * @return {Object} : credit statistics. {status, message, data}
+ */
+const getCreditStats = async (req, res) => {
+  try {
+    const workspaceId = req.params.workspaceId || req.user.workspace;
+    
+    if (!workspaceId) {
+      return res.badRequest({ message: 'Workspace ID is required' });
+    }
+
+    // Check if user has access to this workspace
+    let workspaceQuery = { _id: workspaceId, isDeleted: false };
+    if (req.user.userType === 2) { // recruiter
+      workspaceQuery.$or = [
+        { addedBy: req.user.id },
+        { members: req.user.id }
+      ];
+    }
+
+    const workspace = await Workspace.findOne(workspaceQuery);
+    if (!workspace) {
+      return res.recordNotFound({ message: 'Workspace not found' });
+    }
+
+    // Get recent transactions
+    const recentTransactions = await Credit.find({
+      workspace: workspaceId,
+      isDeleted: false
+    })
+    .sort({ createdAt: -1 })
+    .limit(10)
+    .populate('application', 'status user')
+    .populate('purchase', 'amount credits_amount')
+    .populate('plan', 'name price');
+
+    // Calculate statistics
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+
+    const monthlyUsage = await Credit.aggregate([
+      {
+        $match: {
+          workspace: workspace._id,
+          transaction_type: 'debit',
+          createdAt: { $gte: startOfMonth },
+          isDeleted: false
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalCredits: { $sum: '$amount' },
+          totalTransactions: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const weeklyUsage = await Credit.aggregate([
+      {
+        $match: {
+          workspace: workspace._id,
+          transaction_type: 'debit',
+          createdAt: { $gte: startOfWeek },
+          isDeleted: false
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalCredits: { $sum: '$amount' },
+          totalTransactions: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const stats = {
+      currentBalance: workspace.available_credits,
+      totalPurchased: workspace.total_credits_purchased,
+      totalUsed: workspace.total_credits_used,
+      monthlyUsage: {
+        credits: monthlyUsage[0]?.totalCredits || 0,
+        transactions: monthlyUsage[0]?.totalTransactions || 0
+      },
+      weeklyUsage: {
+        credits: weeklyUsage[0]?.totalCredits || 0,
+        transactions: weeklyUsage[0]?.totalTransactions || 0
+      },
+      recentTransactions: recentTransactions,
+      alertThreshold: workspace.credit_alert_threshold,
+      needsAttention: workspace.available_credits <= workspace.credit_alert_threshold
+    };
+
+    return res.success({ data: stats });
+  } catch (error) {
+    return res.internalServerError({ message: error.message });
+  }
+};
+
+/**
+ * @description : update credit alert threshold
+ * @param {Object} req : request including workspace ID and new threshold
+ * @param {Object} res : response of updated workspace
+ * @return {Object} : updated workspace. {status, message, data}
+ */
+const updateCreditAlertThreshold = async (req, res) => {
+  try {
+    const workspaceId = req.params.workspaceId || req.user.workspace;
+    const { threshold } = req.body;
+    
+    if (!workspaceId) {
+      return res.badRequest({ message: 'Workspace ID is required' });
+    }
+
+    if (threshold === undefined || threshold < 0) {
+      return res.badRequest({ message: 'Valid threshold value is required' });
+    }
+
+    // Check if user has admin access to this workspace
+    let workspaceQuery = { _id: workspaceId, isDeleted: false };
+    if (req.user.userType === 2) { // recruiter
+      workspaceQuery.addedBy = req.user.id; // Only workspace owner can update threshold
+    }
+
+    const workspace = await Workspace.findOneAndUpdate(
+      workspaceQuery,
+      { 
+        credit_alert_threshold: threshold,
+        updatedBy: req.user.id
+      },
+      { new: true }
+    );
+
+    if (!workspace) {
+      return res.recordNotFound({ message: 'Workspace not found or access denied' });
+    }
+
+    return res.success({
+      data: {
+        workspaceId: workspace._id,
+        creditAlertThreshold: workspace.credit_alert_threshold
+      },
+      message: 'Credit alert threshold updated successfully'
+    });
+  } catch (error) {
+    return res.internalServerError({ message: error.message });
+  }
+};
+
+/**
+ * @description : get low credit workspaces (admin only)
+ * @param {Object} req : request with optional threshold parameter
+ * @param {Object} res : response containing workspaces with low credits
+ * @return {Object} : low credit workspaces. {status, message, data}
+ */
+const getLowCreditWorkspaces = async (req, res) => {
+  try {
+    // Admin-only endpoint
+    if (req.user.userType !== 1) {
+      return res.forbidden({ message: 'Admin access required' });
+    }
+
+    const customThreshold = req.query.threshold || 5; // Default threshold is 5 credits
+
+    const lowCreditWorkspaces = await Workspace.find({
+      $or: [
+        { available_credits: { $lte: customThreshold } },
+        { $expr: { $lte: ['$available_credits', '$credit_alert_threshold'] } }
+      ],
+      isDeleted: false
+    })
+    .populate('addedBy', 'name email')
+    .sort({ available_credits: 1 });
+
+    return res.success({
+      data: lowCreditWorkspaces,
+      message: `Found ${lowCreditWorkspaces.length} workspaces with low credits`
+    });
+  } catch (error) {
+    return res.internalServerError({ message: error.message });
+  }
+};
+
 module.exports = {
-    addCredit,bulkInsertCredit,findAllCredit,getCredit,getCreditCount,updateCredit,bulkUpdateCredit,partialUpdateCredit,softDeleteCredit,deleteCredit,deleteManyCredit,softDeleteManyCredit    
+    addCredit,bulkInsertCredit,findAllCredit,getCredit,getCreditCount,updateCredit,bulkUpdateCredit,partialUpdateCredit,softDeleteCredit,deleteCredit,deleteManyCredit,softDeleteManyCredit,
+    getCreditBalance,getCreditHistory,getCreditStats,updateCreditAlertThreshold,getLowCreditWorkspaces    
 }

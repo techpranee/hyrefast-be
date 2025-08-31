@@ -23,4 +23,11 @@ router.route("/client/api/v1/purchase/updateBulk").put(auth(PLATFORM.CLIENT),che
 router.route("/client/api/v1/purchase/delete/:id").delete(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.deletePurchase);
 router.route("/client/api/v1/purchase/deleteMany").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.deleteManyPurchase);
 
+// Enhanced Purchase Management Routes
+router.route("/client/api/v1/purchase/create-order").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.createPurchaseOrder);
+router.route("/client/api/v1/purchase/verify-payment").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.verifyAndCompletePurchase);
+router.route("/client/api/v1/purchase/history/:workspaceId").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.getPurchaseHistory);
+router.route("/client/api/v1/purchase/history").post(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.getPurchaseHistory);
+router.route("/client/api/v1/purchase/cancel/:purchaseId").put(auth(PLATFORM.CLIENT),checkRolePermission,purchaseController.cancelPurchase);
+
 module.exports = router;
