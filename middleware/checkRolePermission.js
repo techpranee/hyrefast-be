@@ -9,12 +9,12 @@ const RouteRole = require('../model/routeRole');
 const ProjectRoute = require('../model/projectRoute');
 const { replaceAll } = require('../utils/common');
 
-  /**
-   * @description : middleware for authentication with role and permission.
-   * @param {Object} req : request of route.
-   * @param {Object} res : response of route.
-   * @param {callback} next : executes the next middleware succeeding the current middleware.
-   */
+/**
+ * @description : middleware for authentication with role and permission.
+ * @param {Object} req : request of route.
+ * @param {Object} res : response of route.
+ * @param {callback} next : executes the next middleware succeeding the current middleware.
+ */
 const checkRolePermission = async (req, res, next) => {
   if (!req.user || !req.user.id) {
     return res.badRequest();

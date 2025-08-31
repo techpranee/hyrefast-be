@@ -1,78 +1,126 @@
 /**
-  * question.js
-  * @description :: model of a database collection question
-  */
+ * question.js
+ * @description :: model of a database collection question
+ */
 
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 let idValidator = require('mongoose-id-validator');
+
 const myCustomLabels = {
-    totalDocs: 'itemCount',
-    docs: 'data',
-    limit: 'perPage',
-    page: 'currentPage',
-    nextPage: 'next',
-    prevPage: 'prev',
-    totalPages: 'pageCount',
-    pagingCounter: 'slNo',
-    meta: 'paginator',
+  totalDocs: 'itemCount',
+  docs: 'data',
+  limit: 'perPage',
+  page: 'currentPage',
+  nextPage: 'next',
+  prevPage: 'prev',
+  totalPages: 'pageCount',
+  pagingCounter: 'slNo',
+  meta: 'paginator',
 };
-mongoosePaginate.paginate.options = {
-    customLabels: myCustomLabels
-};
+mongoosePaginate.paginate.options = { customLabels: myCustomLabels };
+
 const Schema = mongoose.Schema;
 const schema = new Schema(
-{
+  {
+    title: { 
+      type: String,
+      required: true,
+      trim: true
+    },
 
-    title:{type:String},
+    question_type: { 
+      type: String,
+      enum: ['video', 'audio', 'text', 'multiple_choice'],
+      default: 'video'
+    },
 
-    isDeleted:{type:Boolean},
+    evaluation_instructions: { 
+      type: String,
+      trim: true
+    },
 
-    isActive:{type:Boolean},
+    // Additional fields for better functionality
+    timeLimit: {
+      type: Number,
+      default: 120 // seconds
+    },
 
-    createdAt:{type:Date},
+    allowRetry: {
+      type: Boolean,
+      default: false
+    },
 
-    updatedAt:{type:Date},
+    tags: [{
+      type: String,
+      enum: ['Introduction', 'Background', 'Technical', 'Problem Solving', 'Behavioral']
+    }],
 
-    addedBy:{type:Schema.Types.ObjectId,ref:"user"},
+    order: {
+      type: Number,
+      default: 1
+    },
 
-    updatedBy:{type:Schema.Types.ObjectId,ref:"user"},
+    isDeleted: { type: Boolean },
 
-    question_type:{type:String},
+    isActive: { type: Boolean },
 
-    evaluation_instructions:{type:String}
+    createdAt: { type: Date },
+
+    updatedAt: { type: Date },
+
+    addedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    },
+
+    updatedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    },
+
+    workspace: {
+      ref: 'workspace',
+      type: Schema.Types.ObjectId,
+      required: true
     }
-    ,{ 
-        timestamps: { 
-            createdAt: 'createdAt', 
-            updatedAt: 'updatedAt' 
-        } 
-    }
+  },
+  { 
+    timestamps: { 
+      createdAt: 'createdAt', 
+      updatedAt: 'updatedAt' 
+    } 
+  }
 );
-schema.pre('save', async function(next) {
-    this.isDeleted = false;
-    this.isActive = true;
-    next();
+
+schema.pre('save', async function (next) {
+  this.isDeleted = false;
+  this.isActive = true;
+  next();
 });
 
 schema.pre('insertMany', async function (next, docs) {
-    if (docs && docs.length){
-        for (let index = 0; index < docs.length; index++) {
-        const element = docs[index];
-        element.isDeleted = false;
-        element.isActive = true;
-        }
+  if (docs && docs.length) {
+    for (let index = 0; index < docs.length; index++) {
+      const element = docs[index];
+      element.isDeleted = false;
+      element.isActive = true;
     }
-    next();
+  }
+  next();
 });
 
-schema.method("toJSON", function () {
-    const { _id, __v, ...object } = this.toObject({virtuals:true});
-    object.id = _id;
+schema.method('toJSON', function () {
+  const {
+    _id, __v, ...object 
+  } = this.toObject({ virtuals: true });
+  object.id = _id;
      
-    return object;
+  return object;
 });
+
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const question = mongoose.model("question",schema);
-module.exports = question
+
+const question = mongoose.model('question', schema);
+module.exports = question;

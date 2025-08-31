@@ -51,17 +51,17 @@ function replaceAll (string, search, replace) {
  * @return {boolean} : validation status
  */
 async function uniqueValidation (Model,data){
-    let filter = {};
-      if(data && data["email"] ){
-        filter = { "email": data["email"] }
-      }
-    filter.isActive = true;
-    filter.isDeleted = false;
-    let found = await dbService.findOne(Model,filter);
-    if(found){
-        return false;
-    }
-    return true;
+  let filter = {};
+  if (data && data['email'] ){
+    filter = { 'email': data['email'] };
+  }
+  filter.isActive = true;
+  filter.isDeleted = false;
+  let found = await dbService.findOne(Model,filter);
+  if (found){
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -70,7 +70,7 @@ async function uniqueValidation (Model,data){
  * @param {date} toDate  : future date
  * @return {string} : difference of two date in time
  */
-function getDifferenceOfTwoDatesInTime(currentDate,toDate){
+function getDifferenceOfTwoDatesInTime (currentDate,toDate){
   let hours = toDate.diff(currentDate,'hour');
   currentDate =  currentDate.add(hours, 'hour');
   let minutes = toDate.diff(currentDate,'minute');
@@ -89,8 +89,11 @@ function getDifferenceOfTwoDatesInTime(currentDate,toDate){
  * @return {Object} : role access for APIs of model
  */
 async function getRoleAccessData (userId) {
-  let userRole = await dbService.findMany(UserRole, { userId: userId },{pagination:false});
-  let routeRole = await dbService.findMany(RouteRole, { roleId: { $in: userRole.data ? userRole.data.map(u=>u.roleId) : [] } },{ pagination:false,populate:['roleId','routeId'] });
+  let userRole = await dbService.findMany(UserRole, { userId: userId },{ pagination:false });
+  let routeRole = await dbService.findMany(RouteRole, { roleId: { $in: userRole.data ? userRole.data.map(u=>u.roleId) : [] } },{
+    pagination:false,
+    populate:['roleId','routeId'] 
+  });
   let models = mongoose.modelNames();
   let Roles = routeRole.data ? routeRole.data.map(rr => rr.roleId && rr.roleId.name).filter((value, index, self) => self.indexOf(value) === index) : [];
   let roleAccess = {};
@@ -126,11 +129,11 @@ async function getRoleAccessData (userId) {
 }
 
 /**
-  * getSelectObject : to return a object of select from string, array
-  * @param {string || array || object} select : selection attributes
-  * @returns {object} : object of select to be passed with filter
-  */
-function getSelectObject(select) {
+ * getSelectObject : to return a object of select from string, array
+ * @param {string || array || object} select : selection attributes
+ * @returns {object} : object of select to be passed with filter
+ */
+function getSelectObject (select) {
   let selectArray = [];
   if (typeof select === 'string'){
     selectArray = select.split(' ');
@@ -164,70 +167,126 @@ function getSelectObject(select) {
  */
 const checkUniqueFieldsInDatabase = async (model, fieldsToCheck, data, operation, filter = {})=> {
   switch (operation) {
-    case 'INSERT':
+  case 'INSERT':
+    for (const field of fieldsToCheck) {
+      //Add unique field and it's value in filter.
+      let query = {
+        ...filter,
+        [field] : data[field] 
+      };
+      let found = await dbService.findOne(model, query);
+      if (found) {
+        return {
+          isDuplicate : true,
+          field: field,
+          value:  data[field]
+        };
+      }
+    }
+    break;
+  case 'BULK_INSERT':
+    for (const dataToCheck of data) {
       for (const field of fieldsToCheck) {
         //Add unique field and it's value in filter.
-        let query = {...filter, [field] : data[field] };
+        let query = {
+          ...filter,
+          [field] : dataToCheck[field] 
+        };
         let found = await dbService.findOne(model, query);
         if (found) {
           return {
             isDuplicate : true,
             field: field,
-            value:  data[field]
+            value:  dataToCheck[field]
           };
         }
       }
-      break;
-      case 'BULK_INSERT':
-        for (const dataToCheck of data) {
-          for (const field of fieldsToCheck) {
-            //Add unique field and it's value in filter.
-            let query = {...filter, [field] : dataToCheck[field] };
-            let found = await dbService.findOne(model, query);
-            if (found) {
-              return {
-                isDuplicate : true,
-                field: field,
-                value:  dataToCheck[field]
-              };
-            }
+    }
+    break;
+  case 'UPDATE':  
+  case 'BULK_UPDATE':
+    let existData = await dbService.findMany(model, filter, { select : ['_id'] });
+    for (const field of fieldsToCheck) {
+      if (Object.keys(data).includes(field)) {
+        if (existData && existData.length > 1) {
+          return {
+            isDuplicate : true,
+            field: field,
+            value:  data[field]
+          };
+        } else if (existData && existData.length === 1){
+          let found = await dbService.findOne(model,{ [field]: data[field] });
+          if (found && (existData[0]._id.toJSON() !== found._id.toJSON())) {
+            return {
+              isDuplicate : true,
+              field: field,
+              value:  data[field]
+            };
           }
         }
-      break;
-      case 'UPDATE':  
-      case 'BULK_UPDATE':
-        let existData = await dbService.findMany(model, filter, {select : ["_id"]});
-        for (const field of fieldsToCheck) {
-          if (Object.keys(data).includes(field)) {
-            if (existData && existData.length > 1) {
-              return {
-                isDuplicate : true,
-                field: field,
-                value:  data[field]
-              };
-            }else if(existData && existData.length === 1){
-              let found = await dbService.findOne(model,{ [field]: data[field] });
-              if (found && (existData[0]._id.toJSON() !== found._id.toJSON())) {
-                return {
-                  isDuplicate : true,
-                  field: field,
-                  value:  data[field]
-                };
-              }
-            }
-          }
-        }
-      break; 
-    default:
-      return {
-        isDuplicate : false
-      };
-      break;
+      }
+    }
+    break; 
+  default:
+    return { isDuplicate : false };
+    break;
   }
-  return {
-    isDuplicate : false
-  };
+  return { isDuplicate : false };
+};
+
+/**
+ * paginationOptions : get pagination options from request
+ * @param {Object} body : request body containing pagination parameters
+ * @return {Object} : pagination options object
+ */
+function paginationOptions(body = {}) {
+  const options = {};
+  
+  // Set default values
+  const page = parseInt(body.page) || 1;
+  const limit = parseInt(body.limit) || 10;
+  const skip = (page - 1) * limit;
+  
+  options.skip = skip;
+  options.limit = limit;
+  options.page = page;
+  
+  // Handle sorting
+  if (body.sort) {
+    options.sort = body.sort;
+  } else {
+    options.sort = { createdAt: -1 }; // Default sort by creation date descending
+  }
+  
+  // Handle population
+  if (body.populate) {
+    options.populate = body.populate;
+  }
+  
+  // Handle selection
+  if (body.select) {
+    options.select = body.select;
+  }
+  
+  return options;
 }
+
+/**
+ * pickFromObject : pick specific fields from object
+ * @param {Object} obj : source object
+ * @param {Array} fields : array of field names to pick
+ * @return {Object} : object containing only specified fields
+ */
+function pickFromObject(obj, fields) {
+  const result = {};
+  fields.forEach(field => {
+    if (obj.hasOwnProperty(field)) {
+      result[field] = obj[field];
+    }
+  });
+  return result;
+}
+
 
 module.exports = {
   convertObjectToEnum,
@@ -237,5 +296,7 @@ module.exports = {
   getDifferenceOfTwoDatesInTime,
   getRoleAccessData,
   getSelectObject,
-  checkUniqueFieldsInDatabase
+  checkUniqueFieldsInDatabase,
+  paginationOptions,
+  pickFromObject
 };

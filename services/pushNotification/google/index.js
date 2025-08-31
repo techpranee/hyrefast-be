@@ -16,11 +16,7 @@ const sendNotification = async (data) => {
   });
   const registrationToken = data.deviceId;
 
-  const payload = {
-    data: {
-      MyKey: data.message,
-    },
-  };
+  const payload = { data: { MyKey: data.message, }, };
   const options = {
     priority: 'high',
     timeToLive: 60 * 60 * 24,
@@ -33,6 +29,4 @@ const sendNotification = async (data) => {
     });
 };
 
-module.exports = {
-  sendNotification,
-};
+module.exports = { sendNotification, };

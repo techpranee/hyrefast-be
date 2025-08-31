@@ -7,11 +7,11 @@ let ActivityLog = require('../model/activityLog');
 let dbService = require('../utils/dbService');
  
 /**
-* @description : user activity logs related to routes will persist into database.
-* @param {Object} req : request of route.
-* @param {Object} res : response of route.
-* @param {callback} next : executes the next middleware succeeding the current middleware.
-*/
+ * @description : user activity logs related to routes will persist into database.
+ * @param {Object} req : request of route.
+ * @param {Object} res : response of route.
+ * @param {callback} next : executes the next middleware succeeding the current middleware.
+ */
 const addActivityLog = async (req,res,next) => { 
   try {
     res.on('finish',async ()=>{
@@ -44,7 +44,7 @@ const addActivityLog = async (req,res,next) => {
   catch (error){
     next();
   }
-}
+};
 
 /**
  * @description : returns action method for particular route.
@@ -74,8 +74,6 @@ const getAction = (url,method) => {
   };
   
   return action;
-}
+};
 
-module.exports = {
-  addActivityLog
-}
+module.exports = { addActivityLog };
