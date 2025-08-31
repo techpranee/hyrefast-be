@@ -7,10 +7,10 @@ services:
     container_name: hyrefast-backend
     restart: unless-stopped
     ports:
-      - '5000:5000'
+      - '6363:6363'
     environment:
       - NODE_ENV=production
-      - PORT=5000
+      - PORT=6363
       - DB_URL=${MONGODB_CONNECTION_STRING}
       - DB_TEST_URL=${MONGODB_CONNECTION_STRING}
       - ALLOW_ORIGIN=*
