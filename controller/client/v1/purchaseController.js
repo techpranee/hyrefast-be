@@ -415,9 +415,9 @@ const createPurchaseOrder = async (req, res) => {
     }
 
     // Get current workspace balance for tracking
-    const currentBalance = await CreditService.getCreditBalance(workspaceId);
-    purchaseData.balance_before = currentBalance.available_credits;
-    purchaseData.balance_after = currentBalance.available_credits + purchaseData.credits_amount;
+    const currentBalance = await CreditService.getWorkspaceCreditBalance(workspaceId);
+    purchaseData.balance_before = currentBalance.total_available;
+    purchaseData.balance_after = currentBalance.total_available + purchaseData.credits_amount;
 
     // Create purchase record
     const purchase = await dbService.create(Purchase, purchaseData);
@@ -534,9 +534,11 @@ const verifyAndCompletePurchase = async (req, res) => {
 
     // Add credits to workspace
     const creditResult = await CreditService.addCreditsAfterPurchase(
-      purchase.workspace._id,
-      purchase._id,
-      purchase.credits_amount
+      purchase,  // Pass the entire purchase object
+      {
+        credits: purchase.credits_amount,
+        name: purchase.description || 'Credit Purchase'
+      }
     );
 
     if (!creditResult.success) {
@@ -555,7 +557,7 @@ const verifyAndCompletePurchase = async (req, res) => {
         purchaseId: purchase._id,
         paymentId: paymentId,
         creditsAdded: purchase.credits_amount,
-        newBalance: creditResult.workspace.available_credits,
+        newBalance: creditResult.new_balance,
         workspace: {
           id: purchase.workspace._id,
           name: purchase.workspace.name

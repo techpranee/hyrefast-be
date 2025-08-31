@@ -372,19 +372,20 @@ const getCreditBalance = async (req, res) => {
       return res.recordNotFound({ message: 'Workspace not found' });
     }
 
-    const balance = await CreditService.getCreditBalance(workspaceId);
+    const balance = await CreditService.getWorkspaceCreditBalance(workspaceId);
 
     return res.success({
       data: {
         workspaceId: workspaceId,
-        availableCredits: balance.available_credits,
-        totalCreditsUsed: balance.total_credits_used,
-        totalCreditsPurchased: balance.total_credits_purchased,
-        lastCreditUpdate: balance.last_credit_update,
-        creditAlertThreshold: balance.credit_alert_threshold
+        availableCredits: balance.total_available,
+        totalCreditsUsed: balance.total_used,
+        totalCreditsPurchased: balance.total_purchased,
+        lastCreditUpdate: balance.last_update,
+        creditAlertThreshold: balance.alert_threshold
       }
     });
   } catch (error) {
+    console.log(error, "errror");
     return res.internalServerError({ message: error.message });
   }
 };
