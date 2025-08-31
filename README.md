@@ -19,8 +19,8 @@
 
 	- One user with Recruiter role,
 	# Default Recruiter credentials
-	**username** : Daisha_Kulas49@gmail.com
-	**password** : thgHQajJkYBCp7p
+	**username** : Alicia.Connelly60@gmail.com
+	**password** : Dr2G4EdqflsITo2
 
 ## How to use generated APIs:
 [Click here to visit documentation](<https://docs.dhiwise.com/docs/node/generate-apis/> "API Documentation")

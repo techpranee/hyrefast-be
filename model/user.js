@@ -1,132 +1,111 @@
 /**
- * user.js
- * @description :: model of a database collection user
- */
+  * user.js
+  * @description :: model of a database collection user
+  */
 
 const mongoose = require("mongoose");
-const mongoosePaginate = require("mongoose-paginate-v2");
-let idValidator = require("mongoose-id-validator");
+const mongoosePaginate = require('mongoose-paginate-v2');
+let idValidator = require('mongoose-id-validator');
 const bcrypt = require("bcrypt");
-const { USER_TYPES } = require("../constants/authConstant");
-const { convertObjectToEnum } = require("../utils/common");
-const authConstantEnum = require("../constants/authConstant");
-
+const{USER_TYPES} = require("../constants/authConstant");
+const {convertObjectToEnum} = require("../utils/common")
+const authConstantEnum=require("../constants/authConstant")
+        
+        
 const myCustomLabels = {
-  totalDocs: "itemCount",
-  docs: "data",
-  limit: "perPage",
-  page: "currentPage",
-  nextPage: "next",
-  prevPage: "prev",
-  totalPages: "pageCount",
-  pagingCounter: "slNo",
-  meta: "paginator",
+    totalDocs: 'itemCount',
+    docs: 'data',
+    limit: 'perPage',
+    page: 'currentPage',
+    nextPage: 'next',
+    prevPage: 'prev',
+    totalPages: 'pageCount',
+    pagingCounter: 'slNo',
+    meta: 'paginator',
 };
-mongoosePaginate.paginate.options = { customLabels: myCustomLabels };
+mongoosePaginate.paginate.options = {
+    customLabels: myCustomLabels
+};
 const Schema = mongoose.Schema;
 const schema = new Schema(
-  {
-    username: { type: String },
+{
 
-    password: { type: String },
+    username:{type:String},
 
-    email: { type: String },
+    password:{type:String},
 
-    name: { type: String },
+    email:{type:String},
 
-    isActive: { type: Boolean },
+    name:{type:String},
 
-    createdAt: { type: Date },
+    isActive:{type:Boolean},
 
-    updatedAt: { type: Date },
+    createdAt:{type:Date},
 
-    addedBy: {
-      type: Schema.Types.ObjectId,
-      ref: "user",
-    },
+    updatedAt:{type:Date},
 
-    updatedBy: {
-      type: Schema.Types.ObjectId,
-      ref: "user",
-    },
+    addedBy:{type:Schema.Types.ObjectId,ref:"user"},
 
-    userType: {
-      type: Number,
-      enum: convertObjectToEnum(USER_TYPES),
-      required: true,
-    },
+    updatedBy:{type:Schema.Types.ObjectId,ref:"user"},
 
-    workspace: {
-      ref: "workspace",
-      type: Schema.Types.ObjectId,
-    },
+    userType:{type:Number,enum:convertObjectToEnum(USER_TYPES),required:true},
 
-    mobileNo: { type: String },
+    workspace:{ref:"workspace",type:Schema.Types.ObjectId},
 
-    isDeleted: { type: Boolean },
-    twoFactorRequired: {
-      type: Boolean,
-      default: false,
-    },
+    mobileNo:{type:String},
 
-    loginOTP: {
-      code: String,
-      expireTime: Date,
-    },
+    isDeleted:{type:Boolean},
 
-    resetPasswordLink: {
-      code: String,
-      expireTime: Date,
-    },
+    loginOTP:{code:String,expireTime:Date},
 
-    loginRetryLimit: {
-      type: Number,
-      default: 0,
-    },
+    resetPasswordLink:{code:String,expireTime:Date},
 
-    loginReactiveTime: { type: Date },
+    loginRetryLimit:{type:Number,default:0},
 
-    ssoAuth: { googleId: { type: String } },
-  },
-  {
-    timestamps: {
-      createdAt: "createdAt",
-      updatedAt: "updatedAt",
-    },
-  }
-);
-schema.pre("save", async function (next) {
-  this.isDeleted = false;
-  this.isActive = true;
-  if (this.password) {
-    this.password = await bcrypt.hash(this.password, 8);
-  }
-  next();
-});
+    loginReactiveTime:{type:Date},
 
-schema.pre("insertMany", async function (next, docs) {
-  if (docs && docs.length) {
-    for (let index = 0; index < docs.length; index++) {
-      const element = docs[index];
-      element.isDeleted = false;
-      element.isActive = true;
+    ssoAuth:{googleId:{type:String}}
     }
-  }
-  next();
+    ,{ 
+        timestamps: { 
+            createdAt: 'createdAt', 
+            updatedAt: 'updatedAt' 
+        } 
+    }
+);
+schema.pre('save', async function(next) {
+    this.isDeleted = false;
+    this.isActive = true;
+    if(this.password){
+        this.password = await bcrypt.hash(this.password, 8);
+    }
+    next();
 });
+
+schema.pre('insertMany', async function (next, docs) {
+    if (docs && docs.length){
+        for (let index = 0; index < docs.length; index++) {
+        const element = docs[index];
+        element.isDeleted = false;
+        element.isActive = true;
+        }
+    }
+    next();
+});
+
 
 schema.methods.isPasswordMatch = async function (password) {
-  const user = this;
-  return bcrypt.compare(password, user.password);
+    const user = this;
+    return bcrypt.compare(password, user.password);
 };
 schema.method("toJSON", function () {
-  const { _id, __v, ...object } = this.toObject({ virtuals: true });
-  object.id = _id;
-  delete object.password;
-
-  return object;
+    const { _id, __v, ...object } = this.toObject({virtuals:true});
+    object.id = _id;
+                    delete object.password
+     
+    return object;
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const user = mongoose.model("user", schema);
-module.exports = user;
+const user = mongoose.model("user",schema);
+module.exports = user

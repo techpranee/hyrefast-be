@@ -1,67 +1,64 @@
 /**
- * pushNotification.js
- * @description :: model of a database collection pushNotification
- */
+  * pushNotification.js
+  * @description :: model of a database collection pushNotification
+  */
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const mongoosePaginate = require('mongoose-paginate-v2');
 let idValidator = require('mongoose-id-validator');
 const myCustomLabels = {
-  totalDocs: 'itemCount',
-  docs: 'data',
-  limit: 'perPage',
-  page: 'currentPage',
-  nextPage: 'next',
-  prevPage: 'prev',
-  totalPages: 'pageCount',
-  pagingCounter: 'slNo',
-  meta: 'paginator',
+    totalDocs: 'itemCount',
+    docs: 'data',
+    limit: 'perPage',
+    page: 'currentPage',
+    nextPage: 'next',
+    prevPage: 'prev',
+    totalPages: 'pageCount',
+    pagingCounter: 'slNo',
+    meta: 'paginator',
 };
-mongoosePaginate.paginate.options = { customLabels: myCustomLabels };
+mongoosePaginate.paginate.options = {
+    customLabels: myCustomLabels
+};
 const Schema = mongoose.Schema;
 const schema = new Schema(
-  {
+{
 
-    userId:{ type:Schema.Types.ObjectId },
+    userId:{type:Schema.Types.ObjectId},
 
-    deviceId:{
-      type:String,
-      required:true
-    },
+    deviceId:{type:String,required:true},
 
-    playerId:{ type:String },
+    playerId:{type:String},
 
-    isActive:{ type:Boolean },
+    isActive:{type:Boolean},
 
-    isDeleted:{ type:Boolean }
-  }
+    isDeleted:{type:Boolean}
+    }
 );
-schema.pre('save', async function (next) {
-  this.isDeleted = false;
-  this.isActive = true;
-  next();
+schema.pre('save', async function(next) {
+    this.isDeleted = false;
+    this.isActive = true;
+    next();
 });
 
 schema.pre('insertMany', async function (next, docs) {
-  if (docs && docs.length){
-    for (let index = 0; index < docs.length; index++) {
-      const element = docs[index];
-      element.isDeleted = false;
-      element.isActive = true;
+    if (docs && docs.length){
+        for (let index = 0; index < docs.length; index++) {
+        const element = docs[index];
+        element.isDeleted = false;
+        element.isActive = true;
+        }
     }
-  }
-  next();
+    next();
 });
 
-schema.method('toJSON', function () {
-  const {
-    _id, __v, ...object 
-  } = this.toObject({ virtuals:true });
-  object.id = _id;
+schema.method("toJSON", function () {
+    const { _id, __v, ...object } = this.toObject({virtuals:true});
+    object.id = _id;
      
-  return object;
+    return object;
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const pushNotification = mongoose.model('pushNotification',schema);
-module.exports = pushNotification;
+const pushNotification = mongoose.model("pushNotification",schema);
+module.exports = pushNotification

@@ -14,14 +14,26 @@ components:
 tags:
   - name: client
     description: client APIs
-  - name: client > response
-    description: response Model APIs
+  - name: client > credit
+    description: credit Model APIs
   - name: client > Social Login
     description: Login Through Social Accounts
   - name: client > Push Notification
     description: Push Notification Routes
   - name: client > File Upload
     description: Upload Files
+  - name: client > payment
+    description: payment Model APIs
+  - name: client > plan
+    description: plan Model APIs
+  - name: client > purchase
+    description: purchase Model APIs
+  - name: client > invitations
+    description: invitations Model APIs
+  - name: client > workspace
+    description: workspace Model APIs
+  - name: client > response
+    description: response Model APIs
   - name: client > application
     description: application Model APIs
   - name: client > question
@@ -43,11 +55,11 @@ tags:
   - name: client > userRole
     description: userRole Model APIs
 paths:
-  /client/api/v1/response/{id}:
+  /client/api/v1/credit/{id}:
     get:
       tags:
-        - client > response
-      summary: getresponse
+        - client > credit
+      summary: getcredit
       security:
         - bearerAuth: []
       parameters:
@@ -77,30 +89,44 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  job: Ergonomic
-                  question: Market
-                  user: Republic
-                  score: synthesize
-                  id: 6898e051f56626ed02b5ddba
+                  workspace: 68b3fa147a03b547a3ec7c22
+                  deduction: 245
+                  addition: 274
+                  is_added: false
+                  application: 68b3fa147a03b547a3ec7c23
+                  balance:
+                    - _id: false
+                      credits: 770
+                      expiry: '2026-03-31T07:13:53.321Z'
+                      is_promo: false
+                      no_expiry: false
+                  id: 68b3fa147a03b547a3ec7c27
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-01-16T06:34:16.012Z'
-                  updatedAt: '2026-06-28T14:02:37.072Z'
-  /client/api/v1/response/create:
+                  createdAt: '2026-07-04T10:47:09.569Z'
+                  updatedAt: '2026-06-25T02:35:15.369Z'
+  /client/api/v1/credit/create:
     post:
       tags:
-        - client > response
-      summary: addresponse
+        - client > credit
+      summary: addcredit
       requestBody:
         content:
           application/json:
             schema:
               type: object
               example:
-                job: Ergonomic
-                question: Market
-                user: Republic
-                score: synthesize
+                workspace: 68b3fa147a03b547a3ec7c22
+                deduction: 245
+                addition: 274
+                is_added: false
+                application: 68b3fa147a03b547a3ec7c23
+                balance:
+                  - _id: false
+                    credits: 770
+                    expiry: '2026-03-31T07:13:53.321Z'
+                    is_promo: false
+                    no_expiry: false
       security:
         - bearerAuth: []
       parameters:
@@ -125,20 +151,27 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  job: Ergonomic
-                  question: Market
-                  user: Republic
-                  score: synthesize
-                  id: 6898e051f56626ed02b5ddb8
+                  workspace: 68b3fa147a03b547a3ec7c22
+                  deduction: 245
+                  addition: 274
+                  is_added: false
+                  application: 68b3fa147a03b547a3ec7c23
+                  balance:
+                    - _id: false
+                      credits: 770
+                      expiry: '2026-03-31T07:13:53.321Z'
+                      is_promo: false
+                      no_expiry: false
+                  id: 68b3fa147a03b547a3ec7c25
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-01-16T06:34:16.012Z'
-                  updatedAt: '2026-06-28T14:02:37.072Z'
-  /client/api/v1/response/list:
+                  createdAt: '2026-07-04T10:47:09.569Z'
+                  updatedAt: '2026-06-25T02:35:15.369Z'
+  /client/api/v1/credit/list:
     post:
       tags:
-        - client > response
-      summary: findAllresponse
+        - client > credit
+      summary: findAllcredit
       requestBody:
         content:
           application/json:
@@ -191,15 +224,22 @@ paths:
                 message: Your request is successfully executed
                 data:
                   data:
-                    - job: Ergonomic
-                      question: Market
-                      user: Republic
-                      score: synthesize
-                      id: 6898e051f56626ed02b5ddb9
+                    - workspace: 68b3fa147a03b547a3ec7c22
+                      deduction: 245
+                      addition: 274
+                      is_added: false
+                      application: 68b3fa147a03b547a3ec7c23
+                      balance:
+                        - _id: false
+                          credits: 770
+                          expiry: '2026-03-31T07:13:53.321Z'
+                          is_promo: false
+                          no_expiry: false
+                      id: 68b3fa147a03b547a3ec7c26
                       isDeleted: false
                       isActive: true
-                      createdAt: '2026-01-16T06:34:16.012Z'
-                      updatedAt: '2026-06-28T14:02:37.072Z'
+                      createdAt: '2026-07-04T10:47:09.569Z'
+                      updatedAt: '2026-06-25T02:35:15.369Z'
                   paginator:
                     itemCount: 1
                     offset: 0
@@ -211,11 +251,11 @@ paths:
                     hasNextPage: false
                     prev: null
                     next: null
-  /client/api/v1/response/count:
+  /client/api/v1/credit/count:
     post:
       tags:
-        - client > response
-      summary: getresponseCount
+        - client > credit
+      summary: getcreditCount
       requestBody:
         content:
           application/json:
@@ -249,11 +289,11 @@ paths:
                 message: Your request is successfully executed
                 data:
                   count: 10
-  /client/api/v1/response/addBulk:
+  /client/api/v1/credit/addBulk:
     post:
       tags:
-        - client > response
-      summary: insertBulkresponse
+        - client > credit
+      summary: insertBulkcredit
       requestBody:
         content:
           application/json:
@@ -261,10 +301,17 @@ paths:
               type: object
               example:
                 data:
-                  - job: Ergonomic
-                    question: Market
-                    user: Republic
-                    score: synthesize
+                  - workspace: 68b3fa147a03b547a3ec7c22
+                    deduction: 245
+                    addition: 274
+                    is_added: false
+                    application: 68b3fa147a03b547a3ec7c23
+                    balance:
+                      - _id: false
+                        credits: 770
+                        expiry: '2026-03-31T07:13:53.321Z'
+                        is_promo: false
+                        no_expiry: false
       security:
         - bearerAuth: []
       parameters:
@@ -290,11 +337,11 @@ paths:
                 message: Your request is successfully executed
                 data:
                   count: 2
-  /client/api/v1/response/deleteMany:
+  /client/api/v1/credit/deleteMany:
     post:
       tags:
-        - client > response
-      summary: deleteManyresponse
+        - client > credit
+      summary: deleteManycredit
       requestBody:
         content:
           application/json:
@@ -329,21 +376,28 @@ paths:
                 message: Your request is successfully executed
                 data:
                   count: 2
-  /client/api/v1/response/update/{id}:
+  /client/api/v1/credit/update/{id}:
     put:
       tags:
-        - client > response
-      summary: updateresponse
+        - client > credit
+      summary: updatecredit
       requestBody:
         content:
           application/json:
             schema:
               type: object
               example:
-                job: Ergonomic
-                question: Market
-                user: Republic
-                score: synthesize
+                workspace: 68b3fa147a03b547a3ec7c22
+                deduction: 245
+                addition: 274
+                is_added: false
+                application: 68b3fa147a03b547a3ec7c23
+                balance:
+                  - _id: false
+                    credits: 770
+                    expiry: '2026-03-31T07:13:53.321Z'
+                    is_promo: false
+                    no_expiry: false
       security:
         - bearerAuth: []
       parameters:
@@ -373,20 +427,27 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  job: Ergonomic
-                  question: Market
-                  user: Republic
-                  score: synthesize
-                  id: 6898e051f56626ed02b5ddbb
+                  workspace: 68b3fa147a03b547a3ec7c22
+                  deduction: 245
+                  addition: 274
+                  is_added: false
+                  application: 68b3fa147a03b547a3ec7c23
+                  balance:
+                    - _id: false
+                      credits: 770
+                      expiry: '2026-03-31T07:13:53.321Z'
+                      is_promo: false
+                      no_expiry: false
+                  id: 68b3fa147a03b547a3ec7c28
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-01-16T06:34:16.012Z'
-                  updatedAt: '2026-06-28T14:02:37.072Z'
-  /client/api/v1/response/partial-update/{id}:
+                  createdAt: '2026-07-04T10:47:09.569Z'
+                  updatedAt: '2026-06-25T02:35:15.369Z'
+  /client/api/v1/credit/partial-update/{id}:
     put:
       tags:
-        - client > response
-      summary: partialupdateresponse
+        - client > credit
+      summary: partialupdatecredit
       requestBody:
         content:
           application/json:
@@ -424,20 +485,27 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  job: Ergonomic
-                  question: Market
-                  user: Republic
-                  score: synthesize
-                  id: 6898e051f56626ed02b5ddbc
+                  workspace: 68b3fa147a03b547a3ec7c22
+                  deduction: 245
+                  addition: 274
+                  is_added: false
+                  application: 68b3fa147a03b547a3ec7c23
+                  balance:
+                    - _id: false
+                      credits: 770
+                      expiry: '2026-03-31T07:13:53.321Z'
+                      is_promo: false
+                      no_expiry: false
+                  id: 68b3fa147a03b547a3ec7c29
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-01-16T06:34:16.012Z'
-                  updatedAt: '2026-06-28T14:02:37.072Z'
-  /client/api/v1/response/softDelete/{id}:
+                  createdAt: '2026-07-04T10:47:09.569Z'
+                  updatedAt: '2026-06-25T02:35:15.369Z'
+  /client/api/v1/credit/softDelete/{id}:
     put:
       tags:
-        - client > response
-      summary: softDeleteresponse
+        - client > credit
+      summary: softDeletecredit
       requestBody:
         content:
           application/json:
@@ -474,11 +542,11 @@ paths:
                 message: Your request is successfully executed
                 data:
                   count: 2
-  /client/api/v1/response/softDeleteMany:
+  /client/api/v1/credit/softDeleteMany:
     put:
       tags:
-        - client > response
-      summary: softDeleteManyresponse
+        - client > credit
+      summary: softDeleteManycredit
       requestBody:
         content:
           application/json:
@@ -512,11 +580,11 @@ paths:
                 message: Your request is successfully executed
                 data:
                   count: 2
-  /client/api/v1/response/updateBulk:
+  /client/api/v1/credit/updateBulk:
     put:
       tags:
-        - client > response
-      summary: updateBulkresponse
+        - client > credit
+      summary: updateBulkcredit
       requestBody:
         content:
           application/json:
@@ -552,11 +620,11 @@ paths:
                 message: Your request is successfully executed
                 data:
                   count: 2
-  /client/api/v1/response/delete/{id}:
+  /client/api/v1/credit/delete/{id}:
     delete:
       tags:
-        - client > response
-      summary: deleteresponse
+        - client > credit
+      summary: deletecredit
       security:
         - bearerAuth: []
       parameters:
@@ -751,6 +819,3462 @@ paths:
                 data:
                   - status: true
                     path: URL to access file
+  /client/api/v1/payment/{id}:
+    get:
+      tags:
+        - client > payment
+      summary: getpayment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  user: 68b3fa147a03b547a3ec7c2c
+                  workspace: 68b3fa147a03b547a3ec7c2d
+                  data: adapter
+                  status: Switchable
+                  is_subscription: false
+                  currency: Polarised
+                  platform: e-tailers
+                  ip: panel
+                  id: 68b3fa147a03b547a3ec7c31
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2026-08-26T16:58:16.344Z'
+                  updatedAt: '2026-07-14T04:43:31.116Z'
+  /client/api/v1/payment/create:
+    post:
+      tags:
+        - client > payment
+      summary: addpayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                user: 68b3fa147a03b547a3ec7c2c
+                workspace: 68b3fa147a03b547a3ec7c2d
+                data: adapter
+                status: Switchable
+                is_subscription: false
+                currency: Polarised
+                platform: e-tailers
+                ip: panel
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  user: 68b3fa147a03b547a3ec7c2c
+                  workspace: 68b3fa147a03b547a3ec7c2d
+                  data: adapter
+                  status: Switchable
+                  is_subscription: false
+                  currency: Polarised
+                  platform: e-tailers
+                  ip: panel
+                  id: 68b3fa147a03b547a3ec7c2f
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2026-08-26T16:58:16.344Z'
+                  updatedAt: '2026-07-14T04:43:31.116Z'
+  /client/api/v1/payment/list:
+    post:
+      tags:
+        - client > payment
+      summary: findAllpayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  data:
+                    - user: 68b3fa147a03b547a3ec7c2c
+                      workspace: 68b3fa147a03b547a3ec7c2d
+                      data: adapter
+                      status: Switchable
+                      is_subscription: false
+                      currency: Polarised
+                      platform: e-tailers
+                      ip: panel
+                      id: 68b3fa147a03b547a3ec7c30
+                      isDeleted: false
+                      isActive: true
+                      createdAt: '2026-08-26T16:58:16.344Z'
+                      updatedAt: '2026-07-14T04:43:31.116Z'
+                  paginator:
+                    itemCount: 1
+                    offset: 0
+                    perPage: 10
+                    pageCount: 1
+                    currentPage: 1
+                    slNo: 1
+                    hasPrevPage: false
+                    hasNextPage: false
+                    prev: null
+                    next: null
+  /client/api/v1/payment/count:
+    post:
+      tags:
+        - client > payment
+      summary: getpaymentCount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                where:
+                  isActive: true
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 10
+  /client/api/v1/payment/addBulk:
+    post:
+      tags:
+        - client > payment
+      summary: insertBulkpayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                data:
+                  - user: 68b3fa147a03b547a3ec7c2c
+                    workspace: 68b3fa147a03b547a3ec7c2d
+                    data: adapter
+                    status: Switchable
+                    is_subscription: false
+                    currency: Polarised
+                    platform: e-tailers
+                    ip: panel
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/payment/deleteMany:
+    post:
+      tags:
+        - client > payment
+      summary: deleteManypayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/payment/update/{id}:
+    put:
+      tags:
+        - client > payment
+      summary: updatepayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                user: 68b3fa147a03b547a3ec7c2c
+                workspace: 68b3fa147a03b547a3ec7c2d
+                data: adapter
+                status: Switchable
+                is_subscription: false
+                currency: Polarised
+                platform: e-tailers
+                ip: panel
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  user: 68b3fa147a03b547a3ec7c2c
+                  workspace: 68b3fa147a03b547a3ec7c2d
+                  data: adapter
+                  status: Switchable
+                  is_subscription: false
+                  currency: Polarised
+                  platform: e-tailers
+                  ip: panel
+                  id: 68b3fa147a03b547a3ec7c32
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2026-08-26T16:58:16.344Z'
+                  updatedAt: '2026-07-14T04:43:31.116Z'
+  /client/api/v1/payment/partial-update/{id}:
+    put:
+      tags:
+        - client > payment
+      summary: partialupdatepayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  user: 68b3fa147a03b547a3ec7c2c
+                  workspace: 68b3fa147a03b547a3ec7c2d
+                  data: adapter
+                  status: Switchable
+                  is_subscription: false
+                  currency: Polarised
+                  platform: e-tailers
+                  ip: panel
+                  id: 68b3fa147a03b547a3ec7c33
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2026-08-26T16:58:16.344Z'
+                  updatedAt: '2026-07-14T04:43:31.116Z'
+  /client/api/v1/payment/softDelete/{id}:
+    put:
+      tags:
+        - client > payment
+      summary: softDeletepayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/payment/softDeleteMany:
+    put:
+      tags:
+        - client > payment
+      summary: softDeleteManypayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                ids:
+                  - ':id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/payment/updateBulk:
+    put:
+      tags:
+        - client > payment
+      summary: updateBulkpayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/payment/delete/{id}:
+    delete:
+      tags:
+        - client > payment
+      summary: deletepayment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  Count: 1
+  /client/api/v1/plan/{id}:
+    get:
+      tags:
+        - client > plan
+      summary: getplan
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  name: Vivian Wilderman
+                  credits: 632
+                  validity:
+                    text: back
+                    days: 33
+                  amount: 68
+                  currency: Baby
+                  id: 68b3fa147a03b547a3ec7c39
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2025-09-18T07:07:42.027Z'
+                  updatedAt: '2026-01-19T04:22:24.401Z'
+  /client/api/v1/plan/create:
+    post:
+      tags:
+        - client > plan
+      summary: addplan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: Vivian Wilderman
+                credits: 632
+                validity:
+                  text: back
+                  days: 33
+                amount: 68
+                currency: Baby
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  name: Vivian Wilderman
+                  credits: 632
+                  validity:
+                    text: back
+                    days: 33
+                  amount: 68
+                  currency: Baby
+                  id: 68b3fa147a03b547a3ec7c37
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2025-09-18T07:07:42.027Z'
+                  updatedAt: '2026-01-19T04:22:24.401Z'
+  /client/api/v1/plan/list:
+    post:
+      tags:
+        - client > plan
+      summary: findAllplan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  data:
+                    - name: Vivian Wilderman
+                      credits: 632
+                      validity:
+                        text: back
+                        days: 33
+                      amount: 68
+                      currency: Baby
+                      id: 68b3fa147a03b547a3ec7c38
+                      isDeleted: false
+                      isActive: true
+                      createdAt: '2025-09-18T07:07:42.027Z'
+                      updatedAt: '2026-01-19T04:22:24.401Z'
+                  paginator:
+                    itemCount: 1
+                    offset: 0
+                    perPage: 10
+                    pageCount: 1
+                    currentPage: 1
+                    slNo: 1
+                    hasPrevPage: false
+                    hasNextPage: false
+                    prev: null
+                    next: null
+  /client/api/v1/plan/count:
+    post:
+      tags:
+        - client > plan
+      summary: getplanCount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                where:
+                  isActive: true
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 10
+  /client/api/v1/plan/addBulk:
+    post:
+      tags:
+        - client > plan
+      summary: insertBulkplan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                data:
+                  - name: Vivian Wilderman
+                    credits: 632
+                    validity:
+                      text: back
+                      days: 33
+                    amount: 68
+                    currency: Baby
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/plan/deleteMany:
+    post:
+      tags:
+        - client > plan
+      summary: deleteManyplan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/plan/update/{id}:
+    put:
+      tags:
+        - client > plan
+      summary: updateplan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: Vivian Wilderman
+                credits: 632
+                validity:
+                  text: back
+                  days: 33
+                amount: 68
+                currency: Baby
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  name: Vivian Wilderman
+                  credits: 632
+                  validity:
+                    text: back
+                    days: 33
+                  amount: 68
+                  currency: Baby
+                  id: 68b3fa147a03b547a3ec7c3a
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2025-09-18T07:07:42.027Z'
+                  updatedAt: '2026-01-19T04:22:24.401Z'
+  /client/api/v1/plan/partial-update/{id}:
+    put:
+      tags:
+        - client > plan
+      summary: partialupdateplan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  name: Vivian Wilderman
+                  credits: 632
+                  validity:
+                    text: back
+                    days: 33
+                  amount: 68
+                  currency: Baby
+                  id: 68b3fa147a03b547a3ec7c3b
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2025-09-18T07:07:42.027Z'
+                  updatedAt: '2026-01-19T04:22:24.401Z'
+  /client/api/v1/plan/softDelete/{id}:
+    put:
+      tags:
+        - client > plan
+      summary: softDeleteplan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/plan/softDeleteMany:
+    put:
+      tags:
+        - client > plan
+      summary: softDeleteManyplan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                ids:
+                  - ':id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/plan/updateBulk:
+    put:
+      tags:
+        - client > plan
+      summary: updateBulkplan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/plan/delete/{id}:
+    delete:
+      tags:
+        - client > plan
+      summary: deleteplan
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  Count: 1
+  /client/api/v1/purchase/{id}:
+    get:
+      tags:
+        - client > purchase
+      summary: getpurchase
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  workspace: 68b3fa147a03b547a3ec7c3e
+                  plan: 68b3fa147a03b547a3ec7c3f
+                  payment: 68b3fa147a03b547a3ec7c40
+                  status: Usability
+                  promo_code: connecting
+                  is_affiliation: true
+                  is_first_time: false
+                  is_subscription: true
+                  invoice_number: 369
+                  amount: 51
+                  currency: cross-media
+                  id: 68b3fa147a03b547a3ec7c44
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2026-03-29T19:53:23.348Z'
+                  updatedAt: '2026-07-28T14:14:38.633Z'
+  /client/api/v1/purchase/create:
+    post:
+      tags:
+        - client > purchase
+      summary: addpurchase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                workspace: 68b3fa147a03b547a3ec7c3e
+                plan: 68b3fa147a03b547a3ec7c3f
+                payment: 68b3fa147a03b547a3ec7c40
+                status: Usability
+                promo_code: connecting
+                is_affiliation: true
+                is_first_time: false
+                is_subscription: true
+                invoice_number: 369
+                amount: 51
+                currency: cross-media
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  workspace: 68b3fa147a03b547a3ec7c3e
+                  plan: 68b3fa147a03b547a3ec7c3f
+                  payment: 68b3fa147a03b547a3ec7c40
+                  status: Usability
+                  promo_code: connecting
+                  is_affiliation: true
+                  is_first_time: false
+                  is_subscription: true
+                  invoice_number: 369
+                  amount: 51
+                  currency: cross-media
+                  id: 68b3fa147a03b547a3ec7c42
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2026-03-29T19:53:23.348Z'
+                  updatedAt: '2026-07-28T14:14:38.633Z'
+  /client/api/v1/purchase/list:
+    post:
+      tags:
+        - client > purchase
+      summary: findAllpurchase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  data:
+                    - workspace: 68b3fa147a03b547a3ec7c3e
+                      plan: 68b3fa147a03b547a3ec7c3f
+                      payment: 68b3fa147a03b547a3ec7c40
+                      status: Usability
+                      promo_code: connecting
+                      is_affiliation: true
+                      is_first_time: false
+                      is_subscription: true
+                      invoice_number: 369
+                      amount: 51
+                      currency: cross-media
+                      id: 68b3fa147a03b547a3ec7c43
+                      isDeleted: false
+                      isActive: true
+                      createdAt: '2026-03-29T19:53:23.348Z'
+                      updatedAt: '2026-07-28T14:14:38.633Z'
+                  paginator:
+                    itemCount: 1
+                    offset: 0
+                    perPage: 10
+                    pageCount: 1
+                    currentPage: 1
+                    slNo: 1
+                    hasPrevPage: false
+                    hasNextPage: false
+                    prev: null
+                    next: null
+  /client/api/v1/purchase/count:
+    post:
+      tags:
+        - client > purchase
+      summary: getpurchaseCount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                where:
+                  isActive: true
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 10
+  /client/api/v1/purchase/addBulk:
+    post:
+      tags:
+        - client > purchase
+      summary: insertBulkpurchase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                data:
+                  - workspace: 68b3fa147a03b547a3ec7c3e
+                    plan: 68b3fa147a03b547a3ec7c3f
+                    payment: 68b3fa147a03b547a3ec7c40
+                    status: Usability
+                    promo_code: connecting
+                    is_affiliation: true
+                    is_first_time: false
+                    is_subscription: true
+                    invoice_number: 369
+                    amount: 51
+                    currency: cross-media
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/purchase/deleteMany:
+    post:
+      tags:
+        - client > purchase
+      summary: deleteManypurchase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/purchase/update/{id}:
+    put:
+      tags:
+        - client > purchase
+      summary: updatepurchase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                workspace: 68b3fa147a03b547a3ec7c3e
+                plan: 68b3fa147a03b547a3ec7c3f
+                payment: 68b3fa147a03b547a3ec7c40
+                status: Usability
+                promo_code: connecting
+                is_affiliation: true
+                is_first_time: false
+                is_subscription: true
+                invoice_number: 369
+                amount: 51
+                currency: cross-media
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  workspace: 68b3fa147a03b547a3ec7c3e
+                  plan: 68b3fa147a03b547a3ec7c3f
+                  payment: 68b3fa147a03b547a3ec7c40
+                  status: Usability
+                  promo_code: connecting
+                  is_affiliation: true
+                  is_first_time: false
+                  is_subscription: true
+                  invoice_number: 369
+                  amount: 51
+                  currency: cross-media
+                  id: 68b3fa147a03b547a3ec7c45
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2026-03-29T19:53:23.348Z'
+                  updatedAt: '2026-07-28T14:14:38.633Z'
+  /client/api/v1/purchase/partial-update/{id}:
+    put:
+      tags:
+        - client > purchase
+      summary: partialupdatepurchase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  workspace: 68b3fa147a03b547a3ec7c3e
+                  plan: 68b3fa147a03b547a3ec7c3f
+                  payment: 68b3fa147a03b547a3ec7c40
+                  status: Usability
+                  promo_code: connecting
+                  is_affiliation: true
+                  is_first_time: false
+                  is_subscription: true
+                  invoice_number: 369
+                  amount: 51
+                  currency: cross-media
+                  id: 68b3fa147a03b547a3ec7c46
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2026-03-29T19:53:23.348Z'
+                  updatedAt: '2026-07-28T14:14:38.633Z'
+  /client/api/v1/purchase/softDelete/{id}:
+    put:
+      tags:
+        - client > purchase
+      summary: softDeletepurchase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/purchase/softDeleteMany:
+    put:
+      tags:
+        - client > purchase
+      summary: softDeleteManypurchase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                ids:
+                  - ':id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/purchase/updateBulk:
+    put:
+      tags:
+        - client > purchase
+      summary: updateBulkpurchase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/purchase/delete/{id}:
+    delete:
+      tags:
+        - client > purchase
+      summary: deletepurchase
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  Count: 1
+  /client/api/v1/invitations/{id}:
+    get:
+      tags:
+        - client > invitations
+      summary: getinvitations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  company: 68b3fa147a03b547a3ec7c49
+                  email: Fatima_Wisozk@hotmail.com
+                  phone: (240) 110-2812
+                  user: 68b3fa147a03b547a3ec7c4a
+                  id: 68b3fa147a03b547a3ec7c4e
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2026-03-23T21:42:57.671Z'
+                  updatedAt: '2026-06-16T02:14:00.832Z'
+  /client/api/v1/invitations/create:
+    post:
+      tags:
+        - client > invitations
+      summary: addinvitations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                company: 68b3fa147a03b547a3ec7c49
+                email: Fatima_Wisozk@hotmail.com
+                phone: (240) 110-2812
+                user: 68b3fa147a03b547a3ec7c4a
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  company: 68b3fa147a03b547a3ec7c49
+                  email: Fatima_Wisozk@hotmail.com
+                  phone: (240) 110-2812
+                  user: 68b3fa147a03b547a3ec7c4a
+                  id: 68b3fa147a03b547a3ec7c4c
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2026-03-23T21:42:57.671Z'
+                  updatedAt: '2026-06-16T02:14:00.832Z'
+  /client/api/v1/invitations/list:
+    post:
+      tags:
+        - client > invitations
+      summary: findAllinvitations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  data:
+                    - company: 68b3fa147a03b547a3ec7c49
+                      email: Fatima_Wisozk@hotmail.com
+                      phone: (240) 110-2812
+                      user: 68b3fa147a03b547a3ec7c4a
+                      id: 68b3fa147a03b547a3ec7c4d
+                      isDeleted: false
+                      isActive: true
+                      createdAt: '2026-03-23T21:42:57.671Z'
+                      updatedAt: '2026-06-16T02:14:00.832Z'
+                  paginator:
+                    itemCount: 1
+                    offset: 0
+                    perPage: 10
+                    pageCount: 1
+                    currentPage: 1
+                    slNo: 1
+                    hasPrevPage: false
+                    hasNextPage: false
+                    prev: null
+                    next: null
+  /client/api/v1/invitations/count:
+    post:
+      tags:
+        - client > invitations
+      summary: getinvitationsCount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                where:
+                  isActive: true
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 10
+  /client/api/v1/invitations/addBulk:
+    post:
+      tags:
+        - client > invitations
+      summary: insertBulkinvitations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                data:
+                  - company: 68b3fa147a03b547a3ec7c49
+                    email: Fatima_Wisozk@hotmail.com
+                    phone: (240) 110-2812
+                    user: 68b3fa147a03b547a3ec7c4a
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/invitations/deleteMany:
+    post:
+      tags:
+        - client > invitations
+      summary: deleteManyinvitations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/invitations/update/{id}:
+    put:
+      tags:
+        - client > invitations
+      summary: updateinvitations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                company: 68b3fa147a03b547a3ec7c49
+                email: Fatima_Wisozk@hotmail.com
+                phone: (240) 110-2812
+                user: 68b3fa147a03b547a3ec7c4a
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  company: 68b3fa147a03b547a3ec7c49
+                  email: Fatima_Wisozk@hotmail.com
+                  phone: (240) 110-2812
+                  user: 68b3fa147a03b547a3ec7c4a
+                  id: 68b3fa147a03b547a3ec7c4f
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2026-03-23T21:42:57.671Z'
+                  updatedAt: '2026-06-16T02:14:00.832Z'
+  /client/api/v1/invitations/partial-update/{id}:
+    put:
+      tags:
+        - client > invitations
+      summary: partialupdateinvitations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  company: 68b3fa147a03b547a3ec7c49
+                  email: Fatima_Wisozk@hotmail.com
+                  phone: (240) 110-2812
+                  user: 68b3fa147a03b547a3ec7c4a
+                  id: 68b3fa147a03b547a3ec7c50
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2026-03-23T21:42:57.671Z'
+                  updatedAt: '2026-06-16T02:14:00.832Z'
+  /client/api/v1/invitations/softDelete/{id}:
+    put:
+      tags:
+        - client > invitations
+      summary: softDeleteinvitations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/invitations/softDeleteMany:
+    put:
+      tags:
+        - client > invitations
+      summary: softDeleteManyinvitations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                ids:
+                  - ':id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/invitations/updateBulk:
+    put:
+      tags:
+        - client > invitations
+      summary: updateBulkinvitations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/invitations/delete/{id}:
+    delete:
+      tags:
+        - client > invitations
+      summary: deleteinvitations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  Count: 1
+  /client/api/v1/workspace/{id}:
+    get:
+      tags:
+        - client > workspace
+      summary: getworkspace
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  name: Jacquelyn Ziemann
+                  website: digital
+                  legal_name: unleash
+                  logo: product
+                  address: 711 Mayer Trace
+                  admin: 68b3fa147a03b547a3ec7c53
+                  credit_balance: 933
+                  id: 68b3fa147a03b547a3ec7c57
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2025-11-03T14:12:26.964Z'
+                  updatedAt: '2026-04-12T05:43:47.406Z'
+  /client/api/v1/workspace/create:
+    post:
+      tags:
+        - client > workspace
+      summary: addworkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: Jacquelyn Ziemann
+                website: digital
+                legal_name: unleash
+                logo: product
+                address: 711 Mayer Trace
+                admin: 68b3fa147a03b547a3ec7c53
+                credit_balance: 933
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  name: Jacquelyn Ziemann
+                  website: digital
+                  legal_name: unleash
+                  logo: product
+                  address: 711 Mayer Trace
+                  admin: 68b3fa147a03b547a3ec7c53
+                  credit_balance: 933
+                  id: 68b3fa147a03b547a3ec7c55
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2025-11-03T14:12:26.964Z'
+                  updatedAt: '2026-04-12T05:43:47.406Z'
+  /client/api/v1/workspace/list:
+    post:
+      tags:
+        - client > workspace
+      summary: findAllworkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  data:
+                    - name: Jacquelyn Ziemann
+                      website: digital
+                      legal_name: unleash
+                      logo: product
+                      address: 711 Mayer Trace
+                      admin: 68b3fa147a03b547a3ec7c53
+                      credit_balance: 933
+                      id: 68b3fa147a03b547a3ec7c56
+                      isDeleted: false
+                      isActive: true
+                      createdAt: '2025-11-03T14:12:26.964Z'
+                      updatedAt: '2026-04-12T05:43:47.406Z'
+                  paginator:
+                    itemCount: 1
+                    offset: 0
+                    perPage: 10
+                    pageCount: 1
+                    currentPage: 1
+                    slNo: 1
+                    hasPrevPage: false
+                    hasNextPage: false
+                    prev: null
+                    next: null
+  /client/api/v1/workspace/count:
+    post:
+      tags:
+        - client > workspace
+      summary: getworkspaceCount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                where:
+                  isActive: true
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 10
+  /client/api/v1/workspace/addBulk:
+    post:
+      tags:
+        - client > workspace
+      summary: insertBulkworkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                data:
+                  - name: Jacquelyn Ziemann
+                    website: digital
+                    legal_name: unleash
+                    logo: product
+                    address: 711 Mayer Trace
+                    admin: 68b3fa147a03b547a3ec7c53
+                    credit_balance: 933
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/workspace/deleteMany:
+    post:
+      tags:
+        - client > workspace
+      summary: deleteManyworkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/workspace/update/{id}:
+    put:
+      tags:
+        - client > workspace
+      summary: updateworkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: Jacquelyn Ziemann
+                website: digital
+                legal_name: unleash
+                logo: product
+                address: 711 Mayer Trace
+                admin: 68b3fa147a03b547a3ec7c53
+                credit_balance: 933
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  name: Jacquelyn Ziemann
+                  website: digital
+                  legal_name: unleash
+                  logo: product
+                  address: 711 Mayer Trace
+                  admin: 68b3fa147a03b547a3ec7c53
+                  credit_balance: 933
+                  id: 68b3fa147a03b547a3ec7c58
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2025-11-03T14:12:26.964Z'
+                  updatedAt: '2026-04-12T05:43:47.406Z'
+  /client/api/v1/workspace/partial-update/{id}:
+    put:
+      tags:
+        - client > workspace
+      summary: partialupdateworkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  name: Jacquelyn Ziemann
+                  website: digital
+                  legal_name: unleash
+                  logo: product
+                  address: 711 Mayer Trace
+                  admin: 68b3fa147a03b547a3ec7c53
+                  credit_balance: 933
+                  id: 68b3fa147a03b547a3ec7c59
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2025-11-03T14:12:26.964Z'
+                  updatedAt: '2026-04-12T05:43:47.406Z'
+  /client/api/v1/workspace/softDelete/{id}:
+    put:
+      tags:
+        - client > workspace
+      summary: softDeleteworkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/workspace/softDeleteMany:
+    put:
+      tags:
+        - client > workspace
+      summary: softDeleteManyworkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                ids:
+                  - ':id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/workspace/updateBulk:
+    put:
+      tags:
+        - client > workspace
+      summary: updateBulkworkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/workspace/delete/{id}:
+    delete:
+      tags:
+        - client > workspace
+      summary: deleteworkspace
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  Count: 1
+  /client/api/v1/response/{id}:
+    get:
+      tags:
+        - client > response
+      summary: getresponse
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  job: 68b3fa147a03b547a3ec7c5c
+                  question: 68b3fa147a03b547a3ec7c5d
+                  candidate: 68b3fa147a03b547a3ec7c5e
+                  score: portals
+                  sessionId: 68b3fa147a03b547a3ec7c5f
+                  questionNumber: 553
+                  questionText: Granite
+                  responseText: Dollar
+                  responseAudioUrl: Future
+                  responseVideoUrl: Multi-lateral
+                  transcriptionText: iterate
+                  id: 68b3fa147a03b547a3ec7c63
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2025-11-22T23:28:48.385Z'
+                  updatedAt: '2026-06-05T14:54:46.672Z'
+  /client/api/v1/response/create:
+    post:
+      tags:
+        - client > response
+      summary: addresponse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                job: 68b3fa147a03b547a3ec7c5c
+                question: 68b3fa147a03b547a3ec7c5d
+                candidate: 68b3fa147a03b547a3ec7c5e
+                score: portals
+                sessionId: 68b3fa147a03b547a3ec7c5f
+                questionNumber: 553
+                questionText: Granite
+                responseText: Dollar
+                responseAudioUrl: Future
+                responseVideoUrl: Multi-lateral
+                transcriptionText: iterate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  job: 68b3fa147a03b547a3ec7c5c
+                  question: 68b3fa147a03b547a3ec7c5d
+                  candidate: 68b3fa147a03b547a3ec7c5e
+                  score: portals
+                  sessionId: 68b3fa147a03b547a3ec7c5f
+                  questionNumber: 553
+                  questionText: Granite
+                  responseText: Dollar
+                  responseAudioUrl: Future
+                  responseVideoUrl: Multi-lateral
+                  transcriptionText: iterate
+                  id: 68b3fa147a03b547a3ec7c61
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2025-11-22T23:28:48.385Z'
+                  updatedAt: '2026-06-05T14:54:46.672Z'
+  /client/api/v1/response/list:
+    post:
+      tags:
+        - client > response
+      summary: findAllresponse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  data:
+                    - job: 68b3fa147a03b547a3ec7c5c
+                      question: 68b3fa147a03b547a3ec7c5d
+                      candidate: 68b3fa147a03b547a3ec7c5e
+                      score: portals
+                      sessionId: 68b3fa147a03b547a3ec7c5f
+                      questionNumber: 553
+                      questionText: Granite
+                      responseText: Dollar
+                      responseAudioUrl: Future
+                      responseVideoUrl: Multi-lateral
+                      transcriptionText: iterate
+                      id: 68b3fa147a03b547a3ec7c62
+                      isDeleted: false
+                      isActive: true
+                      createdAt: '2025-11-22T23:28:48.385Z'
+                      updatedAt: '2026-06-05T14:54:46.672Z'
+                  paginator:
+                    itemCount: 1
+                    offset: 0
+                    perPage: 10
+                    pageCount: 1
+                    currentPage: 1
+                    slNo: 1
+                    hasPrevPage: false
+                    hasNextPage: false
+                    prev: null
+                    next: null
+  /client/api/v1/response/count:
+    post:
+      tags:
+        - client > response
+      summary: getresponseCount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                where:
+                  isActive: true
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 10
+  /client/api/v1/response/addBulk:
+    post:
+      tags:
+        - client > response
+      summary: insertBulkresponse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                data:
+                  - job: 68b3fa147a03b547a3ec7c5c
+                    question: 68b3fa147a03b547a3ec7c5d
+                    candidate: 68b3fa147a03b547a3ec7c5e
+                    score: portals
+                    sessionId: 68b3fa147a03b547a3ec7c5f
+                    questionNumber: 553
+                    questionText: Granite
+                    responseText: Dollar
+                    responseAudioUrl: Future
+                    responseVideoUrl: Multi-lateral
+                    transcriptionText: iterate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/response/deleteMany:
+    post:
+      tags:
+        - client > response
+      summary: deleteManyresponse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/response/update/{id}:
+    put:
+      tags:
+        - client > response
+      summary: updateresponse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                job: 68b3fa147a03b547a3ec7c5c
+                question: 68b3fa147a03b547a3ec7c5d
+                candidate: 68b3fa147a03b547a3ec7c5e
+                score: portals
+                sessionId: 68b3fa147a03b547a3ec7c5f
+                questionNumber: 553
+                questionText: Granite
+                responseText: Dollar
+                responseAudioUrl: Future
+                responseVideoUrl: Multi-lateral
+                transcriptionText: iterate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  job: 68b3fa147a03b547a3ec7c5c
+                  question: 68b3fa147a03b547a3ec7c5d
+                  candidate: 68b3fa147a03b547a3ec7c5e
+                  score: portals
+                  sessionId: 68b3fa147a03b547a3ec7c5f
+                  questionNumber: 553
+                  questionText: Granite
+                  responseText: Dollar
+                  responseAudioUrl: Future
+                  responseVideoUrl: Multi-lateral
+                  transcriptionText: iterate
+                  id: 68b3fa147a03b547a3ec7c64
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2025-11-22T23:28:48.385Z'
+                  updatedAt: '2026-06-05T14:54:46.672Z'
+  /client/api/v1/response/partial-update/{id}:
+    put:
+      tags:
+        - client > response
+      summary: partialupdateresponse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  job: 68b3fa147a03b547a3ec7c5c
+                  question: 68b3fa147a03b547a3ec7c5d
+                  candidate: 68b3fa147a03b547a3ec7c5e
+                  score: portals
+                  sessionId: 68b3fa147a03b547a3ec7c5f
+                  questionNumber: 553
+                  questionText: Granite
+                  responseText: Dollar
+                  responseAudioUrl: Future
+                  responseVideoUrl: Multi-lateral
+                  transcriptionText: iterate
+                  id: 68b3fa147a03b547a3ec7c65
+                  isDeleted: false
+                  isActive: true
+                  createdAt: '2025-11-22T23:28:48.385Z'
+                  updatedAt: '2026-06-05T14:54:46.672Z'
+  /client/api/v1/response/softDelete/{id}:
+    put:
+      tags:
+        - client > response
+      summary: softDeleteresponse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/response/softDeleteMany:
+    put:
+      tags:
+        - client > response
+      summary: softDeleteManyresponse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                ids:
+                  - ':id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/response/updateBulk:
+    put:
+      tags:
+        - client > response
+      summary: updateBulkresponse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  count: 2
+  /client/api/v1/response/delete/{id}:
+    delete:
+      tags:
+        - client > response
+      summary: deleteresponse
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: SUCCESS
+                message: Your request is successfully executed
+                data:
+                  Count: 1
   /client/api/v1/application/{id}:
     get:
       tags:
@@ -785,13 +4309,13 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  user: 6898e051f56626ed02b5ddbf
-                  job: 6898e051f56626ed02b5ddc0
-                  id: 6898e051f56626ed02b5ddc4
+                  candidate: 68b3fa147a03b547a3ec7c68
+                  job: 68b3fa147a03b547a3ec7c69
+                  id: 68b3fa147a03b547a3ec7c6d
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-02-14T01:54:07.745Z'
-                  updatedAt: '2025-08-24T08:58:47.371Z'
+                  createdAt: '2025-10-14T18:42:02.503Z'
+                  updatedAt: '2026-01-26T06:59:11.383Z'
   /client/api/v1/application/create:
     post:
       tags:
@@ -803,8 +4327,8 @@ paths:
             schema:
               type: object
               example:
-                user: 6898e051f56626ed02b5ddbf
-                job: 6898e051f56626ed02b5ddc0
+                candidate: 68b3fa147a03b547a3ec7c68
+                job: 68b3fa147a03b547a3ec7c69
       security:
         - bearerAuth: []
       parameters:
@@ -829,13 +4353,13 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  user: 6898e051f56626ed02b5ddbf
-                  job: 6898e051f56626ed02b5ddc0
-                  id: 6898e051f56626ed02b5ddc2
+                  candidate: 68b3fa147a03b547a3ec7c68
+                  job: 68b3fa147a03b547a3ec7c69
+                  id: 68b3fa147a03b547a3ec7c6b
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-02-14T01:54:07.745Z'
-                  updatedAt: '2025-08-24T08:58:47.371Z'
+                  createdAt: '2025-10-14T18:42:02.503Z'
+                  updatedAt: '2026-01-26T06:59:11.383Z'
   /client/api/v1/application/list:
     post:
       tags:
@@ -893,13 +4417,13 @@ paths:
                 message: Your request is successfully executed
                 data:
                   data:
-                    - user: 6898e051f56626ed02b5ddbf
-                      job: 6898e051f56626ed02b5ddc0
-                      id: 6898e051f56626ed02b5ddc3
+                    - candidate: 68b3fa147a03b547a3ec7c68
+                      job: 68b3fa147a03b547a3ec7c69
+                      id: 68b3fa147a03b547a3ec7c6c
                       isDeleted: false
                       isActive: true
-                      createdAt: '2026-02-14T01:54:07.745Z'
-                      updatedAt: '2025-08-24T08:58:47.371Z'
+                      createdAt: '2025-10-14T18:42:02.503Z'
+                      updatedAt: '2026-01-26T06:59:11.383Z'
                   paginator:
                     itemCount: 1
                     offset: 0
@@ -961,8 +4485,8 @@ paths:
               type: object
               example:
                 data:
-                  - user: 6898e051f56626ed02b5ddbf
-                    job: 6898e051f56626ed02b5ddc0
+                  - candidate: 68b3fa147a03b547a3ec7c68
+                    job: 68b3fa147a03b547a3ec7c69
       security:
         - bearerAuth: []
       parameters:
@@ -1038,8 +4562,8 @@ paths:
             schema:
               type: object
               example:
-                user: 6898e051f56626ed02b5ddbf
-                job: 6898e051f56626ed02b5ddc0
+                candidate: 68b3fa147a03b547a3ec7c68
+                job: 68b3fa147a03b547a3ec7c69
       security:
         - bearerAuth: []
       parameters:
@@ -1069,13 +4593,13 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  user: 6898e051f56626ed02b5ddbf
-                  job: 6898e051f56626ed02b5ddc0
-                  id: 6898e051f56626ed02b5ddc5
+                  candidate: 68b3fa147a03b547a3ec7c68
+                  job: 68b3fa147a03b547a3ec7c69
+                  id: 68b3fa147a03b547a3ec7c6e
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-02-14T01:54:07.745Z'
-                  updatedAt: '2025-08-24T08:58:47.371Z'
+                  createdAt: '2025-10-14T18:42:02.503Z'
+                  updatedAt: '2026-01-26T06:59:11.383Z'
   /client/api/v1/application/partial-update/{id}:
     put:
       tags:
@@ -1118,13 +4642,13 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  user: 6898e051f56626ed02b5ddbf
-                  job: 6898e051f56626ed02b5ddc0
-                  id: 6898e051f56626ed02b5ddc6
+                  candidate: 68b3fa147a03b547a3ec7c68
+                  job: 68b3fa147a03b547a3ec7c69
+                  id: 68b3fa147a03b547a3ec7c6f
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-02-14T01:54:07.745Z'
-                  updatedAt: '2025-08-24T08:58:47.371Z'
+                  createdAt: '2025-10-14T18:42:02.503Z'
+                  updatedAt: '2026-01-26T06:59:11.383Z'
   /client/api/v1/application/softDelete/{id}:
     put:
       tags:
@@ -1313,12 +4837,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  title: Ramp
-                  id: 6898e051f56626ed02b5ddcc
+                  title: analyzing
+                  question_type: Dollar
+                  evaluation_instructions: Squares
+                  id: 68b3fa147a03b547a3ec7c75
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-06-25T16:24:57.200Z'
-                  updatedAt: '2025-11-19T04:44:25.738Z'
+                  createdAt: '2026-08-09T01:12:11.461Z'
+                  updatedAt: '2026-08-04T07:58:06.303Z'
   /client/api/v1/question/create:
     post:
       tags:
@@ -1330,7 +4856,9 @@ paths:
             schema:
               type: object
               example:
-                title: Ramp
+                title: analyzing
+                question_type: Dollar
+                evaluation_instructions: Squares
       security:
         - bearerAuth: []
       parameters:
@@ -1355,12 +4883,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  title: Ramp
-                  id: 6898e051f56626ed02b5ddca
+                  title: analyzing
+                  question_type: Dollar
+                  evaluation_instructions: Squares
+                  id: 68b3fa147a03b547a3ec7c73
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-06-25T16:24:57.200Z'
-                  updatedAt: '2025-11-19T04:44:25.738Z'
+                  createdAt: '2026-08-09T01:12:11.461Z'
+                  updatedAt: '2026-08-04T07:58:06.303Z'
   /client/api/v1/question/list:
     post:
       tags:
@@ -1418,12 +4948,14 @@ paths:
                 message: Your request is successfully executed
                 data:
                   data:
-                    - title: Ramp
-                      id: 6898e051f56626ed02b5ddcb
+                    - title: analyzing
+                      question_type: Dollar
+                      evaluation_instructions: Squares
+                      id: 68b3fa147a03b547a3ec7c74
                       isDeleted: false
                       isActive: true
-                      createdAt: '2026-06-25T16:24:57.200Z'
-                      updatedAt: '2025-11-19T04:44:25.738Z'
+                      createdAt: '2026-08-09T01:12:11.461Z'
+                      updatedAt: '2026-08-04T07:58:06.303Z'
                   paginator:
                     itemCount: 1
                     offset: 0
@@ -1485,7 +5017,9 @@ paths:
               type: object
               example:
                 data:
-                  - title: Ramp
+                  - title: analyzing
+                    question_type: Dollar
+                    evaluation_instructions: Squares
       security:
         - bearerAuth: []
       parameters:
@@ -1561,7 +5095,9 @@ paths:
             schema:
               type: object
               example:
-                title: Ramp
+                title: analyzing
+                question_type: Dollar
+                evaluation_instructions: Squares
       security:
         - bearerAuth: []
       parameters:
@@ -1591,12 +5127,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  title: Ramp
-                  id: 6898e051f56626ed02b5ddcd
+                  title: analyzing
+                  question_type: Dollar
+                  evaluation_instructions: Squares
+                  id: 68b3fa147a03b547a3ec7c76
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-06-25T16:24:57.200Z'
-                  updatedAt: '2025-11-19T04:44:25.738Z'
+                  createdAt: '2026-08-09T01:12:11.461Z'
+                  updatedAt: '2026-08-04T07:58:06.303Z'
   /client/api/v1/question/partial-update/{id}:
     put:
       tags:
@@ -1639,12 +5177,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  title: Ramp
-                  id: 6898e051f56626ed02b5ddce
+                  title: analyzing
+                  question_type: Dollar
+                  evaluation_instructions: Squares
+                  id: 68b3fa147a03b547a3ec7c77
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-06-25T16:24:57.200Z'
-                  updatedAt: '2025-11-19T04:44:25.738Z'
+                  createdAt: '2026-08-09T01:12:11.461Z'
+                  updatedAt: '2026-08-04T07:58:06.303Z'
   /client/api/v1/question/softDelete/{id}:
     put:
       tags:
@@ -1833,14 +5373,15 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  title: parse
-                  last_date: robust
-                  salary: Cliffs
-                  id: 6898e051f56626ed02b5ddd4
+                  title: compressing
+                  last_date: reboot
+                  salary: Direct
+                  workspace: 68b3fa147a03b547a3ec7c7a
+                  id: 68b3fa147a03b547a3ec7c7e
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-05-30T00:32:20.463Z'
-                  updatedAt: '2026-03-30T20:51:43.815Z'
+                  createdAt: '2026-02-25T02:41:56.796Z'
+                  updatedAt: '2026-05-12T23:01:50.347Z'
   /client/api/v1/job/create:
     post:
       tags:
@@ -1852,9 +5393,10 @@ paths:
             schema:
               type: object
               example:
-                title: parse
-                last_date: robust
-                salary: Cliffs
+                title: compressing
+                last_date: reboot
+                salary: Direct
+                workspace: 68b3fa147a03b547a3ec7c7a
       security:
         - bearerAuth: []
       parameters:
@@ -1879,14 +5421,15 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  title: parse
-                  last_date: robust
-                  salary: Cliffs
-                  id: 6898e051f56626ed02b5ddd2
+                  title: compressing
+                  last_date: reboot
+                  salary: Direct
+                  workspace: 68b3fa147a03b547a3ec7c7a
+                  id: 68b3fa147a03b547a3ec7c7c
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-05-30T00:32:20.463Z'
-                  updatedAt: '2026-03-30T20:51:43.815Z'
+                  createdAt: '2026-02-25T02:41:56.796Z'
+                  updatedAt: '2026-05-12T23:01:50.347Z'
   /client/api/v1/job/list:
     post:
       tags:
@@ -1944,14 +5487,15 @@ paths:
                 message: Your request is successfully executed
                 data:
                   data:
-                    - title: parse
-                      last_date: robust
-                      salary: Cliffs
-                      id: 6898e051f56626ed02b5ddd3
+                    - title: compressing
+                      last_date: reboot
+                      salary: Direct
+                      workspace: 68b3fa147a03b547a3ec7c7a
+                      id: 68b3fa147a03b547a3ec7c7d
                       isDeleted: false
                       isActive: true
-                      createdAt: '2026-05-30T00:32:20.463Z'
-                      updatedAt: '2026-03-30T20:51:43.815Z'
+                      createdAt: '2026-02-25T02:41:56.796Z'
+                      updatedAt: '2026-05-12T23:01:50.347Z'
                   paginator:
                     itemCount: 1
                     offset: 0
@@ -2013,9 +5557,10 @@ paths:
               type: object
               example:
                 data:
-                  - title: parse
-                    last_date: robust
-                    salary: Cliffs
+                  - title: compressing
+                    last_date: reboot
+                    salary: Direct
+                    workspace: 68b3fa147a03b547a3ec7c7a
       security:
         - bearerAuth: []
       parameters:
@@ -2091,9 +5636,10 @@ paths:
             schema:
               type: object
               example:
-                title: parse
-                last_date: robust
-                salary: Cliffs
+                title: compressing
+                last_date: reboot
+                salary: Direct
+                workspace: 68b3fa147a03b547a3ec7c7a
       security:
         - bearerAuth: []
       parameters:
@@ -2123,14 +5669,15 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  title: parse
-                  last_date: robust
-                  salary: Cliffs
-                  id: 6898e051f56626ed02b5ddd5
+                  title: compressing
+                  last_date: reboot
+                  salary: Direct
+                  workspace: 68b3fa147a03b547a3ec7c7a
+                  id: 68b3fa147a03b547a3ec7c7f
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-05-30T00:32:20.463Z'
-                  updatedAt: '2026-03-30T20:51:43.815Z'
+                  createdAt: '2026-02-25T02:41:56.796Z'
+                  updatedAt: '2026-05-12T23:01:50.347Z'
   /client/api/v1/job/partial-update/{id}:
     put:
       tags:
@@ -2173,14 +5720,15 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  title: parse
-                  last_date: robust
-                  salary: Cliffs
-                  id: 6898e051f56626ed02b5ddd6
+                  title: compressing
+                  last_date: reboot
+                  salary: Direct
+                  workspace: 68b3fa147a03b547a3ec7c7a
+                  id: 68b3fa147a03b547a3ec7c80
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-05-30T00:32:20.463Z'
-                  updatedAt: '2026-03-30T20:51:43.815Z'
+                  createdAt: '2026-02-25T02:41:56.796Z'
+                  updatedAt: '2026-05-12T23:01:50.347Z'
   /client/api/v1/job/softDelete/{id}:
     put:
       tags:
@@ -2369,14 +5917,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  name: Natalie Morissette
-                  company: payment
-                  admin: 6th
-                  id: 6898e051f56626ed02b5dddc
+                  name: Kenny Rowe
+                  company: 68b3fa147a03b547a3ec7c83
+                  admin: Re-contextualized
+                  id: 68b3fa147a03b547a3ec7c87
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-08-09T10:01:31.705Z'
-                  updatedAt: '2026-08-06T17:25:14.746Z'
+                  createdAt: '2026-02-19T11:40:46.350Z'
+                  updatedAt: '2025-09-30T10:02:27.345Z'
   /client/api/v1/recruiter/create:
     post:
       tags:
@@ -2388,9 +5936,9 @@ paths:
             schema:
               type: object
               example:
-                name: Natalie Morissette
-                company: payment
-                admin: 6th
+                name: Kenny Rowe
+                company: 68b3fa147a03b547a3ec7c83
+                admin: Re-contextualized
       security:
         - bearerAuth: []
       parameters:
@@ -2415,14 +5963,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  name: Natalie Morissette
-                  company: payment
-                  admin: 6th
-                  id: 6898e051f56626ed02b5ddda
+                  name: Kenny Rowe
+                  company: 68b3fa147a03b547a3ec7c83
+                  admin: Re-contextualized
+                  id: 68b3fa147a03b547a3ec7c85
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-08-09T10:01:31.705Z'
-                  updatedAt: '2026-08-06T17:25:14.746Z'
+                  createdAt: '2026-02-19T11:40:46.350Z'
+                  updatedAt: '2025-09-30T10:02:27.345Z'
   /client/api/v1/recruiter/list:
     post:
       tags:
@@ -2480,14 +6028,14 @@ paths:
                 message: Your request is successfully executed
                 data:
                   data:
-                    - name: Natalie Morissette
-                      company: payment
-                      admin: 6th
-                      id: 6898e051f56626ed02b5dddb
+                    - name: Kenny Rowe
+                      company: 68b3fa147a03b547a3ec7c83
+                      admin: Re-contextualized
+                      id: 68b3fa147a03b547a3ec7c86
                       isDeleted: false
                       isActive: true
-                      createdAt: '2026-08-09T10:01:31.705Z'
-                      updatedAt: '2026-08-06T17:25:14.746Z'
+                      createdAt: '2026-02-19T11:40:46.350Z'
+                      updatedAt: '2025-09-30T10:02:27.345Z'
                   paginator:
                     itemCount: 1
                     offset: 0
@@ -2549,9 +6097,9 @@ paths:
               type: object
               example:
                 data:
-                  - name: Natalie Morissette
-                    company: payment
-                    admin: 6th
+                  - name: Kenny Rowe
+                    company: 68b3fa147a03b547a3ec7c83
+                    admin: Re-contextualized
       security:
         - bearerAuth: []
       parameters:
@@ -2627,9 +6175,9 @@ paths:
             schema:
               type: object
               example:
-                name: Natalie Morissette
-                company: payment
-                admin: 6th
+                name: Kenny Rowe
+                company: 68b3fa147a03b547a3ec7c83
+                admin: Re-contextualized
       security:
         - bearerAuth: []
       parameters:
@@ -2659,14 +6207,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  name: Natalie Morissette
-                  company: payment
-                  admin: 6th
-                  id: 6898e051f56626ed02b5dddd
+                  name: Kenny Rowe
+                  company: 68b3fa147a03b547a3ec7c83
+                  admin: Re-contextualized
+                  id: 68b3fa147a03b547a3ec7c88
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-08-09T10:01:31.705Z'
-                  updatedAt: '2026-08-06T17:25:14.746Z'
+                  createdAt: '2026-02-19T11:40:46.350Z'
+                  updatedAt: '2025-09-30T10:02:27.345Z'
   /client/api/v1/recruiter/partial-update/{id}:
     put:
       tags:
@@ -2709,14 +6257,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  name: Natalie Morissette
-                  company: payment
-                  admin: 6th
-                  id: 6898e051f56626ed02b5ddde
+                  name: Kenny Rowe
+                  company: 68b3fa147a03b547a3ec7c83
+                  admin: Re-contextualized
+                  id: 68b3fa147a03b547a3ec7c89
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-08-09T10:01:31.705Z'
-                  updatedAt: '2026-08-06T17:25:14.746Z'
+                  createdAt: '2026-02-19T11:40:46.350Z'
+                  updatedAt: '2025-09-30T10:02:27.345Z'
   /client/api/v1/recruiter/softDelete/{id}:
     put:
       tags:
@@ -2900,16 +6448,17 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  username: Rocio_Schiller3
-                  email: Mckayla47@gmail.com
-                  name: Lucille McDermott
-                  mobileNo: (263) 794-1691
+                  username: Kelli.Ziemann
+                  email: Summer.Braun@hotmail.com
+                  name: Lionel Sanford II
+                  workspace: 68b3fa147a03b547a3ec7c8c
+                  mobileNo: (689) 121-4611
                   userType: 1
-                  id: 6898e051f56626ed02b5dde3
+                  id: 68b3fa147a03b547a3ec7c8f
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-06-09T23:05:01.024Z'
-                  updatedAt: '2026-01-31T22:53:06.688Z'
+                  createdAt: '2026-08-04T20:11:35.434Z'
+                  updatedAt: '2025-09-21T05:06:35.509Z'
   /client/api/v1/user/update-profile:
     put:
       tags:
@@ -2921,11 +6470,12 @@ paths:
             schema:
               type: object
               example:
-                username: Rocio_Schiller3
-                password: bmeKuO_ubCIpGOD
-                email: Mckayla47@gmail.com
-                name: Lucille McDermott
-                mobileNo: (263) 794-1691
+                username: Kelli.Ziemann
+                password: LxiKL0esjeLSYKH
+                email: Summer.Braun@hotmail.com
+                name: Lionel Sanford II
+                workspace: 68b3fa147a03b547a3ec7c8c
+                mobileNo: (689) 121-4611
                 userType: 1
       security:
         - bearerAuth: []
@@ -2951,16 +6501,17 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  username: Rocio_Schiller3
-                  email: Mckayla47@gmail.com
-                  name: Lucille McDermott
-                  mobileNo: (263) 794-1691
+                  username: Kelli.Ziemann
+                  email: Summer.Braun@hotmail.com
+                  name: Lionel Sanford II
+                  workspace: 68b3fa147a03b547a3ec7c8c
+                  mobileNo: (689) 121-4611
                   userType: 1
-                  id: 6898e051f56626ed02b5dde2
+                  id: 68b3fa147a03b547a3ec7c8e
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-06-09T23:05:01.024Z'
-                  updatedAt: '2026-01-31T22:53:06.688Z'
+                  createdAt: '2026-08-04T20:11:35.434Z'
+                  updatedAt: '2025-09-21T05:06:35.509Z'
   /client/auth/send_otp_2fa:
     post:
       tags:
@@ -3032,17 +6583,18 @@ paths:
                 message: Login Successful
                 data: |-
                   {
-                    "username": "Rocio_Schiller3",
-                    "email": "Mckayla47@gmail.com",
-                    "name": "Lucille McDermott",
-                    "mobileNo": "(263) 794-1691",
-                    "id": "6898e051f56626ed02b5dde4",
+                    "username": "Kelli.Ziemann",
+                    "email": "Summer.Braun@hotmail.com",
+                    "name": "Lionel Sanford II",
+                    "workspace": "68b3fa147a03b547a3ec7c8c",
+                    "mobileNo": "(689) 121-4611",
+                    "id": "68b3fa147a03b547a3ec7c90",
                     "loginRetryLimit": 0,
                     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxMWRlZDVjMGFjMjAxMmFjMDI4ODkxZiIsInVzZXJuYW1lIjoiYWRtaW4iLCJpYXQiOjE2MjkzNTEyNzAsImV4cCI6MTYyOTk1MTI3MH0.BJ-WKjNYeFDQ4pn8kfli5gwn6GLz_c3voFht20Agj9k",
                     "isDeleted": false,
                     "isActive": true,
-                    "createdAt": "2026-07-09T04:06:22.511Z",
-                    "updatedAt": "2025-09-30T14:21:37.137Z"
+                    "createdAt": "2026-06-07T13:16:38.015Z",
+                    "updatedAt": "2026-03-31T13:53:36.552Z"
                   }
   /client/auth/register:
     post:
@@ -3055,11 +6607,12 @@ paths:
             schema:
               type: object
               example:
-                username: Rocio_Schiller3
-                password: bmeKuO_ubCIpGOD
-                email: Mckayla47@gmail.com
-                name: Lucille McDermott
-                mobileNo: (263) 794-1691
+                username: Kelli.Ziemann
+                password: LxiKL0esjeLSYKH
+                email: Summer.Braun@hotmail.com
+                name: Lionel Sanford II
+                workspace: 68b3fa147a03b547a3ec7c8c
+                mobileNo: (689) 121-4611
       security:
         - undefinedAuth: []
       parameters:
@@ -3084,16 +6637,17 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  username: Rocio_Schiller3
-                  email: Mckayla47@gmail.com
-                  name: Lucille McDermott
-                  mobileNo: (263) 794-1691
-                  id: 6898e051f56626ed02b5dde4
+                  username: Kelli.Ziemann
+                  email: Summer.Braun@hotmail.com
+                  name: Lionel Sanford II
+                  workspace: 68b3fa147a03b547a3ec7c8c
+                  mobileNo: (689) 121-4611
+                  id: 68b3fa147a03b547a3ec7c90
                   loginRetryLimit: 0
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-07-09T04:06:22.511Z'
-                  updatedAt: '2025-09-30T14:21:37.137Z'
+                  createdAt: '2026-06-07T13:16:38.015Z'
+                  updatedAt: '2026-03-31T13:53:36.552Z'
   /client/auth/forgot-password:
     post:
       tags:
@@ -3278,14 +6832,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  name: Levi Hickle
-                  code: Analyst
-                  weight: 447
-                  id: 6898e051f56626ed02b5ddf2
+                  name: Olga Funk
+                  code: Borders
+                  weight: 248
+                  id: 68b3fa147a03b547a3ec7c9e
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-06-03T17:39:57.660Z'
-                  updatedAt: '2026-05-04T01:03:50.031Z'
+                  createdAt: '2026-08-14T21:40:22.002Z'
+                  updatedAt: '2026-05-01T16:37:08.480Z'
   /client/api/v1/role/create:
     post:
       tags:
@@ -3297,9 +6851,9 @@ paths:
             schema:
               type: object
               example:
-                name: Levi Hickle
-                code: Analyst
-                weight: 447
+                name: Olga Funk
+                code: Borders
+                weight: 248
       security:
         - bearerAuth: []
       parameters:
@@ -3324,14 +6878,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  name: Levi Hickle
-                  code: Analyst
-                  weight: 447
-                  id: 6898e051f56626ed02b5ddec
+                  name: Olga Funk
+                  code: Borders
+                  weight: 248
+                  id: 68b3fa147a03b547a3ec7c98
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-06-03T17:39:57.660Z'
-                  updatedAt: '2026-05-04T01:03:50.031Z'
+                  createdAt: '2026-08-14T21:40:22.002Z'
+                  updatedAt: '2026-05-01T16:37:08.480Z'
   /client/api/v1/role/addBulk:
     post:
       tags:
@@ -3344,9 +6898,9 @@ paths:
               type: object
               example:
                 data:
-                  - name: Levi Hickle
-                    code: Analyst
-                    weight: 447
+                  - name: Olga Funk
+                    code: Borders
+                    weight: 248
       security:
         - bearerAuth: []
       parameters:
@@ -3429,14 +6983,14 @@ paths:
                 message: Your request is successfully executed
                 data:
                   data:
-                    - name: Levi Hickle
-                      code: Analyst
-                      weight: 447
-                      id: 6898e051f56626ed02b5ddee
+                    - name: Olga Funk
+                      code: Borders
+                      weight: 248
+                      id: 68b3fa147a03b547a3ec7c9a
                       isDeleted: false
                       isActive: true
-                      createdAt: '2026-06-03T17:39:57.660Z'
-                      updatedAt: '2026-05-04T01:03:50.031Z'
+                      createdAt: '2026-08-14T21:40:22.002Z'
+                      updatedAt: '2026-05-01T16:37:08.480Z'
                   paginator:
                     itemCount: 1
                     offset: 0
@@ -3686,14 +7240,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  name: Levi Hickle
-                  code: Analyst
-                  weight: 447
-                  id: 6898e051f56626ed02b5ddf0
+                  name: Olga Funk
+                  code: Borders
+                  weight: 248
+                  id: 68b3fa147a03b547a3ec7c9c
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-06-03T17:39:57.660Z'
-                  updatedAt: '2026-05-04T01:03:50.031Z'
+                  createdAt: '2026-08-14T21:40:22.002Z'
+                  updatedAt: '2026-05-01T16:37:08.480Z'
   /client/api/v1/role/update/{id}:
     put:
       tags:
@@ -3705,9 +7259,9 @@ paths:
             schema:
               type: object
               example:
-                name: Levi Hickle
-                code: Analyst
-                weight: 447
+                name: Olga Funk
+                code: Borders
+                weight: 248
       security:
         - bearerAuth: []
       parameters:
@@ -3737,14 +7291,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  name: Levi Hickle
-                  code: Analyst
-                  weight: 447
-                  id: 6898e051f56626ed02b5ddf1
+                  name: Olga Funk
+                  code: Borders
+                  weight: 248
+                  id: 68b3fa147a03b547a3ec7c9d
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-06-03T17:39:57.660Z'
-                  updatedAt: '2026-05-04T01:03:50.031Z'
+                  createdAt: '2026-08-14T21:40:22.002Z'
+                  updatedAt: '2026-05-01T16:37:08.480Z'
   /client/api/v1/role/delete/{id}:
     delete:
       tags:
@@ -3814,14 +7368,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  route_name: Strategist
-                  method: Intelligent
-                  uri: Arkansas
-                  id: 6898e051f56626ed02b5ddfa
+                  route_name: Chair
+                  method: Designer
+                  uri: Synergized
+                  id: 68b3fa147a03b547a3ec7ca6
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-01-24T19:55:51.147Z'
-                  updatedAt: '2025-12-28T02:02:27.910Z'
+                  createdAt: '2026-07-06T02:17:01.368Z'
+                  updatedAt: '2025-12-21T15:22:24.475Z'
   /client/api/v1/projectroute/create:
     post:
       tags:
@@ -3833,9 +7387,9 @@ paths:
             schema:
               type: object
               example:
-                route_name: Strategist
-                method: Intelligent
-                uri: Arkansas
+                route_name: Chair
+                method: Designer
+                uri: Synergized
       security:
         - bearerAuth: []
       parameters:
@@ -3860,14 +7414,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  route_name: Strategist
-                  method: Intelligent
-                  uri: Arkansas
-                  id: 6898e051f56626ed02b5ddf4
+                  route_name: Chair
+                  method: Designer
+                  uri: Synergized
+                  id: 68b3fa147a03b547a3ec7ca0
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-01-24T19:55:51.147Z'
-                  updatedAt: '2025-12-28T02:02:27.910Z'
+                  createdAt: '2026-07-06T02:17:01.368Z'
+                  updatedAt: '2025-12-21T15:22:24.475Z'
   /client/api/v1/projectroute/addBulk:
     post:
       tags:
@@ -3880,9 +7434,9 @@ paths:
               type: object
               example:
                 data:
-                  - route_name: Strategist
-                    method: Intelligent
-                    uri: Arkansas
+                  - route_name: Chair
+                    method: Designer
+                    uri: Synergized
       security:
         - bearerAuth: []
       parameters:
@@ -3965,14 +7519,14 @@ paths:
                 message: Your request is successfully executed
                 data:
                   data:
-                    - route_name: Strategist
-                      method: Intelligent
-                      uri: Arkansas
-                      id: 6898e051f56626ed02b5ddf6
+                    - route_name: Chair
+                      method: Designer
+                      uri: Synergized
+                      id: 68b3fa147a03b547a3ec7ca2
                       isDeleted: false
                       isActive: true
-                      createdAt: '2026-01-24T19:55:51.147Z'
-                      updatedAt: '2025-12-28T02:02:27.910Z'
+                      createdAt: '2026-07-06T02:17:01.368Z'
+                      updatedAt: '2025-12-21T15:22:24.475Z'
                   paginator:
                     itemCount: 1
                     offset: 0
@@ -4222,14 +7776,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  route_name: Strategist
-                  method: Intelligent
-                  uri: Arkansas
-                  id: 6898e051f56626ed02b5ddf8
+                  route_name: Chair
+                  method: Designer
+                  uri: Synergized
+                  id: 68b3fa147a03b547a3ec7ca4
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-01-24T19:55:51.147Z'
-                  updatedAt: '2025-12-28T02:02:27.910Z'
+                  createdAt: '2026-07-06T02:17:01.368Z'
+                  updatedAt: '2025-12-21T15:22:24.475Z'
   /client/api/v1/projectroute/update/{id}:
     put:
       tags:
@@ -4241,9 +7795,9 @@ paths:
             schema:
               type: object
               example:
-                route_name: Strategist
-                method: Intelligent
-                uri: Arkansas
+                route_name: Chair
+                method: Designer
+                uri: Synergized
       security:
         - bearerAuth: []
       parameters:
@@ -4273,14 +7827,14 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  route_name: Strategist
-                  method: Intelligent
-                  uri: Arkansas
-                  id: 6898e051f56626ed02b5ddf9
+                  route_name: Chair
+                  method: Designer
+                  uri: Synergized
+                  id: 68b3fa147a03b547a3ec7ca5
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-01-24T19:55:51.147Z'
-                  updatedAt: '2025-12-28T02:02:27.910Z'
+                  createdAt: '2026-07-06T02:17:01.368Z'
+                  updatedAt: '2025-12-21T15:22:24.475Z'
   /client/api/v1/projectroute/delete/{id}:
     delete:
       tags:
@@ -4350,13 +7904,13 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  routeId: 6898e051f56626ed02b5ddfb
-                  roleId: 6898e051f56626ed02b5ddfc
-                  id: 6898e051f56626ed02b5de04
+                  routeId: 68b3fa147a03b547a3ec7ca7
+                  roleId: 68b3fa147a03b547a3ec7ca8
+                  id: 68b3fa147a03b547a3ec7cb0
                   isDeleted: false
                   isActive: true
-                  createdAt: '2025-11-17T14:03:56.722Z'
-                  updatedAt: '2025-12-29T15:22:18.746Z'
+                  createdAt: '2025-12-02T14:57:28.301Z'
+                  updatedAt: '2025-11-23T11:24:01.824Z'
   /client/api/v1/routerole/create:
     post:
       tags:
@@ -4368,8 +7922,8 @@ paths:
             schema:
               type: object
               example:
-                routeId: 6898e051f56626ed02b5ddfb
-                roleId: 6898e051f56626ed02b5ddfc
+                routeId: 68b3fa147a03b547a3ec7ca7
+                roleId: 68b3fa147a03b547a3ec7ca8
       security:
         - bearerAuth: []
       parameters:
@@ -4394,13 +7948,13 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  routeId: 6898e051f56626ed02b5ddfb
-                  roleId: 6898e051f56626ed02b5ddfc
-                  id: 6898e051f56626ed02b5ddfe
+                  routeId: 68b3fa147a03b547a3ec7ca7
+                  roleId: 68b3fa147a03b547a3ec7ca8
+                  id: 68b3fa147a03b547a3ec7caa
                   isDeleted: false
                   isActive: true
-                  createdAt: '2025-11-17T14:03:56.722Z'
-                  updatedAt: '2025-12-29T15:22:18.746Z'
+                  createdAt: '2025-12-02T14:57:28.301Z'
+                  updatedAt: '2025-11-23T11:24:01.824Z'
   /client/api/v1/routerole/addBulk:
     post:
       tags:
@@ -4413,8 +7967,8 @@ paths:
               type: object
               example:
                 data:
-                  - routeId: 6898e051f56626ed02b5ddfb
-                    roleId: 6898e051f56626ed02b5ddfc
+                  - routeId: 68b3fa147a03b547a3ec7ca7
+                    roleId: 68b3fa147a03b547a3ec7ca8
       security:
         - bearerAuth: []
       parameters:
@@ -4497,13 +8051,13 @@ paths:
                 message: Your request is successfully executed
                 data:
                   data:
-                    - routeId: 6898e051f56626ed02b5ddfb
-                      roleId: 6898e051f56626ed02b5ddfc
-                      id: 6898e051f56626ed02b5de00
+                    - routeId: 68b3fa147a03b547a3ec7ca7
+                      roleId: 68b3fa147a03b547a3ec7ca8
+                      id: 68b3fa147a03b547a3ec7cac
                       isDeleted: false
                       isActive: true
-                      createdAt: '2025-11-17T14:03:56.722Z'
-                      updatedAt: '2025-12-29T15:22:18.746Z'
+                      createdAt: '2025-12-02T14:57:28.301Z'
+                      updatedAt: '2025-11-23T11:24:01.824Z'
                   paginator:
                     itemCount: 1
                     offset: 0
@@ -4753,13 +8307,13 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  routeId: 6898e051f56626ed02b5ddfb
-                  roleId: 6898e051f56626ed02b5ddfc
-                  id: 6898e051f56626ed02b5de02
+                  routeId: 68b3fa147a03b547a3ec7ca7
+                  roleId: 68b3fa147a03b547a3ec7ca8
+                  id: 68b3fa147a03b547a3ec7cae
                   isDeleted: false
                   isActive: true
-                  createdAt: '2025-11-17T14:03:56.722Z'
-                  updatedAt: '2025-12-29T15:22:18.746Z'
+                  createdAt: '2025-12-02T14:57:28.301Z'
+                  updatedAt: '2025-11-23T11:24:01.824Z'
   /client/api/v1/routerole/update/{id}:
     put:
       tags:
@@ -4771,8 +8325,8 @@ paths:
             schema:
               type: object
               example:
-                routeId: 6898e051f56626ed02b5ddfb
-                roleId: 6898e051f56626ed02b5ddfc
+                routeId: 68b3fa147a03b547a3ec7ca7
+                roleId: 68b3fa147a03b547a3ec7ca8
       security:
         - bearerAuth: []
       parameters:
@@ -4802,13 +8356,13 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  routeId: 6898e051f56626ed02b5ddfb
-                  roleId: 6898e051f56626ed02b5ddfc
-                  id: 6898e051f56626ed02b5de03
+                  routeId: 68b3fa147a03b547a3ec7ca7
+                  roleId: 68b3fa147a03b547a3ec7ca8
+                  id: 68b3fa147a03b547a3ec7caf
                   isDeleted: false
                   isActive: true
-                  createdAt: '2025-11-17T14:03:56.722Z'
-                  updatedAt: '2025-12-29T15:22:18.746Z'
+                  createdAt: '2025-12-02T14:57:28.301Z'
+                  updatedAt: '2025-11-23T11:24:01.824Z'
   /client/api/v1/routerole/delete/{id}:
     delete:
       tags:
@@ -4878,13 +8432,13 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  userId: 6898e051f56626ed02b5de05
-                  roleId: 6898e051f56626ed02b5de06
-                  id: 6898e051f56626ed02b5de0e
+                  userId: 68b3fa147a03b547a3ec7cb1
+                  roleId: 68b3fa147a03b547a3ec7cb2
+                  id: 68b3fa147a03b547a3ec7cba
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-05-30T07:49:54.569Z'
-                  updatedAt: '2026-05-19T06:23:15.228Z'
+                  createdAt: '2026-01-05T19:01:52.609Z'
+                  updatedAt: '2025-12-31T00:22:01.610Z'
   /client/api/v1/userrole/create:
     post:
       tags:
@@ -4896,8 +8450,8 @@ paths:
             schema:
               type: object
               example:
-                userId: 6898e051f56626ed02b5de05
-                roleId: 6898e051f56626ed02b5de06
+                userId: 68b3fa147a03b547a3ec7cb1
+                roleId: 68b3fa147a03b547a3ec7cb2
       security:
         - bearerAuth: []
       parameters:
@@ -4922,13 +8476,13 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  userId: 6898e051f56626ed02b5de05
-                  roleId: 6898e051f56626ed02b5de06
-                  id: 6898e051f56626ed02b5de08
+                  userId: 68b3fa147a03b547a3ec7cb1
+                  roleId: 68b3fa147a03b547a3ec7cb2
+                  id: 68b3fa147a03b547a3ec7cb4
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-05-30T07:49:54.569Z'
-                  updatedAt: '2026-05-19T06:23:15.228Z'
+                  createdAt: '2026-01-05T19:01:52.609Z'
+                  updatedAt: '2025-12-31T00:22:01.610Z'
   /client/api/v1/userrole/addBulk:
     post:
       tags:
@@ -4941,8 +8495,8 @@ paths:
               type: object
               example:
                 data:
-                  - userId: 6898e051f56626ed02b5de05
-                    roleId: 6898e051f56626ed02b5de06
+                  - userId: 68b3fa147a03b547a3ec7cb1
+                    roleId: 68b3fa147a03b547a3ec7cb2
       security:
         - bearerAuth: []
       parameters:
@@ -5025,13 +8579,13 @@ paths:
                 message: Your request is successfully executed
                 data:
                   data:
-                    - userId: 6898e051f56626ed02b5de05
-                      roleId: 6898e051f56626ed02b5de06
-                      id: 6898e051f56626ed02b5de0a
+                    - userId: 68b3fa147a03b547a3ec7cb1
+                      roleId: 68b3fa147a03b547a3ec7cb2
+                      id: 68b3fa147a03b547a3ec7cb6
                       isDeleted: false
                       isActive: true
-                      createdAt: '2026-05-30T07:49:54.569Z'
-                      updatedAt: '2026-05-19T06:23:15.228Z'
+                      createdAt: '2026-01-05T19:01:52.609Z'
+                      updatedAt: '2025-12-31T00:22:01.610Z'
                   paginator:
                     itemCount: 1
                     offset: 0
@@ -5281,13 +8835,13 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  userId: 6898e051f56626ed02b5de05
-                  roleId: 6898e051f56626ed02b5de06
-                  id: 6898e051f56626ed02b5de0c
+                  userId: 68b3fa147a03b547a3ec7cb1
+                  roleId: 68b3fa147a03b547a3ec7cb2
+                  id: 68b3fa147a03b547a3ec7cb8
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-05-30T07:49:54.569Z'
-                  updatedAt: '2026-05-19T06:23:15.228Z'
+                  createdAt: '2026-01-05T19:01:52.609Z'
+                  updatedAt: '2025-12-31T00:22:01.610Z'
   /client/api/v1/userrole/update/{id}:
     put:
       tags:
@@ -5299,8 +8853,8 @@ paths:
             schema:
               type: object
               example:
-                userId: 6898e051f56626ed02b5de05
-                roleId: 6898e051f56626ed02b5de06
+                userId: 68b3fa147a03b547a3ec7cb1
+                roleId: 68b3fa147a03b547a3ec7cb2
       security:
         - bearerAuth: []
       parameters:
@@ -5330,13 +8884,13 @@ paths:
                 status: SUCCESS
                 message: Your request is successfully executed
                 data:
-                  userId: 6898e051f56626ed02b5de05
-                  roleId: 6898e051f56626ed02b5de06
-                  id: 6898e051f56626ed02b5de0d
+                  userId: 68b3fa147a03b547a3ec7cb1
+                  roleId: 68b3fa147a03b547a3ec7cb2
+                  id: 68b3fa147a03b547a3ec7cb9
                   isDeleted: false
                   isActive: true
-                  createdAt: '2026-05-30T07:49:54.569Z'
-                  updatedAt: '2026-05-19T06:23:15.228Z'
+                  createdAt: '2026-01-05T19:01:52.609Z'
+                  updatedAt: '2025-12-31T00:22:01.610Z'
   /client/api/v1/userrole/delete/{id}:
     delete:
       tags:

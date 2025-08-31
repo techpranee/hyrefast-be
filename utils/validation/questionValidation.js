@@ -3,41 +3,45 @@
  * @description :: validate each post and put request as per question model
  */
 
-const joi = require('joi');
-const {
-  options, isCountOnly, populate, select 
-} = require('./commonFilterValidation');
+const joi = require("joi");
+const { options, isCountOnly, populate, select } = require('./commonFilterValidation');
 
 /** validation keys and properties of question */
 exports.schemaKeys = joi.object({
-  title: joi.string().allow(null).allow(''),
-  isDeleted: joi.boolean(),
-  isActive: joi.boolean()
+	title: joi.string().allow(null).allow(''),
+	isDeleted: joi.boolean(),
+	isActive: joi.boolean(),
+	question_type: joi.string().allow(null).allow(''),
+	evaluation_instructions: joi.string().allow(null).allow('')
 }).unknown(true);
 
 /** validation keys and properties of question for updation */
 exports.updateSchemaKeys = joi.object({
-  title: joi.string().allow(null).allow(''),
-  isDeleted: joi.boolean(),
-  isActive: joi.boolean(),
-  _id: joi.string().regex(/^[0-9a-fA-F]{24}$/)
+	title: joi.string().allow(null).allow(''),
+	isDeleted: joi.boolean(),
+	isActive: joi.boolean(),
+	question_type: joi.string().allow(null).allow(''),
+	evaluation_instructions: joi.string().allow(null).allow(''),
+	_id: joi.string().regex(/^[0-9a-fA-F]{24}$/)
 }).unknown(true);
 
 let keys = ['query', 'where'];
 /** validation keys and properties of question for filter documents from collection */
 exports.findFilterKeys = joi.object({
-  options: options,
-  ...Object.fromEntries(
-    keys.map(key => [key, joi.object({
-      title: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
-      isDeleted: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
-      isActive: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
-      id: joi.any(),
-      _id: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object())
-    }).unknown(true),])
-  ),
-  isCountOnly: isCountOnly,
-  populate: joi.array().items(populate),
-  select: select
+	options: options,
+	...Object.fromEntries(
+		keys.map(key => [key, joi.object({
+	title: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
+	isDeleted: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
+	isActive: joi.alternatives().try(joi.array().items(),joi.boolean(),joi.object()),
+	question_type: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
+	evaluation_instructions: joi.alternatives().try(joi.array().items(),joi.string(),joi.object()),
+	id: joi.any(),
+	_id: joi.alternatives().try(joi.array().items(),joi.string().regex(/^[0-9a-fA-F]{24}$/),joi.object())
+}).unknown(true),])
+        ),
+    isCountOnly: isCountOnly,
+	populate: joi.array().items(populate),
+    select: select
     
 }).unknown(true);
