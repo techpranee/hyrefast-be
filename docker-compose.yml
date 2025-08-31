@@ -26,10 +26,13 @@ services:
       - OLLAMA_API_URL=${OLLAMA_API_URL}
       - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
       - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+      - GOOGLE_CLIENTID=${GOOGLE_CLIENTID}
+      - GOOGLE_CLIENTSECRET=${GOOGLE_CLIENTSECRET}
+      - GOOGLE_CALLBACKURL=${GOOGLE_CALLBACKURL}
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:6363/health"]
       interval: 30s
       timeout: 10s
       retries: 3
