@@ -1286,7 +1286,7 @@ const InterviewCompleted = async (req, res) => {
         {
           $set: {
             'overall_score': basicAnalysis,
-            status: 'assessment_ongoing'
+           
           }
         }
       );
