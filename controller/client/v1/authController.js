@@ -39,7 +39,7 @@ const register = async (req, res) => {
     }
     const data = new User({
       ...req.body,
-      userType: authConstant.USER_TYPES.Applicant
+     
     });
 
     let checkUniqueFields = await common.checkUniqueFieldsInDatabase(User, ['email'], data, 'INSERT');

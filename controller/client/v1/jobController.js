@@ -91,7 +91,8 @@ class JobCreationService {
         interviewLinks: interviewLinks, // THIS IS WHAT WAS MISSING
         questions: questionIds,
         addedBy: userId,
-        workspace: workspaceId
+        workspace: workspaceId,
+        preRequisiteQuestions:jobData.preRequisiteQuestions
       };
 
       console.log('Job payload before save:', JSON.stringify(jobPayload, null, 2));
