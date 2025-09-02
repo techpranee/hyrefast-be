@@ -11,7 +11,7 @@ const dbService = require('../../../utils/dbService');
 const ObjectId = require('mongodb').ObjectId;
 const utils = require('../../../utils/common');
 const crypto = require('crypto');
-const { Ollama } = require('ollama');
+const axios = require('axios')
 // Use your existing AWS SES email service instead of nodemailer
 const { sendMail } = require('../../../services/email');
 
@@ -1208,7 +1208,7 @@ const InterviewCompleted = async (req, res) => {
         {
           $set: {
             'overall_score': completeAnalysis, // Store in existing overall_score field
-            status: 'assessment_ongoing', // Use existing enum value
+            status: 'interview_completed', // Use existing enum value
             currentQuestion: responses.length,
             totalQuestions: responses.length
           }
@@ -1286,6 +1286,7 @@ const InterviewCompleted = async (req, res) => {
         {
           $set: {
             'overall_score': basicAnalysis,
+            status: 'interview_completed', // Use existing enum value
            
           }
         }
@@ -1325,14 +1326,22 @@ const InterviewCompleted = async (req, res) => {
 };
 
 /**
- * Generate overall AI analysis for complete interview (using your existing AI approach)
+ * Generate overall AI analysis for complete interview using axios only
  */
 async function generateOverallAIAnalysis({ candidateProfile, jobProfile, responses, interviewMetadata }) {
   try {
     const ollamaHost = process.env.AI_GENERATE_URL || process.env.OLLAMA_HOST || 'https://ollama2.havenify.ai';
     const ollamaModel = process.env.OLLAMA_MODEL || 'gemma3:latest';
     
-    const client = new Ollama({ host: ollamaHost });
+    // Ensure we have the correct API endpoint
+    let ollamaApiUrl;
+    if (!ollamaHost.includes('/api/generate')) {
+      ollamaApiUrl = `${ollamaHost}/api/generate`;
+    } else {
+      ollamaApiUrl = ollamaHost;
+    }
+
+    console.log('🤖 Using API URL for overall analysis:', ollamaApiUrl);
 
     // Create comprehensive prompt for overall analysis
     const overallPrompt = createOverallAnalysisPrompt({
@@ -1344,19 +1353,65 @@ async function generateOverallAIAnalysis({ candidateProfile, jobProfile, respons
 
     console.log('🤖 Calling AI service for overall interview analysis...');
 
-    const response = await client.generate({
-      model: ollamaModel,
-      prompt: overallPrompt,
-      stream: false,
-      options: {
-        temperature: 0.3,
-        num_predict: 3000,
-        top_p: 0.9,
-        repeat_penalty: 1.1,
-      }
-    });
+    // Use axios directly with retry logic
+    const maxRetries = 3;
+    let lastError;
+    let aiResponseText = '';
 
-    const aiResponseText = response.response || response.message?.content || '';
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`Attempt ${attempt}/${maxRetries}: Calling Ollama API for overall analysis`);
+        
+        const response = await axios.post(ollamaApiUrl, {
+          model: ollamaModel,
+          prompt: overallPrompt,
+          stream: false,
+          options: {
+            temperature: 0.3,
+            num_predict: 3000,
+            top_p: 0.9,
+            repeat_penalty: 1.1,
+          }
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          timeout: 120000
+        });
+
+        aiResponseText = response.data.response || '';
+        
+        if (!aiResponseText) {
+          throw new Error('Empty response from Ollama');
+        }
+
+        console.log('✅ AI overall analysis API call successful');
+        break; // Success, exit retry loop
+        
+      } catch (error) {
+        console.error(`Attempt ${attempt} failed:`, error.message);
+        lastError = error;
+        
+        // Don't retry on certain errors
+        if (error.response?.status === 404) {
+          throw new Error(`Ollama service not found at ${ollamaApiUrl}. Please ensure Ollama is running and accessible.`);
+        }
+        
+        if (attempt < maxRetries) {
+          // Wait before retrying (exponential backoff)
+          const waitTime = Math.pow(2, attempt) * 1000;
+          console.log(`Waiting ${waitTime}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+      }
+    }
+
+    // If all retries failed
+    if (!aiResponseText && lastError) {
+      console.error('All AI overall analysis attempts failed:', lastError);
+      throw lastError;
+    }
     
     // Try to extract and parse JSON from AI response
     let aiAnalysis;
@@ -1383,6 +1438,7 @@ async function generateOverallAIAnalysis({ candidateProfile, jobProfile, respons
     return generateFallbackOverallAnalysis(responses);
   }
 }
+
 
 /**
  * Create comprehensive prompt for overall interview analysis

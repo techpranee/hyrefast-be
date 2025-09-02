@@ -1,13 +1,23 @@
-const { Ollama } = require("ollama");
+// services/interviewQuestionsAIService.js
+const axios = require('axios');
 
 class InterviewQuestionsAIService {
   constructor() {
     this.ollamaHost = process.env.AI_GENERATE_URL || process.env.OLLAMA_HOST || 'http://localhost:11434';
     this.ollamaModel = process.env.OLLAMA_MODEL || 'gemma3:latest';
     
-    this.client = new Ollama({ 
-      host: this.ollamaHost 
-    });
+    // Ensure we have the correct API endpoint
+    if (!this.ollamaHost.includes('/api/generate')) {
+      this.ollamaApiUrl = `${this.ollamaHost}/api/generate`;
+    } else {
+      this.ollamaApiUrl = this.ollamaHost;
+    }
+    
+    console.log('=== INTERVIEW QUESTIONS AI CONFIGURATION ===');
+    console.log('Host:', this.ollamaHost);
+    console.log('API URL:', this.ollamaApiUrl);
+    console.log('Model:', this.ollamaModel);
+    console.log('=============================================');
   }
 
   generateInterviewQuestionsPrompt(jobTitle, jobDescription, employmentType, requirements) {
@@ -61,6 +71,100 @@ Requirements:
     return prompt;
   }
 
+  async checkOllamaConnection() {
+    try {
+      // Test connection by listing models using axios
+      const response = await axios.get(`${this.ollamaHost}/api/tags`, {
+        timeout: 10000,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      return {
+        connected: true,
+        models: response.data.models?.map(m => m.name) || [],
+        host: this.ollamaHost
+      };
+    } catch (error) {
+      return {
+        connected: false,
+        error: error.message,
+        host: this.ollamaHost
+      };
+    }
+  }
+
+  async generateWithOllama(prompt) {
+    const maxRetries = 3;
+    let lastError;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`Attempt ${attempt}/${maxRetries}: Generating interview questions with Ollama`);
+        console.log(`Using API URL: ${this.ollamaApiUrl}`);
+        
+        const response = await axios.post(this.ollamaApiUrl, {
+          model: this.ollamaModel,
+          prompt: prompt,
+          stream: false,
+          options: {
+            temperature: 0.7,
+            num_predict: 1500,
+            top_p: 0.9,
+            repeat_penalty: 1.1,
+          }
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          timeout: 120000
+        });
+
+        const generatedText = response.data.response || '';
+        
+        if (!generatedText) {
+          throw new Error('Empty response from Ollama');
+        }
+
+        console.log('Interview questions generation successful');
+        return generatedText;
+        
+      } catch (error) {
+        console.error(`Attempt ${attempt} failed:`, error.message);
+        lastError = error;
+        
+        // Don't retry on certain errors
+        if (error.response?.status === 404) {
+          throw new Error(`Ollama service not found at ${this.ollamaApiUrl}. Please ensure Ollama is running and accessible.`);
+        }
+        
+        if (attempt < maxRetries) {
+          // Wait before retrying (exponential backoff)
+          const waitTime = Math.pow(2, attempt) * 1000;
+          console.log(`Waiting ${waitTime}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+      }
+    }
+
+    // All attempts failed
+    console.error('All attempts failed. Last error:', lastError);
+    
+    if (lastError.code === 'ECONNABORTED') {
+      throw new Error('Ollama request timeout - please check if Ollama is running and accessible');
+    }
+    if (lastError.code === 'ECONNREFUSED') {
+      throw new Error(`Cannot connect to Ollama at ${this.ollamaApiUrl} - is it running and accessible?`);
+    }
+    if (lastError.message?.includes('model')) {
+      throw new Error(`Ollama model '${this.ollamaModel}' not found - please pull the model first using: ollama pull ${this.ollamaModel}`);
+    }
+    
+    throw new Error(`Interview questions generation failed after ${maxRetries} attempts: ${lastError.message}`);
+  }
+
   async generateInterviewQuestions(jobTitle, jobDescription = '', employmentType = '', requirements = []) {
     try {
       if (!jobTitle || typeof jobTitle !== 'string' || !jobTitle.trim()) {
@@ -76,19 +180,7 @@ Requirements:
         requirements || []
       );
       
-      const response = await this.client.generate({
-        model: this.ollamaModel,
-        prompt: prompt,
-        stream: false,
-        options: {
-          temperature: 0.7,
-          num_predict: 1500,
-          top_p: 0.9,
-          repeat_penalty: 1.1,
-        }
-      });
-
-      const generatedText = response.response || response.message?.content || '';
+      const generatedText = await this.generateWithOllama(prompt);
       
       if (!generatedText.trim()) {
         throw new Error('Empty response from AI service');
@@ -117,7 +209,16 @@ Requirements:
       console.error('Interview questions generation error:', error);
       return {
         success: false,
-        error: error.message || 'Failed to generate interview questions'
+        error: error.message || 'Failed to generate interview questions',
+        details: {
+          step: this.identifyFailureStep(error),
+          suggestion: this.getSuggestion(error),
+          ollamaInfo: {
+            host: this.ollamaHost,
+            apiUrl: this.ollamaApiUrl,
+            model: this.ollamaModel
+          }
+        }
       };
     }
   }
@@ -214,27 +315,108 @@ Requirements:
     ];
   }
 
+  identifyFailureStep(error) {
+    if (error.message.includes('Job title is required')) {
+      return 'input_validation';
+    }
+    if (error.message.includes('Ollama') || error.message.includes('connect') || error.message.includes('404')) {
+      return 'ollama_connection';
+    }
+    if (error.message.includes('model')) {
+      return 'model_availability';
+    }
+    if (error.message.includes('Empty response')) {
+      return 'response_generation';
+    }
+    if (error.message.includes('parse') || error.message.includes('JSON')) {
+      return 'json_parsing';
+    }
+    return 'unknown';
+  }
+
+  getSuggestion(error) {
+    const step = this.identifyFailureStep(error);
+    const suggestions = {
+      'input_validation': 'Please provide a valid job title',
+      'ollama_connection': `Ensure Ollama is running at ${this.ollamaHost}. Check service status.`,
+      'model_availability': `Pull the required model using: ollama pull ${this.ollamaModel}`,
+      'response_generation': 'The AI service returned an empty response. Try again or check the model availability.',
+      'json_parsing': 'AI response could not be parsed as JSON. Using fallback questions.',
+      'unknown': 'Please check the logs for more details'
+    };
+    
+    return suggestions[step] || suggestions.unknown;
+  }
+
+  // Test connection method
+  async testConnection() {
+    try {
+      console.log('Testing Ollama connection for interview questions service...');
+      
+      const response = await this.generateWithOllama('Generate one interview question for a Software Engineer position. Return as JSON: [{"text": "question", "timeLimit": 120, "allowRetry": false, "tags": ["Technical"]}]');
+      
+      console.log('Test response:', response.substring(0, 100));
+      return { success: true, response: response.substring(0, 100) };
+    } catch (error) {
+      console.error('Connection test failed:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Enhanced health check method
   async checkHealth() {
     try {
-      const testResponse = await this.client.generate({
-        model: this.ollamaModel,
-        prompt: "Generate one interview question for a Software Engineer position. Return as JSON: {\"text\": \"question\", \"timeLimit\": 120, \"allowRetry\": false, \"tags\": [\"Technical\"]}",
-        stream: false,
-        options: { num_predict: 150 }
-      });
+      console.log('Running health check for InterviewQuestionsAIService...');
+      
+      // Test 1: Connection check
+      const connectionCheck = await this.checkOllamaConnection();
+      
+      if (!connectionCheck.connected) {
+        return {
+          status: 'unhealthy',
+          model: this.ollamaModel,
+          host: this.ollamaHost,
+          apiUrl: this.ollamaApiUrl,
+          error: connectionCheck.error,
+          tests: {
+            connection: 'failed',
+            models: 'not_checked',
+            generation: 'not_checked'
+          }
+        };
+      }
 
+      // Test 2: Simple generation test
+      const testResult = await this.testConnection();
+      
       return {
-        status: 'healthy',
+        status: testResult.success ? 'healthy' : 'unhealthy',
         model: this.ollamaModel,
         host: this.ollamaHost,
-        responseTime: Date.now()
+        apiUrl: this.ollamaApiUrl,
+        availableModels: connectionCheck.models,
+        testResponse: testResult.response,
+        responseTime: Date.now(),
+        tests: {
+          connection: 'passed',
+          models: 'passed',
+          generation: testResult.success ? 'passed' : 'failed'
+        },
+        error: testResult.success ? null : testResult.error
       };
     } catch (error) {
       return {
         status: 'unhealthy',
         model: this.ollamaModel,
         host: this.ollamaHost,
-        error: error.message
+        apiUrl: this.ollamaApiUrl,
+        error: error.message,
+        suggestion: this.getSuggestion(error),
+        tests: {
+          connection: 'unknown',
+          models: 'unknown',
+          generation: 'failed'
+        }
       };
     }
   }

@@ -1,4 +1,5 @@
 const axios = require('axios');
+const extract = require('extract-zip');
 const { Ollama } = require("ollama");
 
 class JobScrapingService {
@@ -102,46 +103,38 @@ Focus on accuracy and completeness. Extract what you can confidently identify fr
     }
   }
 
-  async extractJobDataWithOllama(prompt) {
-    try {
-      console.log(`Connecting to Ollama at: ${this.ollamaHost}`);
-      console.log(`Using model: ${this.ollamaModel}`);
-      
-    //   // First check if Ollama is running and the model exists
-    //   const connectionCheck = await this.checkOllamaConnection();
-    //   if (!connectionCheck.connected) {
-    //     throw new Error(`Cannot connect to Ollama: ${connectionCheck.error}`);
-    //   }
-
-    //   if (!connectionCheck.models.includes(this.ollamaModel)) {
-    //     throw new Error(`Model '${this.ollamaModel}' not found. Available models: ${connectionCheck.models.join(', ')}`);
-    //   }
-
-      console.log('Sending request to Ollama...');
-      
-      const response = await this.client.generate({
-        model: this.ollamaModel,
-        prompt: prompt,
-        stream: false,
-        options: {
-          temperature: 0.1,
-          num_predict: 2000,
-          top_p: 0.9,
-          repeat_penalty: 1.1,
-        }
-      });
-
-      const generatedText = response.response || response.message?.content || '';
-      
-      if (!generatedText) {
-        throw new Error('Empty response from Ollama');
+ async extractJobDataWithOllama(prompt) {
+  try {
+    console.log(`Connecting to Ollama at: ${this.ollamaHost}`);
+    console.log(`Using model: ${this.ollamaModel}`);
+    
+    // Use direct axios call instead of Ollama client
+    const response = await axios.post(`${this.ollamaHost}`, {
+      model: this.ollamaModel,
+      prompt: prompt,
+      stream: false,
+      options: {
+        temperature: 0.1,
+        num_predict: 2000,
+        top_p: 0.9,
+        repeat_penalty: 1.1,
       }
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      timeout: 120000
+    });
+    console.log('Ollama response received',response);
 
-      console.log('Raw Ollama response length:', generatedText.length);
-      console.log('Raw Ollama response preview:', generatedText.substring(0, 200));
+    const generatedText = response.data.response || '';
+    
+    if (!generatedText) {
+      throw new Error('Empty response from Ollama');
+    }
 
-      // Extract JSON from the response using multiple strategies
-      let extractedData = null;
+   let extractedData = null;
       
       // Strategy 1: Try to find JSON block
       const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
@@ -187,26 +180,13 @@ Focus on accuracy and completeness. Extract what you can confidently identify fr
       }
 
       return extractedData;
-
-    } catch (error) {
-      console.error('Ollama processing error:', error);
-      
-      if (error.message?.includes('404') || error.status_code === 404) {
-        throw new Error(`Ollama service not found at ${this.ollamaHost}. Please ensure Ollama is running and accessible.`);
-      }
-      if (error.code === 'ECONNABORTED') {
-        throw new Error('Ollama request timeout - please check if Ollama is running');
-      }
-      if (error.code === 'ECONNREFUSED') {
-        throw new Error(`Cannot connect to Ollama at ${this.ollamaHost} - is it running and accessible?`);
-      }
-      if (error.message?.includes('model')) {
-        throw new Error(`Ollama model '${this.ollamaModel}' not found - please pull the model first using: ollama pull ${this.ollamaModel}`);
-      }
-      
-      throw new Error(`Ollama processing failed: ${error.message}`);
-    }
+    
+  } catch (error) {
+    console.error('Ollama processing error:', error);
+    throw error;
   }
+}
+
 
   validateAndCleanData(extractedData) {
     if (!extractedData || typeof extractedData !== 'object') {
@@ -296,6 +276,8 @@ Focus on accuracy and completeness. Extract what you can confidently identify fr
       // Step 4: Extract data using Ollama
       console.log('Extracting job data with Ollama...');
       const extractedData = await this.extractJobDataWithOllama(prompt);
+
+      console.log(extractedData,"extractedData")
 
       // Step 5: Validate and clean the data
       const cleanedData = this.validateAndCleanData(extractedData);

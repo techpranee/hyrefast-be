@@ -3,13 +3,13 @@
  * @description : exports action methods for response.
  */
 
+const axios = require('axios');
 const Response = require('../../../model/response');
 const responseSchemaKey = require('../../../utils/validation/responseValidation');
 const validation = require('../../../utils/validateRequest');
 const dbService = require('../../../utils/dbService');
 const ObjectId = require('mongodb').ObjectId;
 const utils = require('../../../utils/common');
-const { Ollama } = require('ollama');
 const Application = require('../../../model/application');
 const Question = require('../../../model/question');
    
@@ -63,8 +63,6 @@ const createInterviewResponse = async (req, res) => {
 
     console.log('📊 Generating AI analysis for response...', application);
 
-   
-
     // Generate AI analysis
     const aiAnalysis = await generateAIAnalysis({
       questionText,
@@ -74,7 +72,6 @@ const createInterviewResponse = async (req, res) => {
       candidateInfo: application.candidate,
       evaluationInstructions: evaluation_instructions
     });
-
 
     // Prepare response data
     const responseData = {
@@ -135,17 +132,22 @@ const createInterviewResponse = async (req, res) => {
 };
 
 /**
- * Generate AI analysis for interview response
- */
-/**
- * Generate AI analysis for interview response
+ * Generate AI analysis for interview response using axios only
  */
 async function generateAIAnalysis({ questionText, responseText, jobDetails, questionDetails, candidateInfo, evaluationInstructions }) {
   try {
     const ollamaHost = process.env.AI_GENERATE_URL || process.env.OLLAMA_HOST || 'https://ollama2.havenify.ai';
     const ollamaModel = process.env.OLLAMA_MODEL || 'gemma3:latest';
     
-    const client = new Ollama({ host: ollamaHost });
+    // Ensure we have the correct API endpoint
+    let ollamaApiUrl;
+    if (!ollamaHost.includes('/api/generate')) {
+      ollamaApiUrl = `${ollamaHost}/api/generate`;
+    } else {
+      ollamaApiUrl = ollamaHost;
+    }
+
+    console.log('🤖 Using API URL for analysis:', ollamaApiUrl);
 
     // Let AI determine the analysis approach
     const analysisPrompt = createIntelligentPrompt({
@@ -159,19 +161,65 @@ async function generateAIAnalysis({ questionText, responseText, jobDetails, ques
 
     console.log('🤖 Calling AI service for analysis...');
 
-    const response = await client.generate({
-      model: ollamaModel,
-      prompt: analysisPrompt,
-      stream: false,
-      options: {
-        temperature: 0.3,
-        num_predict: 2500,
-        top_p: 0.9,
-        repeat_penalty: 1.1,
-      }
-    });
+    // Use axios directly instead of Ollama client
+    const maxRetries = 3;
+    let lastError;
+    let aiResponseText = '';
 
-    const aiResponseText = response.response || response.message?.content || '';
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`Attempt ${attempt}/${maxRetries}: Calling Ollama API for response analysis`);
+        
+        const response = await axios.post(ollamaApiUrl, {
+          model: ollamaModel,
+          prompt: analysisPrompt,
+          stream: false,
+          options: {
+            temperature: 0.3,
+            num_predict: 2500,
+            top_p: 0.9,
+            repeat_penalty: 1.1,
+          }
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          timeout: 120000
+        });
+
+        aiResponseText = response.data.response || '';
+        
+        if (!aiResponseText) {
+          throw new Error('Empty response from Ollama');
+        }
+
+        console.log('✅ AI analysis API call successful');
+        break; // Success, exit retry loop
+        
+      } catch (error) {
+        console.error(`Attempt ${attempt} failed:`, error.message);
+        lastError = error;
+        
+        // Don't retry on certain errors
+        if (error.response?.status === 404) {
+          throw new Error(`Ollama service not found at ${ollamaApiUrl}. Please ensure Ollama is running and accessible.`);
+        }
+        
+        if (attempt < maxRetries) {
+          // Wait before retrying (exponential backoff)
+          const waitTime = Math.pow(2, attempt) * 1000;
+          console.log(`Waiting ${waitTime}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+      }
+    }
+
+    // If all retries failed
+    if (!aiResponseText && lastError) {
+      console.error('All AI analysis attempts failed:', lastError);
+      throw lastError;
+    }
     
     // Try to extract and parse JSON from AI response
     let aiAnalysis;
@@ -349,12 +397,14 @@ function standardizeAnalysisStructure(aiAnalysis) {
       engagement_level: 'Standard engagement level'
     },
     analyzed_at: new Date().toISOString(),
-    analysis_version: '4.0-ai-intelligent'
+    analysis_version: '4.0-ai-intelligent',
+    // Add overallScore for backward compatibility
+    overallScore: aiAnalysis.overall_assessment?.score || 75
   };
 }
 
 /**
- * Simplified fallback analysis that lets AI decide structure
+ * Generate fallback analysis when AI service fails
  */
 function generateFallbackAnalysis(questionText, responseText, jobDetails) {
   const wordCount = responseText.trim().split(/\s+/).length;
@@ -423,89 +473,9 @@ function generateFallbackAnalysis(questionText, responseText, jobDetails) {
       engagement_level: 'Requires comprehensive evaluation'
     },
     analyzed_at: new Date().toISOString(),
-    analysis_version: '4.0-fallback'
-  };
-}
-
-
-/**
- * Generate fallback analysis when AI service fails
- */
-function generateFallbackAnalysis(questionText, responseText, jobDetails) {
-  const wordCount = responseText.trim().split(/\s+/).length;
-  const baseScore = calculateBasicScore(responseText);
-  
-  return {
-    overall_score: baseScore,
-    communication_skills: Math.min(baseScore + 5, 85),
-    technical_competency: 75,
-    problem_solving: Math.max(baseScore - 5, 60),
-    cultural_fit: 75,
-    confidence_level: wordCount > 50 ? 80 : 65,
-    strengths: [
-      'Response provided within time limit',
-      wordCount > 50 ? 'Adequate response length' : 'Concise communication'
-    ],
-    areas_for_improvement: [
-      wordCount < 50 ? 'Response could be more detailed' : 'Could provide more specific examples',
-      'Consider using structured approach'
-    ],
-    red_flags: [],
-    key_insights: `Response contains ${wordCount} words. Processed using fallback analysis method due to AI service limitations.`,
-    recommendation: 'Basic evaluation completed - requires further assessment',
-    follow_up_questions: [
-      'Can you elaborate on specific examples?',
-      'What challenges did you face in similar situations?'
-    ]
-  };
-}
-
-
-/**
- * Generate fallback analysis when AI service fails
- */
-function generateFallbackAnalysis(questionText, responseText, jobDetails) {
-  const wordCount = responseText.trim().split(/\s+/).length;
-  const baseScore = calculateBasicScore(responseText);
-  
-  return {
-    overallScore: baseScore,
-    detailedScores: {
-      contentRelevance: Math.max(baseScore - 5, 60),
-      communicationSkills: Math.min(baseScore + 5, 85),
-      technicalAccuracy: 75,
-      completeness: wordCount > 100 ? 80 : 65,
-      professionalism: 75
-    },
-    strengths: [
-      'Response provided within time limit',
-      wordCount > 50 ? 'Adequate response length' : 'Concise communication'
-    ],
-    weaknesses: [
-      wordCount < 50 ? 'Response could be more detailed' : 'Good response structure',
-      'Analysis limited to basic metrics'
-    ],
-    suggestions: [
-      'Consider providing more specific examples',
-      'Structure answers using frameworks like STAR method',
-      'Include quantifiable results where possible'
-    ],
-    keyInsights: [
-      `Response contains ${wordCount} words`,
-      'Processed using fallback analysis method',
-      'Basic content evaluation completed'
-    ],
-    recommendedFollowUp: [
-      'Can you elaborate on specific examples?',
-      'What challenges did you face in similar situations?'
-    ],
-    fitForRole: {
-      score: baseScore,
-      reasoning: 'Evaluated using basic criteria due to AI service limitations'
-    },
-    summary: `Response received and analyzed using fallback method. Word count: ${wordCount}. Consider expanding on key points.`,
-    analyzedAt: new Date().toISOString(),
-    analysisVersion: '2.0-fallback'
+    analysis_version: '4.0-fallback',
+    // Add overallScore for backward compatibility
+    overallScore: score
   };
 }
 
@@ -535,7 +505,6 @@ function calculateBasicScore(responseText) {
   return Math.min(Math.max(score, 40), 95);
 }
 
-   
 /**
  * @description : create document of Response in mongodb collection.
  * @param {Object} req : request including body for creating document.
@@ -765,6 +734,7 @@ const partialUpdateResponse = async (req,res) => {
     return res.internalServerError({ message:error.message });
   }
 };
+
 /**
  * @description : deactivate document of Response from table by id;
  * @param {Object} req : request including id in request params.
@@ -837,6 +807,7 @@ const deleteManyResponse = async (req, res) => {
     return res.internalServerError({ message:error.message }); 
   }
 };
+
 /**
  * @description : deactivate multiple documents of Response from table by ids;
  * @param {Object} req : request including array of ids in request body.
@@ -877,6 +848,6 @@ module.exports = {
   softDeleteResponse,
   deleteResponse,
   deleteManyResponse,
-  softDeleteManyResponse    ,
-   createInterviewResponse, 
+  softDeleteManyResponse,
+  createInterviewResponse, 
 };
