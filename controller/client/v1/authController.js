@@ -23,23 +23,23 @@ const common = require('../../../utils/common');
  * @return {Object} : response for register {status, message, data}
  */
 const register = async (req, res) => {
-    try {
-        let validateRequest = validation.validateParamsWithJoi(
-            req.body,
-            userSchemaKey.schemaKeys
-        );
-        if (!validateRequest.isValid) {
-            return res.validationError({ message: `Invalid values in parameters, ${validateRequest.message}` });
-        }
-        let isEmptyPassword = false;
-        if (!req.body.password) {
-            isEmptyPassword = true;
-            req.body.password = Math.random().toString(36).slice(2);
-        }
-        const data = new User({
-            ...req.body,
-            userType: authConstant.USER_TYPES.Applicant
-        });
+  try {
+    let validateRequest = validation.validateParamsWithJoi(
+      req.body,
+      userSchemaKey.schemaKeys
+    );
+    if (!validateRequest.isValid) {
+      return res.validationError({ message: `Invalid values in parameters, ${validateRequest.message}` });
+    }
+    let isEmptyPassword = false;
+    if (!req.body.password) {
+      isEmptyPassword = true;
+      req.body.password = Math.random().toString(36).slice(2);
+    }
+    const data = new User({
+      ...req.body,
+     
+    });
 
         let checkUniqueFields = await common.checkUniqueFieldsInDatabase(User, ['email'], data, 'INSERT');
         if (checkUniqueFields.isDuplicate) {

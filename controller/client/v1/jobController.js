@@ -11,8 +11,130 @@ const ObjectId = require("mongodb").ObjectId
 const deleteDependentService = require("../../../utils/deleteDependent");
 const utils = require("../../../utils/common");
 
+// Add the JobCreationService class directly in the controller file
+// Replace the JobCreationService class in your jobController.js
+class JobCreationService {
+  async createJobWithQuestions(jobData, userId, workspaceId) {
+    try {
+      console.log('Received job data:', JSON.stringify(jobData, null, 2));
+      
+      const questionIds = [];
+      
+      // Create questions first if they exist
+      if (jobData.questions && jobData.questions.length > 0) {
+        for (const questionData of jobData.questions) {
+          const question = new Question({
+            title: questionData.title,
+            question_type: questionData.question_type || 'video',
+            evaluation_instructions: questionData.evaluation_instructions,
+            timeLimit: questionData.timeLimit || 120,
+            allowRetry: questionData.allowRetry || false,
+            tags: questionData.tags || [],
+            order: questionData.order || 1,
+            addedBy: userId,
+            workspace: workspaceId
+          });
+          
+          const savedQuestion = await dbService.create(Question, question);
+          questionIds.push(savedQuestion._id);
+        }
+      }
 
-   
+      // Process interview links - THIS IS THE KEY FIX
+      const interviewLinks = [];
+      console.log('Processing interview links:', jobData.interviewLinks);
+      
+      if (jobData.interviewLinks && Array.isArray(jobData.interviewLinks) && jobData.interviewLinks.length > 0) {
+        for (const linkData of jobData.interviewLinks) {
+          console.log('Processing link:', linkData);
+          
+          const processedLink = {
+            name: linkData.name || `Interview Link ${interviewLinks.length + 1}`,
+            enabled: linkData.enabled !== undefined ? linkData.enabled : true,
+            maxUses: linkData.maxUses || 'Unlimited',
+            currentUses: 0,
+            expiresAt: linkData.expiresAt ? new Date(linkData.expiresAt) : null,
+            requireVerification: linkData.requireVerification !== undefined ? linkData.requireVerification : true,
+            isActive: true
+          };
+          
+          console.log('Processed link:', processedLink);
+          interviewLinks.push(processedLink);
+        }
+      } else {
+        // Create default interview link if none provided
+        console.log('No interview links provided, creating default');
+        interviewLinks.push({
+          name: 'Main Interview Link',
+          enabled: true,
+          maxUses: 'Unlimited',
+          currentUses: 0,
+          expiresAt: null,
+          requireVerification: true,
+          isActive: true
+        });
+      }
+
+      console.log('Final interview links to save:', interviewLinks);
+
+      // Create job with question references and interview links
+      const jobPayload = {
+        title: jobData.jobTitle,
+        description: jobData.jobDescription,
+        location: jobData.location,
+        employment_type: jobData.employmentType,
+        requirements: jobData.requirements || [],
+        salary: jobData.salaryRange,
+        last_date: jobData.applicationDeadline ? new Date(jobData.applicationDeadline) : null,
+        publicationStatus: jobData.publicationStatus || 'draft',
+        interviewLinks: interviewLinks, // THIS IS WHAT WAS MISSING
+        questions: questionIds,
+        addedBy: userId,
+        workspace: workspaceId,
+        preRequisiteQuestions:jobData.preRequisiteQuestions
+      };
+
+      console.log('Job payload before save:', JSON.stringify(jobPayload, null, 2));
+
+      const job = new Job(jobPayload);
+      const savedJob = await dbService.create(Job, job);
+      
+      console.log('Saved job interview links:', savedJob.interviewLinks);
+      
+      // Populate questions for response
+      const populatedJob = await dbService.findOne(Job, { _id: savedJob._id }, { populate: 'questions' });
+      
+      return {
+        success: true,
+        data: {
+          job: populatedJob,
+          interviewLinks: savedJob.interviewLinks ? savedJob.interviewLinks.map(link => ({
+            id: link.linkId,
+            name: link.name,
+            url: `${process.env.BASE_URL || 'http://localhost:3000'}/interview/${link.linkId}`,
+            enabled: link.enabled,
+            maxUses: link.maxUses,
+            currentUses: link.currentUses,
+            expiresAt: link.expiresAt,
+            requireVerification: link.requireVerification,
+            isActive: link.isActive
+          })) : []
+        }
+      };
+    } catch (error) {
+      console.error('Job creation error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+}
+
+
+// Initialize the service
+const jobCreationService = new JobCreationService();
+
 /**
 * @description : create document of Job in mongodb collection.
 * @param {Object} req : request including body for creating document.
