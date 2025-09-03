@@ -531,7 +531,7 @@ const getCreditBalance = async (req, res) => {
 const getCreditHistory = async (req, res) => {
   try {
     const workspaceId = req.params.workspaceId || req.user.workspace;
-    
+    console.log(workspaceId, "workspaceId");
     // Extract pagination options from request body
     const options = {
       limit: req.body.options?.limit || req.body.limit || 50,

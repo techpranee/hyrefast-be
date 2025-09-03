@@ -46,6 +46,9 @@ const upload = async (req,res) => {
         let uploadFailed = [];
         let fileCount = 1;
 
+        // Extract isPublic flag from form fields (default: false)
+        const isPublic = fields.isPublic === 'true' || fields.isPublic === true;
+
         let fileArr = [];
         if (!files['files']) {
           reject({
@@ -59,7 +62,7 @@ const upload = async (req,res) => {
         }
 
         for (let file of files['files']) {
-          let response = await uploadFiles(file,fields,fileCount++);
+          let response = await uploadFiles(file, fields, fileCount++, isPublic);
           if (response.status == false) {
             uploadFailed.push({
               'name': file.originalFilename,
@@ -70,7 +73,8 @@ const upload = async (req,res) => {
             uploadSuccess.push({
               'name': file.originalFilename,
               'path': response.data,
-              'status': true
+              'status': true,
+              'isPublic': isPublic
             });
           }
         }
@@ -154,14 +158,16 @@ const generatePreSignedURL = async (req, res) => {
         return res.internalServerError({message:error.message}); 
     }
 }
+
 /**
   * @description : upload files
   * @param {Object} file : file to upload
   * @param {Object} fields : fields for file
   * @param {number} fileCount : total number of files to upload
+  * @param {boolean} isPublic : whether file should be public or private
   * @return {Object} : response for file upload
   */
-const uploadFiles = async (file,fields,fileCount) => {
+const uploadFiles = async (file, fields, fileCount, isPublic = false) => {
 
   let extension = path.extname(file.originalFilename);
   extension = extension.split('.').pop();
@@ -194,19 +200,21 @@ const uploadFiles = async (file,fields,fileCount) => {
   }
 
   const response = await new Promise(async (resolve, reject) => {
-    resolve(await uploadToS3(file,fileName));
+    resolve(await uploadToS3(file, fileName, isPublic));
   });
 
   return response;
 
 }
+
 /**
   * @description : upload file to AWS s3
   * @param {Object} file : file to upload
   * @param {string} fileName : name of file
+  * @param {boolean} isPublic : whether file should be public or private (default: false)
   * @return {Object} : response for file upload to AWS s3
   */
-const uploadToS3 = async (file, fileName) => {
+const uploadToS3 = async (file, fileName, isPublic = false) => {
   let S3Config = {
     AWS_S3_ACCESS_KEY_ID: process.env.AWS_S3_ACCESS_KEY_ID,
     AWS_S3_SECRET_ACCESS_KEY: process.env.AWS_S3_SECRET_ACCESS_KEY,
@@ -224,6 +232,7 @@ const uploadToS3 = async (file, fileName) => {
     Bucket: S3Config.AWS_S3_BUCKET_NAME,
     Body: fs.createReadStream(file.filepath),
     Key: fileName,
+    ACL: isPublic ? 'public-read' : 'private' // Set ACL based on isPublic flag
   };
 
   const response = await new Promise(async (resolve, reject) => {
@@ -244,5 +253,5 @@ const uploadToS3 = async (file, fileName) => {
 
   return response;
 }
-module.exports = { upload,generatePreSignedURL};
 
+module.exports = { upload, generatePreSignedURL };

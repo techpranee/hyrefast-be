@@ -26,6 +26,7 @@ router.use(require('./uploadRoutes'));
 router.use(require('./planRoutes'))
 router.use(require('./purchaseRoutes'))
 router.use(require('./creditRoutes'))
+router.use(require('./workspaceRoutes'))
 router.use('/client/api/job-scraping',require('./jobScrapingRoutes'));
 router.use('/client/api/job-description',require('./jobDescriptionRoutes'))
 router.use('/client/api/interview-questions',require('./interviewQuestionsRoutes'));

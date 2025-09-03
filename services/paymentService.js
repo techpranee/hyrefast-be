@@ -130,34 +130,41 @@ class PaymentService {
     }
   }
 
-  /**
-   * Verify Razorpay payment signature
-   * @param {String} razorpay_order_id - Razorpay order ID
-   * @param {String} razorpay_payment_id - Razorpay payment ID  
-   * @param {String} razorpay_signature - Razorpay signature
-   * @returns {Boolean} Verification result
-   */
-  verifyPaymentSignature(razorpay_order_id, razorpay_payment_id, razorpay_signature) {
-    try {
-      const generated_signature = crypto
-        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-        .update(razorpay_order_id + "|" + razorpay_payment_id)
-        .digest('hex');
+ verifyPaymentSignature(razorpay_order_id, razorpay_payment_id, razorpay_signature) {
+  try {
+    console.log('🔍 Signature verification inputs:', {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      secret_key_exists: !!process.env.RAZORPAY_KEY_SECRET,
+      secret_key_length: process.env.RAZORPAY_KEY_SECRET?.length || 0
+    });
 
-      const is_valid = generated_signature === razorpay_signature;
+    // Create the message string - ORDER MATTERS!
+    const message = razorpay_order_id + "|" + razorpay_payment_id;
+    
+    const generated_signature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(message)
+      .digest('hex');
 
-      console.log('🔍 Payment signature verification:', {
-        razorpay_order_id,
-        razorpay_payment_id,
-        is_valid
-      });
+    const is_valid = generated_signature === razorpay_signature;
 
-      return is_valid;
-    } catch (error) {
-      console.error('❌ Error verifying payment signature:', error);
-      return false;
-    }
+    console.log('🔍 Signature verification details:', {
+      message,
+      generated_signature,
+      received_signature: razorpay_signature,
+      is_valid,
+      signatures_match: generated_signature === razorpay_signature
+    });
+
+    return is_valid;
+  } catch (error) {
+    console.error('❌ Error verifying payment signature:', error);
+    return false;
   }
+}
+
 
   /**
    * Process successful payment

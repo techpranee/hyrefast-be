@@ -8,6 +8,7 @@ const Credit = require('../model/credit');
 const Workspace = require('../model/workspace');
 const Purchase = require('../model/purchase');
 const Plan = require('../model/plan');
+const { ObjectId } = require('mongodb');
 
 class CreditService {
 
@@ -415,7 +416,7 @@ async getCreditTransactionHistory(workspace_id, options = {}) {
 
     const transactions = await Credit.find(query)
       .populate('application', 'candidate job status')
-      .populate('purchase_reference', 'amount currency status')
+     
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip(skip);

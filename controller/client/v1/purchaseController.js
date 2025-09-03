@@ -415,100 +415,144 @@ const createPurchaseOrder = async (req, res) => {
 
 /**
  * @description : verify payment and complete purchase
- * @param {Object} req : request including payment verification details
- * @param {Object} res : response with verification result
- * @return {Object} : verification result. {status, message, data}
+ */
+/**
+ * @description : verify payment and complete purchase
+ */
+/**
+ * @description : verify payment and complete purchase
  */
 const verifyAndCompletePurchase = async (req, res) => {
   try {
-    const { orderId, paymentId, signature, purchaseId } = req.body;
+    // Handle both parameter formats for compatibility
+    const razorpay_order_id = req.body.razorpay_order_id || req.body.orderId;
+    const razorpay_payment_id = req.body.razorpay_payment_id || req.body.paymentId;
+    const razorpay_signature = req.body.razorpay_signature || req.body.signature;
+    const purchaseId = req.body.purchaseId;
 
-    // Validate required fields
-    if (!orderId || !paymentId || !signature || !purchaseId) {
-      return res.badRequest({ message: 'All payment verification fields are required' });
-    }
-
-    // Find purchase record
-    const purchase = await Purchase.findOne({
-      _id: purchaseId,
-      razorpay_order_id: orderId,
-      addedBy: req.user.id,
-      isDeleted: false
-    }).populate('workspace');
-
-    if (!purchase) {
-      return res.recordNotFound({ message: 'Purchase record not found' });
-    }
-
-    if (purchase.status === 'completed') {
-      return res.badRequest({ message: 'Purchase already completed' });
-    }
-
-    // Verify payment with Razorpay
-    const verificationResult = await PaymentService.verifyPayment({
-      orderId,
-      paymentId,
-      signature
+    console.log('🔄 Payment verification request:', {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature: razorpay_signature ? '***' : 'missing',
+      purchaseId
     });
 
-    if (!verificationResult.success) {
-      // Mark purchase as failed
-      await Purchase.findByIdAndUpdate(purchaseId, {
-        status: 'failed',
-        failure_reason: 'Payment verification failed',
-        razorpay_payment_id: paymentId
+    // Validate required fields
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.badRequest({ 
+        message: 'Missing required fields: razorpay_order_id, razorpay_payment_id, razorpay_signature' 
       });
-      return res.badRequest({ message: verificationResult.message });
+    }
+
+    // Find purchase record first to get plan details
+    let purchase = null;
+    if (purchaseId) {
+      purchase = await Purchase.findById(purchaseId).populate('plan workspace');
+      if (!purchase) {
+        return res.recordNotFound({ message: 'Purchase record not found' });
+      }
+    }
+
+    // Verify payment signature
+    const isSignatureValid = PaymentService.verifyPaymentSignature(
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature
+    );
+
+    console.log('🔍 Signature verification result:', isSignatureValid);
+
+    if (!isSignatureValid) {
+      // Mark purchase as failed if we have purchaseId
+      if (purchaseId) {
+        await Purchase.findByIdAndUpdate(purchaseId, {
+          status: 'failed',
+          failure_reason: 'Payment signature verification failed'
+        });
+      }
+      return res.badRequest({ message: 'Invalid payment signature' });
     }
 
     // Process successful payment
-    const paymentResult = await PaymentService.processSuccessfulPayment(
-      orderId,
-      paymentId,
-      verificationResult.payment
-    );
+    const paymentResult = await PaymentService.processSuccessfulPayment({
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      customer_details: {
+        ip: req.ip,
+        user_agent: req.get('User-Agent')
+      }
+    });
 
     if (!paymentResult.success) {
-      return res.internalServerError({ message: 'Payment processing failed' });
+      return res.internalServerError({ message: 'Payment processing failed: ' + paymentResult.message });
     }
 
-    // Add credits to workspace
-    const creditResult = await CreditService.addCreditsAfterPurchase(
-      purchase,  // Pass the entire purchase object
-      {
-        credits: purchase.credits_amount,
-        name: purchase.description || 'Credit Purchase'
+    // Update workspace available credits atomically
+    let updatedWorkspace = null;
+    try {
+      const workspaceId = purchase?.workspace?._id || req.user.workspace;
+      const creditsToAdd = paymentResult.credits.added;
+
+      console.log('💰 Adding credits to workspace:', {
+        workspaceId,
+        creditsToAdd,
+        purchaseId: paymentResult.purchase.id
+      });
+
+      // Use $inc operator to atomically increment available credits
+      updatedWorkspace = await Workspace.findByIdAndUpdate(
+        workspaceId,
+        { 
+          $inc: { available_credits: creditsToAdd }
+        },
+        { 
+          new: true,
+          runValidators: true
+        }
+      );
+
+      if (!updatedWorkspace) {
+        console.error('❌ Failed to update workspace credits - workspace not found');
+        // Don't fail the entire transaction, but log the error
+      } else {
+        console.log('✅ Workspace credits updated successfully:', {
+          workspaceId: updatedWorkspace._id,
+          newBalance: updatedWorkspace.available_credits,
+          creditsAdded: creditsToAdd
+        });
       }
-    );
 
-    if (!creditResult.success) {
-      return res.internalServerError({ message: 'Credit addition failed' });
+    } catch (creditUpdateError) {
+      console.error('❌ Error updating workspace credits:', creditUpdateError);
+      // Log error but don't fail the payment verification since payment is already processed
+      // Consider implementing a retry mechanism or manual reconciliation process
     }
-
-    // Update purchase status
-    await Purchase.findByIdAndUpdate(purchaseId, {
-      status: 'completed',
-      completed_at: new Date(),
-      razorpay_payment_id: paymentId
-    });
 
     return res.success({
       data: {
-        purchaseId: purchase._id,
-        paymentId: paymentId,
-        creditsAdded: purchase.credits_amount,
-        newBalance: creditResult.new_balance,
+        purchaseId: paymentResult.purchase.id,
+        paymentId: razorpay_payment_id,
+        credits: {
+          added: paymentResult.credits.added,
+          new_balance: updatedWorkspace?.available_credits || paymentResult.credits.new_balance
+        },
         workspace: {
-          id: purchase.workspace._id,
-          name: purchase.workspace.name
+          id: purchase?.workspace?._id || req.user.workspace,
+          name: purchase?.workspace?.name || 'Workspace'
         }
       },
       message: 'Purchase completed successfully and credits added'
     });
+
   } catch (error) {
+    console.error('❌ Error in verifyAndCompletePurchase:', error);
     return res.internalServerError({ message: error.message });
   }
 };
+
+
+
 
 /**
  * @description : get purchase history for workspace
