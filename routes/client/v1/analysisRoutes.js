@@ -5,8 +5,8 @@
 
 const express = require('express');
 const router = express.Router();
-const analysisController = require('../../controller/client/v1/analysisController');
-const auth = require('../../middleware/auth');
+const analysisController = require('../../../controller/client/v1/analysisController');
+const auth = require('../../../middleware/auth');
 
 // Get analysis status by application ID
 router.get('/status/application/:applicationId', auth, analysisController.getAnalysisStatus);
