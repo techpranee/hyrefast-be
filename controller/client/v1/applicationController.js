@@ -1045,6 +1045,10 @@ const resumePrivateInterview = async (req, res) => {
  * @param {Object} res : response with overall interview analysis
  * @return {Object} : overall interview analysis with AI insights. {status, message, data}
  */
+/**
+ * @description : Complete interview analysis - fetch all responses and generate overall analysis using AI
+ * This will deduct 1 credit from the workspace when analysis is completed
+ */
 const InterviewCompleted = async (req, res) => {
   try {
     const { applicationId, candidateId, jobId, token } = req.body;
@@ -1071,7 +1075,16 @@ const InterviewCompleted = async (req, res) => {
     }
 
     // Fetch application with populated data
-    const application = await Application.findOne(applicationQuery);
+    const application = await Application.findOne(applicationQuery)
+      .populate('candidate', 'name email full_name')
+      .populate({
+        path: 'job',
+        select: 'title description requirements location employment_type workspace',
+        populate: {
+          path: 'workspace',
+          select: 'name industry available_credits'
+        }
+      });
 
     if (!application) {
       return res.notFound({
@@ -1079,23 +1092,65 @@ const InterviewCompleted = async (req, res) => {
       });
     }
 
+    // Check if analysis already completed to prevent duplicate credit deduction
+    if (application.overall_score && 
+        application.overall_score.analyzed_at && 
+        application.status === 'interview_completed') {
+      return res.success({
+        message: "Interview analysis already completed",
+        data: {
+          applicationId: application._id,
+          overallAnalysis: application.overall_score,
+          creditAlreadyDeducted: true
+        }
+      });
+    }
+
     console.log('✅ Application found:', {
       applicationId: application._id,
-      candidateName: application.candidate.name,
-      jobTitle: application.job.title
+      candidateName: application.candidate.name || application.candidate.full_name,
+      jobTitle: application.job.title,
+      workspaceId: application.job.workspace._id
     });
 
-    console.log(application,"application")
+    // Check workspace credits before processing
+    const workspaceId = application.job.workspace._id;
+    const creditService = require('../../../services/creditService'); // Adjust path as needed
+    
+    try {
+      const creditBalance = await creditService.getWorkspaceCreditBalance(workspaceId);
+      
+      if (creditBalance.total_available < 1) {
+        return res.badRequest({
+          message: "Insufficient credits to complete interview analysis",
+          code: "INSUFFICIENT_CREDITS",
+          data: {
+            available_credits: creditBalance.total_available,
+            required_credits: 1,
+            workspace_id: workspaceId
+          }
+        });
+      }
+      
+      console.log('✅ Credit check passed:', {
+        available_credits: creditBalance.total_available,
+        workspace_id: workspaceId
+      });
+      
+    } catch (creditError) {
+      console.error('❌ Credit check failed:', creditError);
+      return res.internalServerError({
+        message: "Failed to check credit balance",
+        error: creditError.message
+      });
+    }
 
     // Build query to find all responses for this interview
-    let responseQuery = {};
-  
-      responseQuery = { 
-        candidate: application.candidate._id, 
-        job: application.job._id,
-        isDeleted: false 
-    
-    }
+    let responseQuery = {
+      candidate: application.candidate._id, 
+      job: application.job._id,
+      isDeleted: false 
+    };
 
     // Fetch all interview responses for this application
     const responses = await Response.find(responseQuery)
@@ -1109,6 +1164,8 @@ const InterviewCompleted = async (req, res) => {
     }
 
     console.log(`📊 Found ${responses.length} responses for analysis`);
+
+    // ... (keep existing response analysis preparation code) ...
 
     // Prepare individual response data for AI analysis
     const responseAnalysisData = responses.map(response => ({
@@ -1132,7 +1189,7 @@ const InterviewCompleted = async (req, res) => {
       evaluationCriteria: response.question?.evaluation_instructions
     }));
 
-    // Candidate profile data
+    // Candidate and job profile data (keep existing code)
     const candidateProfile = {
       name: application.candidate.full_name || application.candidate.name,
       email: application.candidate.email,
@@ -1141,7 +1198,6 @@ const InterviewCompleted = async (req, res) => {
       location: application.candidate.location
     };
 
-    // Job profile data
     const jobProfile = {
       title: application.job.title,
       description: application.job.description,
@@ -1155,7 +1211,7 @@ const InterviewCompleted = async (req, res) => {
     try {
       console.log('🤖 Generating overall interview analysis with AI...');
 
-      // Generate comprehensive analysis using AI (similar to your existing AI logic)
+      // Generate comprehensive analysis using AI (keep existing AI logic)
       const overallAnalysis = await generateOverallAIAnalysis({
         candidateProfile,
         jobProfile,
@@ -1170,7 +1226,7 @@ const InterviewCompleted = async (req, res) => {
 
       console.log('✅ AI overall analysis completed successfully');
 
-      // Calculate additional metrics
+      // Calculate additional metrics (keep existing code)
       const individualScores = responses
         .filter(r => r.aiAnalysis?.overall_assessment?.score)
         .map(r => r.aiAnalysis.overall_assessment.score);
@@ -1202,13 +1258,13 @@ const InterviewCompleted = async (req, res) => {
         analysisType: 'complete_interview'
       };
 
-      // Update application with overall analysis using existing overall_score field
+      // Update application with overall analysis
       const updatedApplication = await Application.findByIdAndUpdate(
         application._id,
         {
           $set: {
-            'overall_score': completeAnalysis, // Store in existing overall_score field
-            status: 'interview_completed', // Use existing enum value
+            'overall_score': completeAnalysis,
+            status: 'interview_completed',
             currentQuestion: responses.length,
             totalQuestions: responses.length
           }
@@ -1218,7 +1274,31 @@ const InterviewCompleted = async (req, res) => {
 
       console.log('💾 Overall analysis saved to application successfully');
 
-      // Prepare comprehensive response
+      // 🔥 DEDUCT CREDIT AFTER SUCCESSFUL ANALYSIS
+      try {
+        console.log('💳 Deducting 1 credit for interview analysis...');
+        
+        const deductionResult = await creditService.deductCreditForInterview(
+          workspaceId,
+          application._id.toString()
+        );
+
+        if (deductionResult.success) {
+          console.log('✅ Credit deducted successfully:', {
+            application_id: application._id,
+            remaining_balance: deductionResult.remaining_balance,
+            credit_record_id: deductionResult.credit_record_id
+          });
+        } else {
+          console.error('❌ Failed to deduct credit:', deductionResult);
+        }
+
+      } catch (creditDeductionError) {
+        console.error('❌ Error deducting credit:', creditDeductionError);
+        // Don't fail the analysis if credit deduction fails - log and continue
+      }
+
+      // Prepare comprehensive response (keep existing response structure)
       const analysisResult = {
         applicationId: application._id,
         candidate: {
@@ -1250,18 +1330,23 @@ const InterviewCompleted = async (req, res) => {
           applicationCreated: application.createdAt,
           interviewCompleted: responses[responses.length - 1]?.createdAt,
           analysisCompleted: new Date()
+        },
+        // Add credit information to response
+        creditInfo: {
+          creditDeducted: true,
+          remainingCredits: deductionResult?.remaining_balance || 'unknown'
         }
       };
 
       return res.success({
-        message: "Complete interview analysis generated successfully",
+        message: "Complete interview analysis generated successfully and 1 credit deducted",
         data: analysisResult
       });
 
     } catch (aiError) {
       console.error('❌ AI overall analysis failed:', aiError);
 
-      // Return basic analysis without AI if AI service fails
+      // Handle fallback analysis with credit deduction
       const individualScores = responses
         .filter(r => r.aiAnalysis?.overall_assessment?.score)
         .map(r => r.aiAnalysis.overall_assessment.score);
@@ -1280,20 +1365,30 @@ const InterviewCompleted = async (req, res) => {
         version: '1.0-fallback'
       };
 
-      // Store basic analysis in overall_score field
+      // Store basic analysis and deduct credit for fallback too
       await Application.findByIdAndUpdate(
         application._id,
         {
           $set: {
             'overall_score': basicAnalysis,
-            status: 'interview_completed', // Use existing enum value
-           
+            status: 'interview_completed'
           }
         }
       );
 
+      // Deduct credit even for fallback analysis
+      try {
+        const deductionResult = await creditService.deductCreditForInterview(
+          workspaceId,
+          application._id.toString()
+        );
+        console.log('✅ Credit deducted for fallback analysis');
+      } catch (creditError) {
+        console.error('❌ Failed to deduct credit for fallback analysis:', creditError);
+      }
+
       return res.success({
-        message: "Basic overall analysis completed (AI overall analysis failed)",
+        message: "Basic overall analysis completed (AI overall analysis failed) and 1 credit deducted",
         data: {
           applicationId: application._id,
           candidate: {
@@ -1311,7 +1406,11 @@ const InterviewCompleted = async (req, res) => {
             questionText: r.questionText,
             individualAnalysis: r.aiAnalysis
           })),
-          aiError: aiError.message
+          aiError: aiError.message,
+          creditInfo: {
+            creditDeducted: true,
+            analysisType: 'fallback'
+          }
         }
       });
     }
@@ -1324,6 +1423,7 @@ const InterviewCompleted = async (req, res) => {
     });
   }
 };
+
 
 /**
  * Generate overall AI analysis for complete interview using axios only

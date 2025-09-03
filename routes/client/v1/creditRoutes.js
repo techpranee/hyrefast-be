@@ -34,4 +34,10 @@ router.route("/client/api/v1/credit/alert-threshold/:workspaceId").put(auth(PLAT
 router.route("/client/api/v1/credit/alert-threshold").put(auth(PLATFORM.CLIENT), checkRolePermission, creditController.updateCreditAlertThreshold);
 router.route("/client/api/v1/credit/low-credit-workspaces").get(auth(PLATFORM.CLIENT), checkRolePermission, creditController.getLowCreditWorkspaces);
 
+
+// Add this line to your creditRoutes.js after the existing routes
+router.route("/client/api/v1/credit/usage-analytics/:workspaceId").get(auth(PLATFORM.CLIENT), checkRolePermission, creditController.getJobUsageAnalytics);
+router.route("/client/api/v1/credit/usage-analytics").get(auth(PLATFORM.CLIENT), checkRolePermission, creditController.getJobUsageAnalytics);
+
+
 module.exports = router;

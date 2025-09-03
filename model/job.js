@@ -6,6 +6,7 @@
 const mongoose = require("mongoose");
 const mongoosePaginate = require('mongoose-paginate-v2');
 let idValidator = require('mongoose-id-validator');
+const { v4: uuidv4 } = require("uuid");
 const myCustomLabels = {
     totalDocs: 'itemCount',
     docs: 'data',

@@ -48,6 +48,7 @@ const schema = new Schema(
         "interview_completed",
         "interview_aborted",
         "assessment_ongoing",
+        "assessment_completed"
       ],
       default: "interview_link_not_sent",
     },
@@ -145,6 +146,14 @@ schema.pre("save", async function (next) {
     };
   }
 
+
+
+  next();
+});
+
+
+schema.pre('findOneAndUpdate', async function (next) {
+  this.set({ updatedAt: new Date() });
   next();
 });
 

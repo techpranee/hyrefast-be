@@ -33,27 +33,27 @@ const createInterviewResponse = async (req, res) => {
       evaluation_instructions
     } = req.body;
 
-    // Validate required fields
-    if (!applicationId || !questionNumber || !responseText) {
-      return res.badRequest({ 
-        message: 'Application ID, question number, and response text are required' 
-      });
-    }
+    // // Validate required fields
+    // if (!applicationId || !questionNumber || !responseText) {
+    //   return res.badRequest({ 
+    //     message: 'Application ID, question number, and response text are required' 
+    //   });
+    // }
 
     // Get application with populated references
-    const application = await dbService.findOne(Application, 
-      { _id: applicationId }, 
-      { 
-        populate: [
-          { path: 'job', select: 'title description requirements' },
-          { path: 'candidate', select: 'name email' }
-        ]
-      }
-    );
+    // const application = await dbService.findOne(Application, 
+    //   { _id: applicationId }, 
+    //   { 
+    //     populate: [
+    //       { path: 'job', select: 'title description requirements' },
+    //       { path: 'candidate', select: 'name email' }
+    //     ]
+    //   }
+    // );
 
-    if (!application) {
-      return res.recordNotFound({ message: 'Application not found' });
-    }
+    // if (!application) {
+    //   return res.recordNotFound({ message: 'Application not found' });
+    // }
 
     // Get question details if questionId provided
     let questionDetails = null;
@@ -61,65 +61,51 @@ const createInterviewResponse = async (req, res) => {
       questionDetails = await dbService.findOne(Question, { _id: questionId });
     }
 
-    console.log('📊 Generating AI analysis for response...', application);
+
 
     // Generate AI analysis
-    const aiAnalysis = await generateAIAnalysis({
-      questionText,
-      responseText,
-      jobDetails: application.job,
-      questionDetails,
-      candidateInfo: application.candidate,
-      evaluationInstructions: evaluation_instructions
-    });
+    // const aiAnalysis = await generateAIAnalysis({
+    //   questionText,
+    //   responseText,
+    //   jobDetails: application.job,
+    //   questionDetails,
+    //   candidateInfo: application.candidate,
+    //   evaluationInstructions: evaluation_instructions
+    // });
 
     // Prepare response data
-    const responseData = {
-      job: application.job?._id,
-      question: questionId && ObjectId.isValid(questionId) ? questionId : null,
-      candidate: application.candidate?._id,
-      sessionId: applicationId,
-      questionNumber: parseInt(questionNumber),
-      questionText,
-      responseText,
-      transcriptionText: responseText,
-      responseAudioUrl,
-      responseVideoUrl,
-      score: aiAnalysis.overallScore?.toString() || '75',
-      aiAnalysis: aiAnalysis,
-      addedBy: application.candidate?._id || req.user?.id
-    };
+   
 
     // Validate data against schema
-    let validateRequest = validation.validateParamsWithJoi(
-      responseData,
-      responseSchemaKey.schemaKeys
-    );
+    // let validateRequest = validation.validateParamsWithJoi(
+    //   responseData,
+    //   responseSchemaKey.schemaKeys
+    // );
     
-    if (!validateRequest.isValid) {
-      // If validation fails, create minimal response without strict validation
-      console.warn('⚠️ Validation failed, creating with minimal data:', validateRequest.message);
-    }
+    // if (!validateRequest.isValid) {
+    //   // If validation fails, create minimal response without strict validation
+    //   console.warn('⚠️ Validation failed, creating with minimal data:', validateRequest.message);
+    // }
 
     // Create response document
-    const newResponse = new Response(responseData);
-    const createdResponse = await dbService.create(Response, newResponse);
+    // const newResponse = new Response(responseData);
+    // const createdResponse = await dbService.create(Response, newResponse);
 
-    const updateInterViewResponse = await dbService.updateOne(Application,{
-      _id: applicationId,
-    },{
-      currentQuestion: questionNumber + 1,
-    })
+    // const updateInterViewResponse = await dbService.updateOne(Application,{
+    //   _id: applicationId,
+    // },{
+    //   currentQuestion: questionNumber + 1,
+    // })
 
-    console.log('✅ Interview response created successfully');
+    // console.log('✅ Interview response created successfully');
 
     return res.success({
       message: 'Interview response created with AI analysis',
-      data: {
-        responseId: createdResponse._id || createdResponse.id,
-        aiAnalysis: aiAnalysis,
-        score: aiAnalysis.overallScore
-      }
+      // data: {
+      //   responseId: createdResponse._id || createdResponse.id,
+      //   aiAnalysis: aiAnalysis,
+      //   score: aiAnalysis.overallScore
+      // }
     });
 
   } catch (error) {

@@ -73,6 +73,21 @@ schema.pre('save', async function (next) {
     next();
 });
 
+schema.post('save', async function (doc, next) {
+  // Only create credits for newly created workspaces (not updates)
+
+    try {
+      const creditService = require('../services/creditService');
+      await creditService.createInitialCreditsForWorkspace(this._id, this.addedBy);
+      console.log('✅ Initial credits created for workspace:', this._id);
+    } catch (error) {
+      console.error('❌ Failed to create initial credits for workspace:', this._id, error);
+      // Log error but don't fail workspace creation
+    }
+
+  next();
+});
+
 schema.pre('insertMany', async function (next, docs) {
     if (docs && docs.length) {
         for (let index = 0; index < docs.length; index++) {

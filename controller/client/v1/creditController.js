@@ -15,6 +15,144 @@ const CreditService = require("../../../services/creditService");
 
 
 /**
+ * @description : get job usage analytics for workspace
+ * @param {Object} req : request including workspace ID
+ * @param {Object} res : response containing job usage analytics
+ * @return {Object} : job usage analytics. {status, message, data}
+ */
+const getJobUsageAnalytics = async (req, res) => {
+  try {
+    const workspaceId = req.params.workspaceId || req.user.workspace;
+
+    if (!workspaceId) {
+      return res.badRequest({ message: 'Workspace ID is required' });
+    }
+
+    // Check if user has access to this workspace
+    let workspaceQuery = { _id: workspaceId, isDeleted: false };
+    if (req.user.userType === 2) { // recruiter
+      workspaceQuery.$or = [
+        { addedBy: req.user.id },
+        { members: req.user.id }
+      ];
+    }
+
+    const workspace = await Workspace.findOne(workspaceQuery);
+    if (!workspace) {
+      return res.recordNotFound({ message: 'Workspace not found' });
+    }
+
+    // Aggregate job usage data
+    const jobUsageData = await Credit.aggregate([
+      {
+        $match: {
+          workspace: new ObjectId(workspaceId),
+          transaction_type: 'usage',
+          is_added: false,
+          isDeleted: false
+        }
+      },
+      {
+        $lookup: {
+          from: 'applications',
+          localField: 'application',
+          foreignField: '_id',
+          as: 'applicationData'
+        }
+      },
+      {
+        $unwind: {
+          path: '$applicationData',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: 'jobs',
+          localField: 'applicationData.job',
+          foreignField: '_id',
+          as: 'jobData'
+        }
+      },
+      {
+        $unwind: {
+          path: '$jobData',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $match: {
+          'jobData._id': { $exists: true }
+        }
+      },
+      {
+        $group: {
+          _id: '$jobData._id',
+          jobTitle: { $first: '$jobData.title' },
+          applications: { $sum: 1 },
+          creditsUsed: { $sum: '$deduction' },
+          lastActivity: { $max: '$createdAt' }
+        }
+      },
+      {
+        $addFields: {
+          avgCreditsPerApplication: {
+            $divide: ['$creditsUsed', '$applications']
+          }
+        }
+      },
+      {
+        $sort: { creditsUsed: -1 }
+      },
+      {
+        $limit: 20
+      }
+    ]);
+
+    // Helper function to get relative time
+    const getRelativeTime = (date) => {
+      const now = new Date();
+      const diffMs = now - new Date(date);
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffMins < 60) {
+        return `${diffMins} minutes ago`;
+      } else if (diffHours < 24) {
+        return `${diffHours} hours ago`;
+      } else {
+        return `${diffDays} days ago`;
+      }
+    };
+
+    // Format the response
+    const formattedJobUsage = jobUsageData.map(job => ({
+      jobId: job._id,
+      jobTitle: job.jobTitle,
+      applications: job.applications,
+      creditsUsed: job.creditsUsed,
+      avgCreditsPerApplication: parseFloat(job.avgCreditsPerApplication.toFixed(1)),
+      lastActivity: getRelativeTime(job.lastActivity)
+    }));
+
+    return res.success({
+      data: {
+        jobUsage: formattedJobUsage,
+        totalJobs: formattedJobUsage.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching job usage analytics:', error);
+    return res.internalServerError({ message: error.message });
+  }
+};
+
+
+
+
+/**
 * @description : create document of Credit in mongodb collection.
 * @param {Object} req : request including body for creating document.
 * @param {Object} res : response of created document
@@ -390,24 +528,26 @@ const getCreditBalance = async (req, res) => {
   }
 };
 
-/**
- * @description : get credit transaction history for workspace
- * @param {Object} req : request including workspace ID and pagination
- * @param {Object} res : response containing transaction history
- * @return {Object} : transaction history. {status, message, data}
- */
 const getCreditHistory = async (req, res) => {
   try {
     const workspaceId = req.params.workspaceId || req.user.workspace;
-    const options = utils.paginationOptions(req.body);
+    
+    // Extract pagination options from request body
+    const options = {
+      limit: req.body.options?.limit || req.body.limit || 50,
+      skip: req.body.options?.skip || req.body.skip || 0,
+      transaction_type: req.body.options?.transaction_type || req.body.transaction_type || null,
+      start_date: req.body.options?.start_date || req.body.start_date || null,
+      end_date: req.body.options?.end_date || req.body.end_date || null
+    };
 
     if (!workspaceId) {
       return res.badRequest({ message: 'Workspace ID is required' });
     }
 
-    // Check if user has access to this workspace
+    // Check workspace access
     let workspaceQuery = { _id: workspaceId, isDeleted: false };
-    if (req.user.userType === 2) { // recruiter
+    if (req.user.userType === 2) {
       workspaceQuery.$or = [
         { addedBy: req.user.id },
         { members: req.user.id }
@@ -423,9 +563,11 @@ const getCreditHistory = async (req, res) => {
 
     return res.success({ data: history });
   } catch (error) {
+    console.error('Error in getCreditHistory:', error);
     return res.internalServerError({ message: error.message });
   }
 };
+
 
 /**
  * @description : get credit statistics for workspace
@@ -617,5 +759,5 @@ const getLowCreditWorkspaces = async (req, res) => {
 
 module.exports = {
   addCredit, bulkInsertCredit, findAllCredit, getCredit, getCreditCount, updateCredit, bulkUpdateCredit, partialUpdateCredit, softDeleteCredit, deleteCredit, deleteManyCredit, softDeleteManyCredit,
-  getCreditBalance, getCreditHistory, getCreditStats, updateCreditAlertThreshold, getLowCreditWorkspaces
+  getCreditBalance, getCreditHistory, getCreditStats, updateCreditAlertThreshold, getLowCreditWorkspaces, getJobUsageAnalytics
 }
