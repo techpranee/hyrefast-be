@@ -23,12 +23,13 @@ router.use(require('./projectRouteRoutes'));
 router.use(require('./routeRoleRoutes'));
 router.use(require('./userRoleRoutes'));
 router.use(require('./uploadRoutes'));
-router.use(require('./planRoutes'))
-router.use(require('./purchaseRoutes'))
-router.use(require('./creditRoutes'))
+router.use(require('./planRoutes'));
+router.use(require('./purchaseRoutes'));
+router.use(require('./creditRoutes'));
 router.use('/client/api/job-scraping',require('./jobScrapingRoutes'));
-router.use('/client/api/job-description',require('./jobDescriptionRoutes'))
+router.use('/client/api/job-description',require('./jobDescriptionRoutes'));
 router.use('/client/api/interview-questions',require('./interviewQuestionsRoutes'));
 router.use('/client/api/candidate-verification', require('./candidateVerificationRoutes'));
+router.use('/client/api/analysis', require('./analysisRoutes'));
 
 module.exports = router;
