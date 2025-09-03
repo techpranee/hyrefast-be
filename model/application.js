@@ -166,17 +166,17 @@ schema.post('findOneAndUpdate', async function (doc) {
         const fullDoc = await this.model.findById(doc._id).select('workspace');
         workspaceId = fullDoc ? fullDoc.workspace : null;
       }
-      
+
       if (!workspaceId) {
         console.error('❌ Cannot deduct credit: workspace not found for application', doc._id);
         return;
       }
-      
+
       // Deduct credit for interview
       let credit_deduction = await CreditService.deductCreditForInterview(workspaceId, doc._id);
       doc.credit_deduction_reference = credit_deduction.credit_record_id;
       await doc.save();
-      
+
       //  start the AI analysis
       if (credit_deduction.success) {
         // Queue analysis task using worker thread manager
@@ -187,7 +187,7 @@ schema.post('findOneAndUpdate', async function (doc) {
             workspaceId: workspaceId,
             priority: 'normal'
           });
-          
+
           if (queueResult.success) {
             console.log(`✅ Analysis task queued for application ${doc._id}: ${queueResult.taskId}`);
           } else {
