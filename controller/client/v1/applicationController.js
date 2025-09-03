@@ -1716,10 +1716,6 @@ const getInterviewAnalysis = async (req, res) => {
   }
 };
 
-
-
-
-
 module.exports = {
   addApplication,
   createApplicationWithPrivateLink,

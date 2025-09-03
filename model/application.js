@@ -7,6 +7,7 @@ const mongoosePaginate = require("mongoose-paginate-v2");
 let idValidator = require("mongoose-id-validator");
 const crypto = require("crypto");
 const { options } = require("joi");
+const CreditService = require("../services/creditService");
 
 const myCustomLabels = {
   totalDocs: "itemCount",
@@ -109,7 +110,13 @@ const schema = new Schema(
     },
 
     overall_score: { type: Schema.Types.Mixed },
+
     credit_deduction_reference: { type: Schema.Types.ObjectId, ref: "credit" },
+
+    workspace: {
+      type: Schema.Types.ObjectId,
+      ref: "workspace"
+    }
   },
   {
     timestamps: {
@@ -120,14 +127,14 @@ const schema = new Schema(
 );
 
 // Auto-populate candidate and job data
-schema.pre(/^find/, function (next) {
-  this.populate(
-    "candidate",
-    "name email phone_number location experience skills full_name"
-  );
-  this.populate("job", "title description location employment_type workspace");
-  next();
-});
+// schema.pre(/^find/, function (next) {
+//   this.populate(
+//     "candidate",
+//     "name email phone_number location experience skills full_name"
+//   );
+//   this.populate("job", "title description location employment_type workspace");
+//   next();
+// });
 
 // Generate unique private token before save
 schema.pre("save", async function (next) {
@@ -145,16 +152,55 @@ schema.pre("save", async function (next) {
       used: false,
     };
   }
-
-
-
   next();
 });
 
+schema.post('findOneAndUpdate', async function (doc) {
+  // Update the updatedAt field
+  if (doc && doc.status === 'interview_completed' && !doc.credit_deduction_reference) {
+    try {
+      // Make sure we have the workspace ID - if not populated, get it
+      let workspaceId = doc.workspace;
+      if (!workspaceId || (typeof workspaceId === 'object' && !workspaceId._id)) {
+        // Re-fetch the document to ensure we have the workspace ID
+        const fullDoc = await this.model.findById(doc._id).select('workspace');
+        workspaceId = fullDoc ? fullDoc.workspace : null;
+      }
 
-schema.pre('findOneAndUpdate', async function (next) {
-  this.set({ updatedAt: new Date() });
-  next();
+      if (!workspaceId) {
+        console.error('❌ Cannot deduct credit: workspace not found for application', doc._id);
+        return;
+      }
+
+      // Deduct credit for interview
+      let credit_deduction = await CreditService.deductCreditForInterview(workspaceId, doc._id);
+      doc.credit_deduction_reference = credit_deduction.credit_record_id;
+      await doc.save();
+
+      //  start the AI analysis
+      if (credit_deduction.success) {
+        // Queue analysis task using worker thread manager
+        const AnalysisWorkerManager = require('../services/analysisWorkerManager');
+        try {
+          const queueResult = await AnalysisWorkerManager.queueAnalysisTask({
+            applicationId: doc._id,
+            workspaceId: workspaceId,
+            priority: 'normal'
+          });
+
+          if (queueResult.success) {
+            console.log(`✅ Analysis task queued for application ${doc._id}: ${queueResult.taskId}`);
+          } else {
+            console.error(`❌ Failed to queue analysis task for application ${doc._id}:`, queueResult.message);
+          }
+        } catch (error) {
+          console.error(`❌ Error queuing analysis task for application ${doc._id}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error in post-update hook:', error);
+    }
+  }
 });
 
 schema.pre("insertMany", async function (next, docs) {

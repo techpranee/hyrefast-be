@@ -31,5 +31,6 @@ router.use('/client/api/job-scraping',require('./jobScrapingRoutes'));
 router.use('/client/api/job-description',require('./jobDescriptionRoutes'))
 router.use('/client/api/interview-questions',require('./interviewQuestionsRoutes'));
 router.use('/client/api/candidate-verification', require('./candidateVerificationRoutes'));
+router.use('/client/api/analysis', require('./analysisRoutes'));
 
 module.exports = router;

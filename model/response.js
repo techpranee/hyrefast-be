@@ -21,66 +21,82 @@ mongoosePaginate.paginate.options = { customLabels: myCustomLabels };
 const Schema = mongoose.Schema;
 const schema = new Schema(
   {
-
-    job:{
-      type:Schema.Types.ObjectId,
-      ref:'job'
+    sessionId: {
+      ref: 'application',
+      type: Schema.Types.ObjectId
     },
 
-    question:{
-      type:Schema.Types.ObjectId,
-      ref:'question'
+    job: {
+      type: Schema.Types.ObjectId,
+      ref: 'job'
     },
 
-    candidate:{
-      type:Schema.Types.ObjectId,
-      ref:'user'
+    candidate: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
     },
 
-    isDeleted:{ type:Boolean },
-
-    isActive:{ type:Boolean },
-
-    createdAt:{ type:Date },
-
-    updatedAt:{ type:Date },
-
-    addedBy:{
-      type:Schema.Types.ObjectId,
-      ref:'user'
+    question: {
+      type: Schema.Types.ObjectId,
+      ref: 'question'
     },
 
-    updatedBy:{
-      type:Schema.Types.ObjectId,
-      ref:'user'
+    questionNumber: { type: Number },
+
+    questionText: { type: String },
+
+    responseAudioUrl: { type: String },  //FE dependant
+
+    responseVideoUrl: { type: String },  //FE dependant
+
+    browserTranscription: { type: String },   //FE dependant
+
+    transcriptionText: { type: String }, //AI whisper transcription
+
+    // responseText: { type: String },
+
+    aiAnalysis: { type: Schema.Types.Mixed }, //AI
+
+    // Analysis tracking for worker threads
+    analysisStatus: {
+      type: String,
+      enum: ['pending', 'processing', 'completed', 'failed'],
+      default: 'pending'
     },
 
-    score:{ type:String },
-
-    aiAnalysis:{ type:Schema.Types.Mixed },
-
-    sessionId:{
-      ref:'application',
-      type:Schema.Types.ObjectId
+    analysisTaskId: {
+      type: String,
+      ref: 'analysisTasks'
     },
 
-    questionNumber:{ type:Number },
+    analysisProcessedAt: { type: Date },
 
-    questionText:{ type:String },
+    score: { type: String }, //AI
 
-    responseText:{ type:String },
+    isDeleted: { type: Boolean },
 
-    responseAudioUrl:{ type:String },
+    isActive: { type: Boolean },
 
-    responseVideoUrl:{ type:String },
+    createdAt: { type: Date },
 
-    transcriptionText:{ type:String }
+    updatedAt: { type: Date },
+
+    addedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    },
+
+    updatedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    }
+
   }
-  ,{ 
-    timestamps: { 
-      createdAt: 'createdAt', 
-      updatedAt: 'updatedAt' 
-    } 
+  , {
+    timestamps: {
+      createdAt: 'createdAt',
+      updatedAt: 'updatedAt'
+    }
   }
 );
 schema.pre('save', async function (next) {
@@ -90,7 +106,7 @@ schema.pre('save', async function (next) {
 });
 
 schema.pre('insertMany', async function (next, docs) {
-  if (docs && docs.length){
+  if (docs && docs.length) {
     for (let index = 0; index < docs.length; index++) {
       const element = docs[index];
       element.isDeleted = false;
@@ -102,13 +118,13 @@ schema.pre('insertMany', async function (next, docs) {
 
 schema.method('toJSON', function () {
   const {
-    _id, __v, ...object 
-  } = this.toObject({ virtuals:true });
+    _id, __v, ...object
+  } = this.toObject({ virtuals: true });
   object.id = _id;
-     
+
   return object;
 });
 schema.plugin(mongoosePaginate);
 schema.plugin(idValidator);
-const response = mongoose.model('response',schema);
+const response = mongoose.model('response', schema);
 module.exports = response;
