@@ -1,5 +1,7 @@
 const axios = require('axios');
 const FormData = require('form-data');
+const os = require('os');
+const path = require('path');
 const fs = require('fs');
 
 class TranscriptionService {
@@ -9,157 +11,246 @@ class TranscriptionService {
     }
 
     /**
-     * Process single audio file with TTS context and retry logic
-     * Adapted from your working Supabase implementation
+     * Bulletproof multipart upload helper
      */
-    async processSingleFile(audioBuffer, contextIntro = '', audioMimeType = 'audio/wav') {
-        console.log(`🎵 Processing single file: ${Math.round(audioBuffer.byteLength / 1024 / 1024 * 100) / 100}MB`);
+    async postMultipart(url, fields, fileKey, fileBuffer, filename, contentType, extraHeaders = {}) {
+        const fd = new FormData();
 
-        let finalAudioBuffer = audioBuffer;
+        // Append file first
+        fd.append(fileKey, fileBuffer, { filename, contentType });
 
-        // Add TTS context if available and formats match
-        if (contextIntro && contextIntro.length > 0) {
-            let ttsAudioBuffer = null;
-            let ttsMimeType = 'audio/wav';
-
-            // Try to request TTS in webm if original is webm
-            if (audioMimeType === 'audio/webm') {
-                try {
-                    const ttsResponse = await axios.post('https://api.streamelements.com/kappa/v2/speech', {
-                        voice: 'Brian',
-                        text: contextIntro,
-                        format: 'webm'
-                    }, {
-                        headers: { 'Content-Type': 'application/json' },
-                        responseType: 'arraybuffer'
-                    });
-
-                    if (ttsResponse.status === 200 && ttsResponse.headers['content-type']?.includes('webm')) {
-                        ttsAudioBuffer = ttsResponse.data;
-                        ttsMimeType = 'audio/webm';
-                        console.log('✅ Generated TTS context in webm');
-                    } else {
-                        console.log('⚠️ TTS API did not return webm, skipping TTS context for webm audio');
-                    }
-                } catch (e) {
-                    console.log('⚠️ TTS webm generation failed:', e.message);
-                }
-            } else {
-                // Default: use wav for non-webm
-                ttsAudioBuffer = await this.generateTTSAudio(contextIntro);
-                ttsMimeType = 'audio/wav';
-            }
-
-            if (ttsAudioBuffer && ttsAudioBuffer.byteLength > 0 && ttsMimeType === audioMimeType) {
-                // Concatenate TTS + silence + audio (same format)
-                const silenceBuffer = Buffer.alloc(4000, 0);
-                finalAudioBuffer = Buffer.concat([
-                    Buffer.from(ttsAudioBuffer),
-                    silenceBuffer,
-                    Buffer.from(audioBuffer)
-                ]);
-                console.log(`🎵 Enhanced with TTS context in ${ttsMimeType}`);
-            } else if (audioMimeType === 'audio/webm') {
-                console.log('⚠️ Skipping TTS context for webm audio (format mismatch)');
-            } else if (ttsAudioBuffer && ttsAudioBuffer.byteLength > 0) {
-                // For non-webm, allow wav TTS context
-                const silenceBuffer = Buffer.alloc(4000, 0);
-                finalAudioBuffer = Buffer.concat([
-                    Buffer.from(ttsAudioBuffer),
-                    silenceBuffer,
-                    Buffer.from(audioBuffer)
-                ]);
-                console.log('🎵 Enhanced with TTS context (wav) for non-webm');
-            }
+        // Append text fields
+        for (const [k, v] of Object.entries(fields || {})) {
+            fd.append(k, String(v));
         }
 
-        // Retry logic for Whisper API calls
-        const maxRetries = 3;
-        let lastError = null;
+        // Compute content-length (some servers need it)
+        const contentLength = await new Promise((resolve, reject) => {
+            fd.getLength((err, len) => (err ? reject(err) : resolve(len)));
+        });
 
-        for (let attempt = 1; attempt <= maxRetries; attempt++) {
-            try {
-                console.log(`🔄 Processing attempt ${attempt}/${maxRetries}`);
-                console.log(`📏 Sending audio buffer of size: ${finalAudioBuffer.byteLength} bytes`);
+        const headers = {
+            ...fd.getHeaders(),          // includes multipart/form-data; boundary=...
+            'Content-Length': contentLength, // prevents "no file provided" on some Node servers
+            ...extraHeaders,
+        };
 
-                // Call Whisper API with translate and language params to force English output
-                const formData = new FormData();
-                formData.append('audio', finalAudioBuffer, {
-                    filename: 'interview-audio.wav',
-                    contentType: 'audio/wav'
-                });
-                formData.append('translate', 'true'); // Force translation to English
-                formData.append('language', 'en');    // Force output language to English
+        console.log('📤 Sending multipart request with headers:', Object.keys(headers));
+        console.log('📊 Content-Length:', contentLength);
 
-                const whisperResponse = await axios.post(this.whisperUrl, formData, {
-                    headers: {
-                        ...formData.getHeaders(),
-                        'Accept': 'application/json'
-                    },
-                    timeout: 60000,
-                    maxContentLength: Infinity,
-                    maxBodyLength: Infinity
-                });
-
-                if (whisperResponse.status !== 200) {
-                    const errorText = whisperResponse.data || 'No error details';
-                    const error = new Error(`Whisper API failed (attempt ${attempt}): ${whisperResponse.status} - ${errorText}`);
-                    console.error(`❌ ${error.message}`);
-
-                    // If it's a 500 error and we have retries left, wait and try again
-                    if (whisperResponse.status === 500 && attempt < maxRetries) {
-                        const waitTime = Math.pow(2, attempt) * 1000; // Exponential backoff
-                        console.log(`⏳ Waiting ${waitTime}ms before retry...`);
-                        await new Promise(resolve => setTimeout(resolve, waitTime));
-                        lastError = error;
-                        continue;
-                    }
-
-                    throw error;
-                }
-
-                const whisperResult = whisperResponse.data;
-
-                // Extract transcription
-                let transcription = '';
-                if (typeof whisperResult === 'string') {
-                    transcription = whisperResult.trim();
-                } else if (whisperResult && typeof whisperResult === 'object') {
-                    if (whisperResult.transcription?.text) {
-                        transcription = whisperResult.transcription.text.trim();
-                    } else {
-                        const possibleFields = ['text', 'result', 'transcript', 'output', 'data', 'content', 'message'];
-                        for (const field of possibleFields) {
-                            if (whisperResult[field] && typeof whisperResult[field] === 'string') {
-                                transcription = whisperResult[field].trim();
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                console.log(`✅ Transcription successful: ${transcription.length} characters`);
-                return transcription;
-
-            } catch (error) {
-                lastError = error;
-                console.error(`❌ Attempt ${attempt} failed:`, error.message);
-
-                if (attempt < maxRetries) {
-                    const waitTime = Math.pow(2, attempt) * 1000; // Exponential backoff
-                    console.log(`⏳ Waiting ${waitTime}ms before retry...`);
-                    await new Promise(resolve => setTimeout(resolve, waitTime));
-                }
-            }
-        }
-
-        // If all retries failed, throw the last error
-        throw lastError || new Error('All transcription attempts failed');
+        return axios.post(url, fd, {
+            headers,
+            maxBodyLength: Infinity,
+            maxContentLength: Infinity,
+            timeout: 60000,
+        });
     }
 
     /**
-     * Generate TTS audio (placeholder - implement as needed)
+     * **FIXED**: Cross-platform compatible streaming approach
      */
+    async transcribeWithOllama(audioInput, options = {}) {
+        try {
+            console.log('🎯 Starting transcription with Ollama endpoint...');
+
+            // Get audio buffer
+            let audioBuffer;
+            let mime = (options.mimeType || '').toLowerCase() || 'audio/webm';
+
+            if (typeof audioInput === 'string' && audioInput.startsWith('http')) {
+                console.log('📥 Downloading from URL:', audioInput);
+                const response = await axios.get(audioInput, { 
+                    responseType: 'arraybuffer',
+                    timeout: 30000
+                });
+                audioBuffer = Buffer.from(response.data);
+                // Prefer server-advertised mime if present
+                if (response.headers['content-type']) {
+                    mime = response.headers['content-type'].toLowerCase();
+                }
+            } else if (Buffer.isBuffer(audioInput)) {
+                audioBuffer = audioInput;
+            } else {
+                throw new Error('Invalid audio input format');
+            }
+
+            if (!audioBuffer?.length) {
+                throw new Error('Audio buffer is empty');
+            }
+
+            console.log('📊 Audio buffer size:', audioBuffer.length, 'bytes');
+
+            // Determine correct file extension from mime type
+            const ext = mime.includes('wav') ? 'wav'
+                     : mime.includes('mp3') ? 'mp3'
+                     : mime.includes('mp4') ? 'mp4'
+                     : mime.includes('ogg') ? 'ogg'
+                     : 'webm';
+
+            console.log('🎵 Detected format:', ext, 'MIME:', mime);
+
+            // Match Postman exactly: field name 'audio' + translate/language
+            const response = await this.postMultipart(
+                this.whisperUrl,
+                { translate: 'true', language: 'en' },
+                'audio',
+                audioBuffer,
+                `upload.${ext}`,
+                mime
+            );
+
+            const result = response.data;
+            console.log('✅ Server response received:',  result);
+
+            let transcription = '';
+            if (typeof result === 'string') {
+                transcription = result.trim();
+            } else if (result?.transcription) {
+                // Based on your Postman response structure
+                transcription = result.transcription.text || 
+                              JSON.stringify(result.transcription);
+            } else if (result?.text) {
+                transcription = result.text.trim();
+            }
+
+            return {
+                success: true,
+                transcription: transcription || '[No speech detected]',
+                confidence: result?.confidence ?? 0.9,
+                raw: result
+            };
+
+        } catch (error) {
+            console.error('❌ Buffer transcription error:', {
+                message: error.message,
+                status: error.response?.status,
+                data: error.response?.data
+            });
+            
+            return {
+                success: false,
+                error: error.response?.data?.error || error.message
+            };
+        }
+    }
+
+    /**
+     * **FIXED**: Proper cross-platform temp file handling
+     */
+    async transcribeFromTempFile(audioBuffer, options = {}) {
+        let tempFilePath = null;
+        
+        try {
+            const mime = (options.mimeType || 'audio/webm').toLowerCase();
+            const ext = mime.includes('wav') ? 'wav'
+                     : mime.includes('mp3') ? 'mp3'
+                     : mime.includes('mp4') ? 'mp4'
+                     : mime.includes('ogg') ? 'ogg'
+                     : 'webm';
+
+            const tempDir = os.tmpdir();
+            const tempFileName = `audio_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            tempFilePath = path.join(tempDir, tempFileName);
+
+            console.log('📁 Creating temp file at:', tempFilePath);
+
+            // Ensure temp directory exists (create if needed)
+            if (!fs.existsSync(tempDir)) {
+                console.log('📁 Creating temp directory:', tempDir);
+                fs.mkdirSync(tempDir, { recursive: true });
+            }
+
+            // Write buffer to temp file
+            fs.writeFileSync(tempFilePath, audioBuffer);
+            console.log('✅ Temp file created successfully');
+
+            // Use the bulletproof multipart helper
+            const response = await this.postMultipart(
+                this.whisperUrl,
+                { translate: 'true', language: 'en' },
+                'audio',
+                fs.createReadStream(tempFilePath),
+                `upload.${ext}`,
+                mime
+            );
+
+            const result = response.data;
+            console.log('✅ Server response received:', typeof result);
+
+            let transcription = '';
+            if (typeof result === 'string') {
+                transcription = result.trim();
+            } else if (result?.transcription?.text) {
+                transcription = result.transcription.text.trim();
+            } else if (result?.text) {
+                transcription = result.text.trim();
+            }
+
+            return {
+                success: true,
+                transcription: transcription || '[No speech detected]',
+                confidence: result?.confidence ?? 0.9
+            };
+
+        } catch (error) {
+            console.error('❌ Temp file transcription error:', {
+                message: error.message,
+                status: error.response?.status,
+                data: error.response?.data
+            });
+            return {
+                success: false,
+                error: error.response?.data?.error || error.message
+            };
+        } finally {
+            // **CRITICAL**: Always cleanup temp file
+            if (tempFilePath && fs.existsSync(tempFilePath)) {
+                try {
+                    fs.unlinkSync(tempFilePath);
+                    console.log('🗑️ Cleaned up temp file:', tempFilePath);
+                } catch (cleanupError) {
+                    console.warn('⚠️ Failed to cleanup temp file:', cleanupError.message);
+                }
+            }
+        }
+    }
+
+    /**
+     * **FIXED**: Main processing method with proper error handling
+     */
+    async processSingleFile(audioBuffer, contextIntro = '', audioMimeType = 'audio/webm') {
+        // **FIX 3**: Proper file size calculation
+        const fileSizeMB = audioBuffer ? Math.round(audioBuffer.byteLength / 1024 / 1024 * 100) / 100 : 0;
+        console.log(`🎵 Processing single file: ${fileSizeMB}MB`);
+
+        if (!audioBuffer || audioBuffer.length === 0) {
+            throw new Error('Audio buffer is empty or invalid');
+        }
+
+        // Method 1: Try buffer approach first
+        console.log('🔄 Attempting Method 1: Direct buffer...');
+        let result = await this.transcribeWithOllama(audioBuffer, { mimeType: audioMimeType });
+        
+        if (result.success) {
+            console.log('✅ Method 1 (buffer) succeeded');
+            return result.transcription;
+        }
+
+        console.log('⚠️ Method 1 failed, trying Method 2: Temp file...');
+        
+        // Method 2: Fallback to temp file approach
+        result = await this.transcribeFromTempFile(audioBuffer, { mimeType: audioMimeType });
+        
+        if (result.success) {
+            console.log('✅ Method 2 (temp file) succeeded');
+            return result.transcription;
+        }
+
+        console.log('❌ All methods failed');
+        throw new Error(`All transcription methods failed. Last error: ${result.error}`);
+    }
+
+    // Keep existing methods...
     async generateTTSAudio(text) {
         try {
             const response = await axios.post('https://api.streamelements.com/kappa/v2/speech', {
@@ -176,117 +267,25 @@ class TranscriptionService {
         }
     }
 
-    /**
-     * Main transcription method using the processSingleFile approach
-     */
-async transcribeWithOllama(audioInput, options = {}) {
-    try {
-        const formData = new FormData();
-
-        // Get audio buffer
-        let audioBuffer;
-        if (typeof audioInput === 'string' && audioInput.startsWith('http')) {
-            console.log('📥 Downloading from URL:', audioInput);
-            const response = await axios.get(audioInput, { 
-                responseType: 'arraybuffer',
-                timeout: 30000
-            });
-            audioBuffer = Buffer.from(response.data);
-        } else if (Buffer.isBuffer(audioInput)) {
-            audioBuffer = audioInput;
-        } else {
-            throw new Error('Invalid audio input format');
-        }
-
-        if (audioBuffer.length === 0) {
-            throw new Error('Audio buffer is empty');
-        }
-
-        console.log('📊 Audio buffer size:', audioBuffer.length, 'bytes');
-
-        // ✅ Use correct FormData syntax
-        formData.append('audio', audioBuffer, {
-            filename: 'interview-audio.wav',
-            contentType: 'audio/wav'
-        });
-
-        // Add required parameters
-        formData.append('translate', 'true');
-        formData.append('language', 'en');
-
-        console.log('🔊 Sending to Ollama transcription service...');
-
-        // ✅ FIX: Remove explicit Content-Type header - let Axios handle it automatically
-        const response = await axios.post(this.whisperUrl, formData, {
-            headers: {
-                ...formData.getHeaders()
-                // ❌ Remove this line: 'Accept': 'application/json'
-                // ❌ Remove this line: 'Content-Type': 'multipart/form-data'
-            },
-            timeout: 60000,
-            maxContentLength: Infinity,
-            maxBodyLength: Infinity
-        });
-
-        const result = response.data;
-        let transcription = '';
-
-        // Extract transcription
-        if (result.transcription && result.transcription.text !== undefined) {
-            transcription = result.transcription.text.trim();
-        } else if (result.text) {
-            transcription = result.text.trim();
-        }
-
-        return {
-            success: true,
-            transcription: transcription || '[No speech detected]',
-            confidence: result.confidence || 0.9
-        };
-
-    } catch (error) {
-        console.error('❌ Transcription error:', {
-            message: error.message,
-            status: error.response?.status,
-            data: error.response?.data
-        });
-        
-        return {
-            success: false,
-            error: error.response?.data?.error || error.message
-        };
-    }
-}
-
-
-
-
-    /**
-     * Complete transcription pipeline
-     */
     async processAudioTranscription(audioFile, context = {}) {
         try {
-            const transcriptionResult = await this.transcribeWithOllama(audioFile, {
-                language: context.language || 'en',
-                contextIntro: context.contextIntro || '',
-                mimeType: context.mimeType || 'audio/wav'
-            });
-
-            if (!transcriptionResult.success) {
-                return transcriptionResult;
-            }
+            const transcription = await this.processSingleFile(
+                audioFile, 
+                context.contextIntro || '', 
+                context.mimeType || 'audio/webm'
+            );
 
             return {
                 success: true,
                 raw: {
-                    transcription: transcriptionResult.transcription,
-                    confidence: transcriptionResult.confidence,
-                    language: transcriptionResult.language
+                    transcription: transcription,
+                    confidence: 0.9,
+                    language: context.language || 'en'
                 },
                 metadata: {
                     processedAt: new Date().toISOString(),
                     context: context,
-                    method: 'custom-ollama-endpoint'
+                    method: 'cross-platform-optimized'
                 }
             };
         } catch (error) {
@@ -298,9 +297,7 @@ async transcribeWithOllama(audioInput, options = {}) {
         }
     }
 
-    // Keep your other methods for AI analysis unchanged
     async improveTranscription(rawTranscription, context = {}) {
-        // Your existing implementation
         return {
             success: true,
             originalText: rawTranscription,

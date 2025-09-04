@@ -48,6 +48,8 @@ const ollamaAudioTranscription = async (req, res) => {
             model: context?.model || 'whisper'
         });
 
+        console.log('📊 Transcription result:', result);
+
         if (!result.success) {
             console.log('❌ Transcription service failed:', result.error);
             return res.status(500).json({

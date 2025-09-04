@@ -299,7 +299,7 @@ const sendPrivateInterviewLinkEmail = async ({
 }) => {
   try {
     // Create private interview URL
-    const privateInterviewUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/private-interview/${privateToken}`;
+    const privateInterviewUrl = `${process.env.FRONTEND_URL || 'https://hyrefast.ai'}/private-interview/${privateToken}`;
 
     // Generate HTML content with resend indicator
     const htmlContent = getPrivateInterviewLinkEmailTemplate({
