@@ -12,13 +12,14 @@ const ObjectId = require('mongodb').ObjectId;
 const utils = require('../../../utils/common');
 const Application = require('../../../model/application');
 const Question = require('../../../model/question');
+const question = require('../../../model/question');
    
 /**
  * Create interview response with AI analysis
  */
 const createInterviewResponse = async (req, res) => {
   try {
-    console.log('🎯 Creating interview response with AI analysis');
+   
     
     const {
       applicationId,
@@ -30,7 +31,7 @@ const createInterviewResponse = async (req, res) => {
       responseDuration,
       token,
       questionId,
-      evaluation_instructions
+      evaluation_instructions,
     } = req.body;
 
     // // Validate required fields
@@ -41,19 +42,14 @@ const createInterviewResponse = async (req, res) => {
     // }
 
     // Get application with populated references
-    // const application = await dbService.findOne(Application, 
-    //   { _id: applicationId }, 
-    //   { 
-    //     populate: [
-    //       { path: 'job', select: 'title description requirements' },
-    //       { path: 'candidate', select: 'name email' }
-    //     ]
-    //   }
-    // );
+    const application = await dbService.findOne(Application, 
+      { _id: applicationId }, 
+    
+    );
 
-    // if (!application) {
-    //   return res.recordNotFound({ message: 'Application not found' });
-    // }
+    if (!application) {
+      return res.recordNotFound({ message: 'Application not found' });
+    }
 
     // Get question details if questionId provided
     let questionDetails = null;
@@ -74,7 +70,16 @@ const createInterviewResponse = async (req, res) => {
     // });
 
     // Prepare response data
-   
+   const responseData = {
+    sessionId:applicationId,
+    question:question.id,
+    candidate :  application.candidate,
+    job:application.job,
+    questionNumber : questionNumber,
+    questionText:questionText,
+    responseAudioUrl:responseAudioUrl,
+    responseVideoUrl:responseVideoUrl,
+   }
 
     // Validate data against schema
     // let validateRequest = validation.validateParamsWithJoi(
@@ -88,14 +93,14 @@ const createInterviewResponse = async (req, res) => {
     // }
 
     // Create response document
-    // const newResponse = new Response(responseData);
-    // const createdResponse = await dbService.create(Response, newResponse);
+    const newResponse = new Response(responseData);
+    const createdResponse = await dbService.create(Response, newResponse);
 
-    // const updateInterViewResponse = await dbService.updateOne(Application,{
-    //   _id: applicationId,
-    // },{
-    //   currentQuestion: questionNumber + 1,
-    // })
+    const updateInterViewResponse = await dbService.updateOne(Application,{
+      _id: applicationId,
+    },{
+      currentQuestion: questionNumber + 1,
+    })
 
     // console.log('✅ Interview response created successfully');
 

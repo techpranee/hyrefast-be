@@ -1,4 +1,4 @@
-const JobScrapingService = require('../../../services/jobScrapingService');
+const JobScrapingService = require("../../../services/jobScrapingService");
 
 class JobScrapingController {
   constructor() {
@@ -13,7 +13,7 @@ class JobScrapingController {
       if (!url) {
         return res.status(400).json({
           success: false,
-          error: 'URL is required'
+          error: "URL is required",
         });
       }
 
@@ -23,16 +23,16 @@ class JobScrapingController {
       } catch (urlError) {
         return res.status(400).json({
           success: false,
-          error: 'Invalid URL format'
+          error: "Invalid URL format",
         });
       }
 
       // Check if URL is HTTP/HTTPS
       const urlObj = new URL(url);
-      if (!['http:', 'https:'].includes(urlObj.protocol)) {
+      if (!["http:", "https:"].includes(urlObj.protocol)) {
         return res.status(400).json({
           success: false,
-          error: 'Only HTTP and HTTPS URLs are supported'
+          error: "Only HTTP and HTTPS URLs are supported",
         });
       }
 
@@ -44,12 +44,11 @@ class JobScrapingController {
       } else {
         res.status(500).json(result);
       }
-
     } catch (error) {
-      console.error('Controller error:', error);
+      console.error("Controller error:", error);
       res.status(500).json({
         success: false,
-        error: 'Internal server error'
+        error: "Internal server error",
       });
     }
   }
@@ -59,24 +58,26 @@ class JobScrapingController {
     try {
       const healthStatus = {
         success: true,
-        message: 'Job scraping service is healthy',
+        message: "Job scraping service is healthy",
         timestamp: new Date().toISOString(),
         services: {
           ollama: {
-            endpoint: process.env.OLLAMA_ENDPOINT || 'http://localhost:11434',
-            model: process.env.OLLAMA_MODEL || 'llama2'
+            endpoint:
+              process.env.OLLAMA_ENDPOINT ||
+              "https://ollama2.havenify.ai/api/generate",
+            model: process.env.OLLAMA_MODEL || "llama2",
           },
           openai: {
-            configured: !!process.env.OPENAI_API_KEY
-          }
-        }
+            configured: !!process.env.OPENAI_API_KEY,
+          },
+        },
       };
 
       res.status(200).json(healthStatus);
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: 'Service unhealthy'
+        error: "Service unhealthy",
       });
     }
   }
@@ -84,30 +85,35 @@ class JobScrapingController {
   // Test endpoint to check if AI services are working
   async testAI(req, res) {
     try {
-      const testPrompt = "Extract job info from: <h1>Software Engineer</h1><p>Remote position</p>";
-      const result = await this.jobScrapingService.extractWithOllama(testPrompt);
-      
+      const testPrompt =
+        "Extract job info from: <h1>Software Engineer</h1><p>Remote position</p>";
+      const result = await this.jobScrapingService.extractWithOllama(
+        testPrompt
+      );
+
       res.status(200).json({
         success: true,
-        message: 'AI service test successful',
-        result
+        message: "AI service test successful",
+        result,
       });
     } catch (ollamaError) {
       try {
-        const result = await this.jobScrapingService.extractWithOpenAI(testPrompt);
+        const result = await this.jobScrapingService.extractWithOpenAI(
+          testPrompt
+        );
         res.status(200).json({
           success: true,
-          message: 'OpenAI fallback test successful',
-          result
+          message: "OpenAI fallback test successful",
+          result,
         });
       } catch (openaiError) {
         res.status(500).json({
           success: false,
-          error: 'Both AI services failed',
+          error: "Both AI services failed",
           details: {
             ollama: ollamaError.message,
-            openai: openaiError.message
-          }
+            openai: openaiError.message,
+          },
         });
       }
     }
