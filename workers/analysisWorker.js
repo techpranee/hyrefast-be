@@ -128,9 +128,12 @@ async function processAnalysisTask(taskData) {
             isDeleted: false
         }).populate('question');
 
-        if (!responses || responses.length === 0) {
-            throw new Error('No responses found for this application');
-        }
+    // ✅ Fixed code
+if (!responses || responses.length === 0) {
+    const noResponsesError = new Error('No responses found for this application');
+    noResponsesError.code = 'NO_RESPONSES'; // This is the key fix
+    throw noResponsesError;
+}
 
         // Fetch application details with populated data
         const application = await Application.findById(appObjectId)
@@ -392,6 +395,7 @@ async function processAnalysisTask(taskData) {
 // Handle messages from parent thread
 if (parentPort) {
     parentPort.on('message', async (data) => {
+        console.log('Worker received message:', data);
         try {
             if (data.type === 'start') {
                 await processAnalysisTask(data.taskData);

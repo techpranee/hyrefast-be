@@ -209,13 +209,15 @@ async deductCreditForInterview(workspace_id, application_id) {
   const session = await mongoose.startSession();
 
   try {
-    return await session.withTransaction(async () => {
+    let result;
+    
+    await session.withTransaction(async () => {
       console.log('🔄 Starting credit deduction for interview:', {
         workspace: workspace_id,
         application: application_id
       });
 
-      // Check if credit already deducted for this application (prevents duplicate deduction)
+      // Check if credit already deducted for this application
       const existingDeduction = await Credit.findOne({
         workspace: workspace_id,
         application: application_id,
@@ -248,14 +250,17 @@ async deductCreditForInterview(workspace_id, application_id) {
         is_added: false,
         application: application_id,
         transaction_type: 'usage',
+        balance_before: current_balance,
+        balance_after: new_balance,
         balance: [{
-          credits: new_balance, // CORRECTED: This shows the remaining balance after deduction
+          credits: new_balance,
           expiry: null,
           is_promo: false,
           no_expiry: true,
           credit_source: 'usage',
           added_at: new Date()
-        }]
+        }],
+        processed_at: new Date()
       });
 
       await credit_record.save({ session });
@@ -278,13 +283,17 @@ async deductCreditForInterview(workspace_id, application_id) {
         remaining_balance: new_balance
       });
 
-      return {
+      // Store the result instead of returning it directly
+      result = {
         success: true,
         credits_deducted: 1,
         remaining_balance: new_balance,
         credit_record_id: credit_record._id
       };
     });
+
+    return result; // Return the stored result after transaction completes
+
   } catch (error) {
     console.error('❌ Error deducting credit for interview:', error);
     throw new Error(`Failed to deduct credit: ${error.message}`);

@@ -14,5 +14,6 @@ router.route('/client/api/v1/user/list').post(auth(PLATFORM.CLIENT),userControll
 router.route('/client/api/v1/user/change-password').put(auth(PLATFORM.CLIENT),userController.changePassword);
 router.route('/client/api/v1/user/update/:id').put(auth(PLATFORM.CLIENT),userController.updateProfile);
 router.route('/client/api/v1/user/toggle-2fa').put(auth(PLATFORM.CLIENT),userController.toggle2FA);
+router.route('/client/api/v1/user/addBulk').post(auth(PLATFORM.CLIENT),userController.addBulkUsers);
 
 module.exports = router;

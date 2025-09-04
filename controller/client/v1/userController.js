@@ -121,6 +121,204 @@ const getLoggedInUserInfo = async (req, res) => {
   }
 };
 
+
+/**
+ * @description : Bulk create users with concurrency control and batching
+ * @param {Object} req : request including array of user data in body
+ * @param {Object} res : response with bulk creation results
+ * @return {Object} : bulk creation results {status, message, data}
+ */
+const addBulkUsers = async (req, res) => {
+  try {
+    const { users } = req.body;
+    
+    // Validation
+    if (!users || !Array.isArray(users) || users.length === 0) {
+      return res.validationError({ 
+        message: 'Invalid input: users array is required and must not be empty' 
+      });
+    }
+
+    // Configuration for batching and concurrency control
+    const BATCH_SIZE = 5; // Process 5 users at a time
+    const DELAY_BETWEEN_BATCHES = 1000; // 1 second delay between batches
+    const MAX_BULK_SIZE = 1000; // Maximum users allowed in single bulk request
+
+    // Check bulk size limit
+    if (users.length > MAX_BULK_SIZE) {
+      return res.validationError({ 
+        message: `Bulk size exceeds maximum limit of ${MAX_BULK_SIZE} users` 
+      });
+    }
+
+    // Results tracking
+    const results = {
+      total: users.length,
+      created: 0,
+      existing: 0,
+      errors: [],
+      processed: 0
+    };
+
+    // Helper function to add delay
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // Cache to avoid duplicate email checks within the same request
+    const emailCache = new Map();
+
+    // Function to process a single user
+    const processUser = async (userData, index) => {
+      try {
+        // Basic validation for each user
+        const validateRequest = validation.validateParamsWithJoi(
+          userData,
+          userSchemaKey.schemaKeys
+        );
+        
+        if (!validateRequest.isValid) {
+          results.errors.push({
+            index: index + 1,
+            email: userData.email || 'unknown',
+            error: `Validation failed: ${validateRequest.message}`
+          });
+          return null;
+        }
+
+        const email = userData.email;
+        
+        // Check cache first to avoid duplicate API calls
+        if (emailCache.has(email)) {
+          const cachedUser = emailCache.get(email);
+          if (cachedUser) {
+            results.existing++;
+            return cachedUser;
+          } else {
+            // Email was checked and user doesn't exist, create new
+            const newUser = new User(userData);
+            const createdUser = await dbService.create(User, newUser);
+            emailCache.set(email, createdUser);
+            results.created++;
+            return createdUser;
+          }
+        }
+
+        // Check for existing user (first time for this email)
+        const existingUser = await dbService.findOne(User, { 
+          email: email,
+          isDeleted: false 
+        });
+        
+        if (existingUser) {
+          emailCache.set(email, existingUser);
+          results.existing++;
+          return existingUser;
+        }
+
+        // Create new user
+        const newUser = new User(userData);
+        const createdUser = await dbService.create(User, newUser);
+        emailCache.set(email, createdUser);
+        results.created++;
+        return createdUser;
+
+      } catch (error) {
+        console.error(`Error processing user at index ${index + 1}:`, error);
+        results.errors.push({
+          index: index + 1,
+          email: userData.email || 'unknown',
+          error: error.message
+        });
+        return null;
+      }
+    };
+
+    // Batch processing function
+    const processBatch = async (batch, batchIndex) => {
+      console.log(`Processing batch ${batchIndex + 1}/${Math.ceil(users.length / BATCH_SIZE)}`);
+      
+      // Process batch concurrently
+      const promises = batch.map((userData, index) => 
+        processUser(userData, (batchIndex * BATCH_SIZE) + index)
+      );
+      
+      const batchResults = await Promise.all(promises);
+      results.processed += batch.length;
+      
+      return batchResults.filter(result => result !== null);
+    };
+
+    // Process users in batches
+    console.log(`Starting bulk user creation for ${users.length} users`);
+    const allCreatedUsers = [];
+
+    for (let i = 0; i < users.length; i += BATCH_SIZE) {
+      const batch = users.slice(i, i + BATCH_SIZE);
+      const batchIndex = Math.floor(i / BATCH_SIZE);
+      
+      try {
+        const batchResults = await processBatch(batch, batchIndex);
+        allCreatedUsers.push(...batchResults);
+        
+        // Add delay between batches to prevent API overload
+        if (i + BATCH_SIZE < users.length) {
+          console.log(`Batch ${batchIndex + 1} completed. Waiting ${DELAY_BETWEEN_BATCHES}ms before next batch...`);
+          await delay(DELAY_BETWEEN_BATCHES);
+        }
+      } catch (batchError) {
+        console.error(`Error in batch ${batchIndex + 1}:`, batchError);
+        results.errors.push({
+          batch: batchIndex + 1,
+          error: batchError.message
+        });
+      }
+    }
+
+    // Prepare final response
+    const responseData = {
+      summary: {
+        total: results.total,
+        created: results.created,
+        existing: results.existing,
+        failed: results.errors.length,
+        processed: results.processed
+      },
+      errors: results.errors.length > 0 ? results.errors.slice(0, 10) : [], // Limit errors in response
+      hasMoreErrors: results.errors.length > 10
+    };
+
+    // Log final results
+    console.log(`Bulk user creation completed:`, responseData.summary);
+
+    // Determine response status
+    if (results.errors.length === 0) {
+      return res.success({ 
+        message: `Successfully processed ${results.total} users. Created: ${results.created}, Existing: ${results.existing}`,
+        data: responseData
+      });
+    } else if (results.created + results.existing > 0) {
+      return res.success({ 
+        message: `Partially successful. Processed ${results.created + results.existing}/${results.total} users. ${results.errors.length} errors occurred.`,
+        data: responseData
+      });
+    } else {
+      return res.validationError({ 
+        message: `Bulk creation failed. ${results.errors.length} errors occurred.`,
+        data: responseData
+      });
+    }
+
+  } catch (error) {
+    console.error('Bulk user creation error:', error);
+    return res.internalServerError({ 
+      message: 'Failed to process bulk user creation',
+      error: error.message 
+    });
+  }
+};
+
+
+
+
 /**
  * @description : find document of User from table by id;
  * @param {Object} req : request including id in request params.
@@ -282,6 +480,7 @@ const toggle2FA = async (req, res) => {
   }
 };
 
+
 module.exports = {
   findAllUser,
   addUser,
@@ -290,5 +489,6 @@ module.exports = {
   changePassword,
   updateProfile,
   updateUser,
-  toggle2FA    
+  toggle2FA,
+  addBulkUsers   
 };

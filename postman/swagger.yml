@@ -112,16 +112,21 @@ paths:
       summary: addcredit
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"workspace\": \"68b3fa147a03b547a3ec7c22\",\n 
-                \"deduction\": 245,\n  \"addition\": 274,\n  \"is_added\":
-                false,\n  \"application\": \"68b3fa147a03b547a3ec7c23\",\n 
-                \"balance\": [\n    {\n      \"_id\": false,\n      \"credits\":
-                770,\n      \"expiry\": \"2026-03-31T07:13:53.321Z\",\n     
-                \"is_promo\": false,\n      \"no_expiry\": false\n    }\n  ]\n}"
+              type: object
+              example:
+                workspace: 68b3fa147a03b547a3ec7c22
+                deduction: 245
+                addition: 274
+                is_added: false
+                application: 68b3fa147a03b547a3ec7c23
+                balance:
+                  - _id: false
+                    credits: 770
+                    expiry: '2026-03-31T07:13:53.321Z'
+                    is_promo: false
+                    no_expiry: false
       security:
         - bearerAuth: []
       parameters:
@@ -169,19 +174,31 @@ paths:
       summary: findAllcredit
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -241,10 +258,12 @@ paths:
       summary: getcreditCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -277,19 +296,22 @@ paths:
       summary: insertBulkcredit
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"workspace\":
-                \"68b3fa147a03b547a3ec7c22\",\n      \"deduction\": 245,\n     
-                \"addition\": 274,\n      \"is_added\": false,\n     
-                \"application\": \"68b3fa147a03b547a3ec7c23\",\n     
-                \"balance\": [\n        {\n          \"_id\": false,\n         
-                \"credits\": 770,\n          \"expiry\":
-                \"2026-03-31T07:13:53.321Z\",\n          \"is_promo\":
-                false,\n          \"no_expiry\": false\n        }\n      ]\n   
-                }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - workspace: 68b3fa147a03b547a3ec7c22
+                    deduction: 245
+                    addition: 274
+                    is_added: false
+                    application: 68b3fa147a03b547a3ec7c23
+                    balance:
+                      - _id: false
+                        credits: 770
+                        expiry: '2026-03-31T07:13:53.321Z'
+                        is_promo: false
+                        no_expiry: false
       security:
         - bearerAuth: []
       parameters:
@@ -322,10 +344,13 @@ paths:
       summary: deleteManycredit
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -358,16 +383,21 @@ paths:
       summary: updatecredit
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"workspace\": \"68b3fa147a03b547a3ec7c22\",\n 
-                \"deduction\": 245,\n  \"addition\": 274,\n  \"is_added\":
-                false,\n  \"application\": \"68b3fa147a03b547a3ec7c23\",\n 
-                \"balance\": [\n    {\n      \"_id\": false,\n      \"credits\":
-                770,\n      \"expiry\": \"2026-03-31T07:13:53.321Z\",\n     
-                \"is_promo\": false,\n      \"no_expiry\": false\n    }\n  ]\n}"
+              type: object
+              example:
+                workspace: 68b3fa147a03b547a3ec7c22
+                deduction: 245
+                addition: 274
+                is_added: false
+                application: 68b3fa147a03b547a3ec7c23
+                balance:
+                  - _id: false
+                    credits: 770
+                    expiry: '2026-03-31T07:13:53.321Z'
+                    is_promo: false
+                    no_expiry: false
       security:
         - bearerAuth: []
       parameters:
@@ -420,10 +450,12 @@ paths:
       summary: partialupdatecredit
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -476,10 +508,10 @@ paths:
       summary: softDeletecredit
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -517,10 +549,12 @@ paths:
       summary: softDeleteManycredit
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -553,12 +587,14 @@ paths:
       summary: updateBulkcredit
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -644,13 +680,15 @@ paths:
       summary: Add Player Id
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"userId\": \"611cbe48fe58009a1603f9f2\",\n  \"playerId\":
-                \"xxx12345xxx\",\n  \"deviceId\": \"2001abcdef\",\n 
-                \"isActive\": true,\n  \"isDeleted\": false\n}"
+              type: object
+              example:
+                userId: 611cbe48fe58009a1603f9f2
+                playerId: xxx12345xxx
+                deviceId: 2001abcdef
+                isActive: true
+                isDeleted: false
       security:
         - undefinedAuth: []
       parameters:
@@ -671,10 +709,11 @@ paths:
       summary: Remove Player Id
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"deviceId\": \"012345abcde\"\n}"'
+              type: object
+              example:
+                deviceId: 012345abcde
       security:
         - undefinedAuth: []
       parameters:
@@ -744,10 +783,11 @@ paths:
       summary: Get Presigned Url for S3 private Upload
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"uri\": \"s3 URL\"\n}"'
+              type: object
+              example:
+                uri: s3 URL
       security:
         - undefinedAuth: []
       parameters:
@@ -833,15 +873,18 @@ paths:
       summary: addpayment
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"user\": \"68b3fa147a03b547a3ec7c2c\",\n  \"workspace\":
-                \"68b3fa147a03b547a3ec7c2d\",\n  \"data\": \"adapter\",\n 
-                \"status\": \"Switchable\",\n  \"is_subscription\": false,\n 
-                \"currency\": \"Polarised\",\n  \"platform\": \"e-tailers\",\n 
-                \"ip\": \"panel\"\n}"
+              type: object
+              example:
+                user: 68b3fa147a03b547a3ec7c2c
+                workspace: 68b3fa147a03b547a3ec7c2d
+                data: adapter
+                status: Switchable
+                is_subscription: false
+                currency: Polarised
+                platform: e-tailers
+                ip: panel
       security:
         - bearerAuth: []
       parameters:
@@ -886,19 +929,31 @@ paths:
       summary: findAllpayment
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -955,10 +1010,12 @@ paths:
       summary: getpaymentCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -991,17 +1048,19 @@ paths:
       summary: insertBulkpayment
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"user\":
-                \"68b3fa147a03b547a3ec7c2c\",\n      \"workspace\":
-                \"68b3fa147a03b547a3ec7c2d\",\n      \"data\":
-                \"adapter\",\n      \"status\": \"Switchable\",\n     
-                \"is_subscription\": false,\n      \"currency\":
-                \"Polarised\",\n      \"platform\": \"e-tailers\",\n     
-                \"ip\": \"panel\"\n    }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - user: 68b3fa147a03b547a3ec7c2c
+                    workspace: 68b3fa147a03b547a3ec7c2d
+                    data: adapter
+                    status: Switchable
+                    is_subscription: false
+                    currency: Polarised
+                    platform: e-tailers
+                    ip: panel
       security:
         - bearerAuth: []
       parameters:
@@ -1034,10 +1093,13 @@ paths:
       summary: deleteManypayment
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -1070,15 +1132,18 @@ paths:
       summary: updatepayment
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"user\": \"68b3fa147a03b547a3ec7c2c\",\n  \"workspace\":
-                \"68b3fa147a03b547a3ec7c2d\",\n  \"data\": \"adapter\",\n 
-                \"status\": \"Switchable\",\n  \"is_subscription\": false,\n 
-                \"currency\": \"Polarised\",\n  \"platform\": \"e-tailers\",\n 
-                \"ip\": \"panel\"\n}"
+              type: object
+              example:
+                user: 68b3fa147a03b547a3ec7c2c
+                workspace: 68b3fa147a03b547a3ec7c2d
+                data: adapter
+                status: Switchable
+                is_subscription: false
+                currency: Polarised
+                platform: e-tailers
+                ip: panel
       security:
         - bearerAuth: []
       parameters:
@@ -1128,10 +1193,12 @@ paths:
       summary: partialupdatepayment
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -1181,10 +1248,10 @@ paths:
       summary: softDeletepayment
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -1222,10 +1289,12 @@ paths:
       summary: softDeleteManypayment
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -1258,12 +1327,14 @@ paths:
       summary: updateBulkpayment
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -1377,13 +1448,17 @@ paths:
       summary: addplan
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"name\": \"Vivian Wilderman\",\n  \"credits\": 632,\n 
-                \"validity\": {\n    \"text\": \"back\",\n    \"days\": 33\n 
-                },\n  \"amount\": 68,\n  \"currency\": \"Baby\"\n}"
+              type: object
+              example:
+                name: Vivian Wilderman
+                credits: 632
+                validity:
+                  text: back
+                  days: 33
+                amount: 68
+                currency: Baby
       security:
         - bearerAuth: []
       parameters:
@@ -1427,19 +1502,31 @@ paths:
       summary: findAllplan
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -1495,10 +1582,12 @@ paths:
       summary: getplanCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -1531,15 +1620,18 @@ paths:
       summary: insertBulkplan
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"name\": \"Vivian
-                Wilderman\",\n      \"credits\": 632,\n      \"validity\":
-                {\n        \"text\": \"back\",\n        \"days\": 33\n     
-                },\n      \"amount\": 68,\n      \"currency\": \"Baby\"\n   
-                }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - name: Vivian Wilderman
+                    credits: 632
+                    validity:
+                      text: back
+                      days: 33
+                    amount: 68
+                    currency: Baby
       security:
         - bearerAuth: []
       parameters:
@@ -1572,10 +1664,13 @@ paths:
       summary: deleteManyplan
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -1608,13 +1703,17 @@ paths:
       summary: updateplan
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"name\": \"Vivian Wilderman\",\n  \"credits\": 632,\n 
-                \"validity\": {\n    \"text\": \"back\",\n    \"days\": 33\n 
-                },\n  \"amount\": 68,\n  \"currency\": \"Baby\"\n}"
+              type: object
+              example:
+                name: Vivian Wilderman
+                credits: 632
+                validity:
+                  text: back
+                  days: 33
+                amount: 68
+                currency: Baby
       security:
         - bearerAuth: []
       parameters:
@@ -1663,10 +1762,12 @@ paths:
       summary: partialupdateplan
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -1715,10 +1816,10 @@ paths:
       summary: softDeleteplan
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -1756,10 +1857,12 @@ paths:
       summary: softDeleteManyplan
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -1792,12 +1895,14 @@ paths:
       summary: updateBulkplan
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -1915,17 +2020,21 @@ paths:
       summary: addpurchase
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"workspace\": \"68b3fa147a03b547a3ec7c3e\",\n  \"plan\":
-                \"68b3fa147a03b547a3ec7c3f\",\n  \"payment\":
-                \"68b3fa147a03b547a3ec7c40\",\n  \"status\": \"Usability\",\n 
-                \"promo_code\": \"connecting\",\n  \"is_affiliation\": true,\n 
-                \"is_first_time\": false,\n  \"is_subscription\": true,\n 
-                \"invoice_number\": 369,\n  \"amount\": 51,\n  \"currency\":
-                \"cross-media\"\n}"
+              type: object
+              example:
+                workspace: 68b3fa147a03b547a3ec7c3e
+                plan: 68b3fa147a03b547a3ec7c3f
+                payment: 68b3fa147a03b547a3ec7c40
+                status: Usability
+                promo_code: connecting
+                is_affiliation: true
+                is_first_time: false
+                is_subscription: true
+                invoice_number: 369
+                amount: 51
+                currency: cross-media
       security:
         - bearerAuth: []
       parameters:
@@ -1973,19 +2082,31 @@ paths:
       summary: findAllpurchase
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -2045,10 +2166,12 @@ paths:
       summary: getpurchaseCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -2081,19 +2204,22 @@ paths:
       summary: insertBulkpurchase
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"workspace\":
-                \"68b3fa147a03b547a3ec7c3e\",\n      \"plan\":
-                \"68b3fa147a03b547a3ec7c3f\",\n      \"payment\":
-                \"68b3fa147a03b547a3ec7c40\",\n      \"status\":
-                \"Usability\",\n      \"promo_code\": \"connecting\",\n     
-                \"is_affiliation\": true,\n      \"is_first_time\":
-                false,\n      \"is_subscription\": true,\n     
-                \"invoice_number\": 369,\n      \"amount\": 51,\n     
-                \"currency\": \"cross-media\"\n    }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - workspace: 68b3fa147a03b547a3ec7c3e
+                    plan: 68b3fa147a03b547a3ec7c3f
+                    payment: 68b3fa147a03b547a3ec7c40
+                    status: Usability
+                    promo_code: connecting
+                    is_affiliation: true
+                    is_first_time: false
+                    is_subscription: true
+                    invoice_number: 369
+                    amount: 51
+                    currency: cross-media
       security:
         - bearerAuth: []
       parameters:
@@ -2126,10 +2252,13 @@ paths:
       summary: deleteManypurchase
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -2162,17 +2291,21 @@ paths:
       summary: updatepurchase
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"workspace\": \"68b3fa147a03b547a3ec7c3e\",\n  \"plan\":
-                \"68b3fa147a03b547a3ec7c3f\",\n  \"payment\":
-                \"68b3fa147a03b547a3ec7c40\",\n  \"status\": \"Usability\",\n 
-                \"promo_code\": \"connecting\",\n  \"is_affiliation\": true,\n 
-                \"is_first_time\": false,\n  \"is_subscription\": true,\n 
-                \"invoice_number\": 369,\n  \"amount\": 51,\n  \"currency\":
-                \"cross-media\"\n}"
+              type: object
+              example:
+                workspace: 68b3fa147a03b547a3ec7c3e
+                plan: 68b3fa147a03b547a3ec7c3f
+                payment: 68b3fa147a03b547a3ec7c40
+                status: Usability
+                promo_code: connecting
+                is_affiliation: true
+                is_first_time: false
+                is_subscription: true
+                invoice_number: 369
+                amount: 51
+                currency: cross-media
       security:
         - bearerAuth: []
       parameters:
@@ -2225,10 +2358,12 @@ paths:
       summary: partialupdatepurchase
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -2281,10 +2416,10 @@ paths:
       summary: softDeletepurchase
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -2322,10 +2457,12 @@ paths:
       summary: softDeleteManypurchase
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -2358,12 +2495,14 @@ paths:
       summary: updateBulkpurchase
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -2474,13 +2613,14 @@ paths:
       summary: addinvitations
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"company\": \"68b3fa147a03b547a3ec7c49\",\n  \"email\":
-                \"Fatima_Wisozk@hotmail.com\",\n  \"phone\": \"(240)
-                110-2812\",\n  \"user\": \"68b3fa147a03b547a3ec7c4a\"\n}"
+              type: object
+              example:
+                company: 68b3fa147a03b547a3ec7c49
+                email: Fatima_Wisozk@hotmail.com
+                phone: (240) 110-2812
+                user: 68b3fa147a03b547a3ec7c4a
       security:
         - bearerAuth: []
       parameters:
@@ -2521,19 +2661,31 @@ paths:
       summary: findAllinvitations
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -2586,10 +2738,12 @@ paths:
       summary: getinvitationsCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -2622,15 +2776,15 @@ paths:
       summary: insertBulkinvitations
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"company\":
-                \"68b3fa147a03b547a3ec7c49\",\n      \"email\":
-                \"Fatima_Wisozk@hotmail.com\",\n      \"phone\": \"(240)
-                110-2812\",\n      \"user\": \"68b3fa147a03b547a3ec7c4a\"\n   
-                }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - company: 68b3fa147a03b547a3ec7c49
+                    email: Fatima_Wisozk@hotmail.com
+                    phone: (240) 110-2812
+                    user: 68b3fa147a03b547a3ec7c4a
       security:
         - bearerAuth: []
       parameters:
@@ -2663,10 +2817,13 @@ paths:
       summary: deleteManyinvitations
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -2699,13 +2856,14 @@ paths:
       summary: updateinvitations
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"company\": \"68b3fa147a03b547a3ec7c49\",\n  \"email\":
-                \"Fatima_Wisozk@hotmail.com\",\n  \"phone\": \"(240)
-                110-2812\",\n  \"user\": \"68b3fa147a03b547a3ec7c4a\"\n}"
+              type: object
+              example:
+                company: 68b3fa147a03b547a3ec7c49
+                email: Fatima_Wisozk@hotmail.com
+                phone: (240) 110-2812
+                user: 68b3fa147a03b547a3ec7c4a
       security:
         - bearerAuth: []
       parameters:
@@ -2751,10 +2909,12 @@ paths:
       summary: partialupdateinvitations
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -2800,10 +2960,10 @@ paths:
       summary: softDeleteinvitations
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -2841,10 +3001,12 @@ paths:
       summary: softDeleteManyinvitations
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -2877,12 +3039,14 @@ paths:
       summary: updateBulkinvitations
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -2996,14 +3160,17 @@ paths:
       summary: addworkspace
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"name\": \"Jacquelyn Ziemann\",\n  \"website\":
-                \"digital\",\n  \"legal_name\": \"unleash\",\n  \"logo\":
-                \"product\",\n  \"address\": \"711 Mayer Trace\",\n  \"admin\":
-                \"68b3fa147a03b547a3ec7c53\",\n  \"credit_balance\": 933\n}"
+              type: object
+              example:
+                name: Jacquelyn Ziemann
+                website: digital
+                legal_name: unleash
+                logo: product
+                address: 711 Mayer Trace
+                admin: 68b3fa147a03b547a3ec7c53
+                credit_balance: 933
       security:
         - bearerAuth: []
       parameters:
@@ -3047,19 +3214,31 @@ paths:
       summary: findAllworkspace
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -3115,10 +3294,12 @@ paths:
       summary: getworkspaceCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -3151,16 +3332,18 @@ paths:
       summary: insertBulkworkspace
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"name\": \"Jacquelyn
-                Ziemann\",\n      \"website\": \"digital\",\n     
-                \"legal_name\": \"unleash\",\n      \"logo\":
-                \"product\",\n      \"address\": \"711 Mayer Trace\",\n     
-                \"admin\": \"68b3fa147a03b547a3ec7c53\",\n     
-                \"credit_balance\": 933\n    }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - name: Jacquelyn Ziemann
+                    website: digital
+                    legal_name: unleash
+                    logo: product
+                    address: 711 Mayer Trace
+                    admin: 68b3fa147a03b547a3ec7c53
+                    credit_balance: 933
       security:
         - bearerAuth: []
       parameters:
@@ -3193,10 +3376,13 @@ paths:
       summary: deleteManyworkspace
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -3229,14 +3415,17 @@ paths:
       summary: updateworkspace
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"name\": \"Jacquelyn Ziemann\",\n  \"website\":
-                \"digital\",\n  \"legal_name\": \"unleash\",\n  \"logo\":
-                \"product\",\n  \"address\": \"711 Mayer Trace\",\n  \"admin\":
-                \"68b3fa147a03b547a3ec7c53\",\n  \"credit_balance\": 933\n}"
+              type: object
+              example:
+                name: Jacquelyn Ziemann
+                website: digital
+                legal_name: unleash
+                logo: product
+                address: 711 Mayer Trace
+                admin: 68b3fa147a03b547a3ec7c53
+                credit_balance: 933
       security:
         - bearerAuth: []
       parameters:
@@ -3285,10 +3474,12 @@ paths:
       summary: partialupdateworkspace
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -3337,10 +3528,10 @@ paths:
       summary: softDeleteworkspace
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -3378,10 +3569,12 @@ paths:
       summary: softDeleteManyworkspace
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -3414,12 +3607,14 @@ paths:
       summary: updateBulkworkspace
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -3537,18 +3732,21 @@ paths:
       summary: addresponse
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"job\": \"68b3fa147a03b547a3ec7c5c\",\n  \"question\":
-                \"68b3fa147a03b547a3ec7c5d\",\n  \"candidate\":
-                \"68b3fa147a03b547a3ec7c5e\",\n  \"score\": \"portals\",\n 
-                \"sessionId\": \"68b3fa147a03b547a3ec7c5f\",\n 
-                \"questionNumber\": 553,\n  \"questionText\": \"Granite\",\n 
-                \"responseText\": \"Dollar\",\n  \"responseAudioUrl\":
-                \"Future\",\n  \"responseVideoUrl\": \"Multi-lateral\",\n 
-                \"transcriptionText\": \"iterate\"\n}"
+              type: object
+              example:
+                job: 68b3fa147a03b547a3ec7c5c
+                question: 68b3fa147a03b547a3ec7c5d
+                candidate: 68b3fa147a03b547a3ec7c5e
+                score: portals
+                sessionId: 68b3fa147a03b547a3ec7c5f
+                questionNumber: 553
+                questionText: Granite
+                responseText: Dollar
+                responseAudioUrl: Future
+                responseVideoUrl: Multi-lateral
+                transcriptionText: iterate
       security:
         - bearerAuth: []
       parameters:
@@ -3596,19 +3794,31 @@ paths:
       summary: findAllresponse
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -3668,10 +3878,12 @@ paths:
       summary: getresponseCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -3704,21 +3916,22 @@ paths:
       summary: insertBulkresponse
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"job\":
-                \"68b3fa147a03b547a3ec7c5c\",\n      \"question\":
-                \"68b3fa147a03b547a3ec7c5d\",\n      \"candidate\":
-                \"68b3fa147a03b547a3ec7c5e\",\n      \"score\":
-                \"portals\",\n      \"sessionId\":
-                \"68b3fa147a03b547a3ec7c5f\",\n      \"questionNumber\":
-                553,\n      \"questionText\": \"Granite\",\n     
-                \"responseText\": \"Dollar\",\n      \"responseAudioUrl\":
-                \"Future\",\n      \"responseVideoUrl\":
-                \"Multi-lateral\",\n      \"transcriptionText\":
-                \"iterate\"\n    }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - job: 68b3fa147a03b547a3ec7c5c
+                    question: 68b3fa147a03b547a3ec7c5d
+                    candidate: 68b3fa147a03b547a3ec7c5e
+                    score: portals
+                    sessionId: 68b3fa147a03b547a3ec7c5f
+                    questionNumber: 553
+                    questionText: Granite
+                    responseText: Dollar
+                    responseAudioUrl: Future
+                    responseVideoUrl: Multi-lateral
+                    transcriptionText: iterate
       security:
         - bearerAuth: []
       parameters:
@@ -3751,10 +3964,13 @@ paths:
       summary: deleteManyresponse
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -3787,18 +4003,21 @@ paths:
       summary: updateresponse
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"job\": \"68b3fa147a03b547a3ec7c5c\",\n  \"question\":
-                \"68b3fa147a03b547a3ec7c5d\",\n  \"candidate\":
-                \"68b3fa147a03b547a3ec7c5e\",\n  \"score\": \"portals\",\n 
-                \"sessionId\": \"68b3fa147a03b547a3ec7c5f\",\n 
-                \"questionNumber\": 553,\n  \"questionText\": \"Granite\",\n 
-                \"responseText\": \"Dollar\",\n  \"responseAudioUrl\":
-                \"Future\",\n  \"responseVideoUrl\": \"Multi-lateral\",\n 
-                \"transcriptionText\": \"iterate\"\n}"
+              type: object
+              example:
+                job: 68b3fa147a03b547a3ec7c5c
+                question: 68b3fa147a03b547a3ec7c5d
+                candidate: 68b3fa147a03b547a3ec7c5e
+                score: portals
+                sessionId: 68b3fa147a03b547a3ec7c5f
+                questionNumber: 553
+                questionText: Granite
+                responseText: Dollar
+                responseAudioUrl: Future
+                responseVideoUrl: Multi-lateral
+                transcriptionText: iterate
       security:
         - bearerAuth: []
       parameters:
@@ -3851,10 +4070,12 @@ paths:
       summary: partialupdateresponse
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -3907,10 +4128,10 @@ paths:
       summary: softDeleteresponse
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -3948,10 +4169,12 @@ paths:
       summary: softDeleteManyresponse
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -3984,12 +4207,14 @@ paths:
       summary: updateBulkresponse
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -4098,12 +4323,12 @@ paths:
       summary: addapplication
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"candidate\": \"68b3fa147a03b547a3ec7c68\",\n  \"job\":
-                \"68b3fa147a03b547a3ec7c69\"\n}"
+              type: object
+              example:
+                candidate: 68b3fa147a03b547a3ec7c68
+                job: 68b3fa147a03b547a3ec7c69
       security:
         - bearerAuth: []
       parameters:
@@ -4142,19 +4367,31 @@ paths:
       summary: findAllapplication
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -4205,10 +4442,12 @@ paths:
       summary: getapplicationCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -4241,13 +4480,13 @@ paths:
       summary: insertBulkapplication
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"candidate\":
-                \"68b3fa147a03b547a3ec7c68\",\n      \"job\":
-                \"68b3fa147a03b547a3ec7c69\"\n    }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - candidate: 68b3fa147a03b547a3ec7c68
+                    job: 68b3fa147a03b547a3ec7c69
       security:
         - bearerAuth: []
       parameters:
@@ -4280,10 +4519,13 @@ paths:
       summary: deleteManyapplication
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -4316,12 +4558,12 @@ paths:
       summary: updateapplication
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"candidate\": \"68b3fa147a03b547a3ec7c68\",\n  \"job\":
-                \"68b3fa147a03b547a3ec7c69\"\n}"
+              type: object
+              example:
+                candidate: 68b3fa147a03b547a3ec7c68
+                job: 68b3fa147a03b547a3ec7c69
       security:
         - bearerAuth: []
       parameters:
@@ -4365,10 +4607,12 @@ paths:
       summary: partialupdateapplication
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -4412,10 +4656,10 @@ paths:
       summary: softDeleteapplication
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -4453,10 +4697,12 @@ paths:
       summary: softDeleteManyapplication
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -4489,12 +4735,14 @@ paths:
       summary: updateBulkapplication
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -4604,12 +4852,13 @@ paths:
       summary: addquestion
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"title\": \"analyzing\",\n  \"question_type\":
-                \"Dollar\",\n  \"evaluation_instructions\": \"Squares\"\n}"
+              type: object
+              example:
+                title: analyzing
+                question_type: Dollar
+                evaluation_instructions: Squares
       security:
         - bearerAuth: []
       parameters:
@@ -4649,19 +4898,31 @@ paths:
       summary: findAllquestion
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -4713,10 +4974,12 @@ paths:
       summary: getquestionCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -4749,13 +5012,14 @@ paths:
       summary: insertBulkquestion
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"title\": \"analyzing\",\n     
-                \"question_type\": \"Dollar\",\n     
-                \"evaluation_instructions\": \"Squares\"\n    }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - title: analyzing
+                    question_type: Dollar
+                    evaluation_instructions: Squares
       security:
         - bearerAuth: []
       parameters:
@@ -4788,10 +5052,13 @@ paths:
       summary: deleteManyquestion
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -4824,12 +5091,13 @@ paths:
       summary: updatequestion
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"title\": \"analyzing\",\n  \"question_type\":
-                \"Dollar\",\n  \"evaluation_instructions\": \"Squares\"\n}"
+              type: object
+              example:
+                title: analyzing
+                question_type: Dollar
+                evaluation_instructions: Squares
       security:
         - bearerAuth: []
       parameters:
@@ -4874,10 +5142,12 @@ paths:
       summary: partialupdatequestion
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -4922,10 +5192,10 @@ paths:
       summary: softDeletequestion
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -4963,10 +5233,12 @@ paths:
       summary: softDeleteManyquestion
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -4999,12 +5271,14 @@ paths:
       summary: updateBulkquestion
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -5115,13 +5389,14 @@ paths:
       summary: addjob
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"title\": \"compressing\",\n  \"last_date\":
-                \"reboot\",\n  \"salary\": \"Direct\",\n  \"workspace\":
-                \"68b3fa147a03b547a3ec7c7a\"\n}"
+              type: object
+              example:
+                title: compressing
+                last_date: reboot
+                salary: Direct
+                workspace: 68b3fa147a03b547a3ec7c7a
       security:
         - bearerAuth: []
       parameters:
@@ -5162,19 +5437,31 @@ paths:
       summary: findAlljob
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -5227,10 +5514,12 @@ paths:
       summary: getjobCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -5263,14 +5552,15 @@ paths:
       summary: insertBulkjob
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"title\":
-                \"compressing\",\n      \"last_date\": \"reboot\",\n     
-                \"salary\": \"Direct\",\n      \"workspace\":
-                \"68b3fa147a03b547a3ec7c7a\"\n    }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - title: compressing
+                    last_date: reboot
+                    salary: Direct
+                    workspace: 68b3fa147a03b547a3ec7c7a
       security:
         - bearerAuth: []
       parameters:
@@ -5303,10 +5593,13 @@ paths:
       summary: deleteManyjob
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -5339,13 +5632,14 @@ paths:
       summary: updatejob
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"title\": \"compressing\",\n  \"last_date\":
-                \"reboot\",\n  \"salary\": \"Direct\",\n  \"workspace\":
-                \"68b3fa147a03b547a3ec7c7a\"\n}"
+              type: object
+              example:
+                title: compressing
+                last_date: reboot
+                salary: Direct
+                workspace: 68b3fa147a03b547a3ec7c7a
       security:
         - bearerAuth: []
       parameters:
@@ -5391,10 +5685,12 @@ paths:
       summary: partialupdatejob
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -5440,10 +5736,10 @@ paths:
       summary: softDeletejob
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -5481,10 +5777,12 @@ paths:
       summary: softDeleteManyjob
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -5517,12 +5815,14 @@ paths:
       summary: updateBulkjob
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -5632,13 +5932,13 @@ paths:
       summary: addrecruiter
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"name\": \"Kenny Rowe\",\n  \"company\":
-                \"68b3fa147a03b547a3ec7c83\",\n  \"admin\":
-                \"Re-contextualized\"\n}"
+              type: object
+              example:
+                name: Kenny Rowe
+                company: 68b3fa147a03b547a3ec7c83
+                admin: Re-contextualized
       security:
         - bearerAuth: []
       parameters:
@@ -5678,19 +5978,31 @@ paths:
       summary: findAllrecruiter
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -5742,10 +6054,12 @@ paths:
       summary: getrecruiterCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -5778,13 +6092,14 @@ paths:
       summary: insertBulkrecruiter
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"name\": \"Kenny Rowe\",\n     
-                \"company\": \"68b3fa147a03b547a3ec7c83\",\n      \"admin\":
-                \"Re-contextualized\"\n    }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - name: Kenny Rowe
+                    company: 68b3fa147a03b547a3ec7c83
+                    admin: Re-contextualized
       security:
         - bearerAuth: []
       parameters:
@@ -5817,10 +6132,13 @@ paths:
       summary: deleteManyrecruiter
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -5853,13 +6171,13 @@ paths:
       summary: updaterecruiter
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"name\": \"Kenny Rowe\",\n  \"company\":
-                \"68b3fa147a03b547a3ec7c83\",\n  \"admin\":
-                \"Re-contextualized\"\n}"
+              type: object
+              example:
+                name: Kenny Rowe
+                company: 68b3fa147a03b547a3ec7c83
+                admin: Re-contextualized
       security:
         - bearerAuth: []
       parameters:
@@ -5904,10 +6222,12 @@ paths:
       summary: partialupdaterecruiter
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -5952,10 +6272,10 @@ paths:
       summary: softDeleterecruiter
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -5993,10 +6313,12 @@ paths:
       summary: softDeleteManyrecruiter
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -6029,12 +6351,14 @@ paths:
       summary: updateBulkrecruiter
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -6142,15 +6466,17 @@ paths:
       summary: updateProfile
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"username\": \"Kelli.Ziemann\",\n  \"password\":
-                \"LxiKL0esjeLSYKH\",\n  \"email\":
-                \"Summer.Braun@hotmail.com\",\n  \"name\": \"Lionel Sanford
-                II\",\n  \"workspace\": \"68b3fa147a03b547a3ec7c8c\",\n 
-                \"mobileNo\": \"(689) 121-4611\",\n  \"userType\": 1\n}"
+              type: object
+              example:
+                username: Kelli.Ziemann
+                password: LxiKL0esjeLSYKH
+                email: Summer.Braun@hotmail.com
+                name: Lionel Sanford II
+                workspace: 68b3fa147a03b547a3ec7c8c
+                mobileNo: (689) 121-4611
+                userType: 1
       security:
         - bearerAuth: []
       parameters:
@@ -6193,12 +6519,12 @@ paths:
       summary: Send  OTP for two factor authentication in client
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"username\": \"username\",\n  \"password\":
-                \"password\"\n}"
+              type: object
+              example:
+                username: username
+                password: password
       security:
         - undefinedAuth: []
       parameters:
@@ -6230,12 +6556,13 @@ paths:
       summary: Login With 2FA in client
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"username\": \"username\",\n  \"password\":
-                \"password\",\n  \"code\": \"OTP\"\n}"
+              type: object
+              example:
+                username: username
+                password: password
+                code: OTP
       security:
         - undefinedAuth: []
       parameters:
@@ -6276,15 +6603,16 @@ paths:
       summary: Register User in client
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"username\": \"Kelli.Ziemann\",\n  \"password\":
-                \"LxiKL0esjeLSYKH\",\n  \"email\":
-                \"Summer.Braun@hotmail.com\",\n  \"name\": \"Lionel Sanford
-                II\",\n  \"workspace\": \"68b3fa147a03b547a3ec7c8c\",\n 
-                \"mobileNo\": \"(689) 121-4611\"\n}"
+              type: object
+              example:
+                username: Kelli.Ziemann
+                password: LxiKL0esjeLSYKH
+                email: Summer.Braun@hotmail.com
+                name: Lionel Sanford II
+                workspace: 68b3fa147a03b547a3ec7c8c
+                mobileNo: (689) 121-4611
       security:
         - undefinedAuth: []
       parameters:
@@ -6327,10 +6655,11 @@ paths:
       summary: Forgot Password in client
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"email\": \"yourmail@gmail.com\"\n}"'
+              type: object
+              example:
+                email: yourmail@gmail.com
       security:
         - undefinedAuth: []
       parameters:
@@ -6357,10 +6686,11 @@ paths:
       summary: Validate OTP in client
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"otp\": \"5898\"\n}"'
+              type: object
+              example:
+                otp: '5898'
       security:
         - undefinedAuth: []
       parameters:
@@ -6387,10 +6717,10 @@ paths:
       summary: Logout in client
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -6411,12 +6741,12 @@ paths:
       summary: Change Password in client
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"oldPassword\": \"OldPassword\",\n  \"newPassword\":
-                \"NewPassword\"\n}"
+              type: object
+              example:
+                oldPassword: OldPassword
+                newPassword: NewPassword
       security:
         - bearerAuth: []
       parameters:
@@ -6443,12 +6773,12 @@ paths:
       summary: Reset password in client
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"code\": \"5898\",\n  \"newPassword\":
-                \"yourPassword\"\n}"
+              type: object
+              example:
+                code: '5898'
+                newPassword: yourPassword
       security:
         - undefinedAuth: []
       parameters:
@@ -6517,12 +6847,13 @@ paths:
       summary: addrole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"name\": \"Olga Funk\",\n  \"code\": \"Borders\",\n 
-                \"weight\": 248\n}"
+              type: object
+              example:
+                name: Olga Funk
+                code: Borders
+                weight: 248
       security:
         - bearerAuth: []
       parameters:
@@ -6562,12 +6893,14 @@ paths:
       summary: insertBulkrole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"name\": \"Olga Funk\",\n     
-                \"code\": \"Borders\",\n      \"weight\": 248\n    }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - name: Olga Funk
+                    code: Borders
+                    weight: 248
       security:
         - bearerAuth: []
       parameters:
@@ -6600,19 +6933,31 @@ paths:
       summary: findAllrole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -6664,10 +7009,12 @@ paths:
       summary: getroleCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -6700,10 +7047,13 @@ paths:
       summary: deleteManyrole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -6736,12 +7086,14 @@ paths:
       summary: updateBulkrole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -6774,10 +7126,12 @@ paths:
       summary: softDeleteManyrole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -6810,10 +7164,10 @@ paths:
       summary: softDeleterole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -6851,10 +7205,12 @@ paths:
       summary: partialupdaterole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -6899,12 +7255,13 @@ paths:
       summary: updaterole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"name\": \"Olga Funk\",\n  \"code\": \"Borders\",\n 
-                \"weight\": 248\n}"
+              type: object
+              example:
+                name: Olga Funk
+                code: Borders
+                weight: 248
       security:
         - bearerAuth: []
       parameters:
@@ -7026,12 +7383,13 @@ paths:
       summary: addprojectRoute
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"route_name\": \"Chair\",\n  \"method\": \"Designer\",\n 
-                \"uri\": \"Synergized\"\n}"
+              type: object
+              example:
+                route_name: Chair
+                method: Designer
+                uri: Synergized
       security:
         - bearerAuth: []
       parameters:
@@ -7071,13 +7429,14 @@ paths:
       summary: insertBulkprojectRoute
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"route_name\":
-                \"Chair\",\n      \"method\": \"Designer\",\n      \"uri\":
-                \"Synergized\"\n    }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - route_name: Chair
+                    method: Designer
+                    uri: Synergized
       security:
         - bearerAuth: []
       parameters:
@@ -7110,19 +7469,31 @@ paths:
       summary: findAllprojectRoute
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -7174,10 +7545,12 @@ paths:
       summary: getprojectRouteCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -7210,10 +7583,13 @@ paths:
       summary: deleteManyprojectRoute
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -7246,12 +7622,14 @@ paths:
       summary: updateBulkprojectRoute
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -7284,10 +7662,12 @@ paths:
       summary: softDeleteManyprojectRoute
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -7320,10 +7700,10 @@ paths:
       summary: softDeleteprojectRoute
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -7361,10 +7741,12 @@ paths:
       summary: partialupdateprojectRoute
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -7409,12 +7791,13 @@ paths:
       summary: updateprojectRoute
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"route_name\": \"Chair\",\n  \"method\": \"Designer\",\n 
-                \"uri\": \"Synergized\"\n}"
+              type: object
+              example:
+                route_name: Chair
+                method: Designer
+                uri: Synergized
       security:
         - bearerAuth: []
       parameters:
@@ -7535,12 +7918,12 @@ paths:
       summary: addrouteRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"routeId\": \"68b3fa147a03b547a3ec7ca7\",\n  \"roleId\":
-                \"68b3fa147a03b547a3ec7ca8\"\n}"
+              type: object
+              example:
+                routeId: 68b3fa147a03b547a3ec7ca7
+                roleId: 68b3fa147a03b547a3ec7ca8
       security:
         - bearerAuth: []
       parameters:
@@ -7579,13 +7962,13 @@ paths:
       summary: insertBulkrouteRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"routeId\":
-                \"68b3fa147a03b547a3ec7ca7\",\n      \"roleId\":
-                \"68b3fa147a03b547a3ec7ca8\"\n    }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - routeId: 68b3fa147a03b547a3ec7ca7
+                    roleId: 68b3fa147a03b547a3ec7ca8
       security:
         - bearerAuth: []
       parameters:
@@ -7618,19 +8001,31 @@ paths:
       summary: findAllrouteRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -7681,10 +8076,12 @@ paths:
       summary: getrouteRoleCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -7717,10 +8114,13 @@ paths:
       summary: deleteManyrouteRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -7753,12 +8153,14 @@ paths:
       summary: updateBulkrouteRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -7791,10 +8193,12 @@ paths:
       summary: softDeleteManyrouteRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -7827,10 +8231,10 @@ paths:
       summary: softDeleterouteRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -7868,10 +8272,12 @@ paths:
       summary: partialupdaterouteRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -7915,12 +8321,12 @@ paths:
       summary: updaterouteRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"routeId\": \"68b3fa147a03b547a3ec7ca7\",\n  \"roleId\":
-                \"68b3fa147a03b547a3ec7ca8\"\n}"
+              type: object
+              example:
+                routeId: 68b3fa147a03b547a3ec7ca7
+                roleId: 68b3fa147a03b547a3ec7ca8
       security:
         - bearerAuth: []
       parameters:
@@ -8040,12 +8446,12 @@ paths:
       summary: adduserRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"userId\": \"68b3fa147a03b547a3ec7cb1\",\n  \"roleId\":
-                \"68b3fa147a03b547a3ec7cb2\"\n}"
+              type: object
+              example:
+                userId: 68b3fa147a03b547a3ec7cb1
+                roleId: 68b3fa147a03b547a3ec7cb2
       security:
         - bearerAuth: []
       parameters:
@@ -8084,13 +8490,13 @@ paths:
       summary: insertBulkuserRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"data\": [\n    {\n      \"userId\":
-                \"68b3fa147a03b547a3ec7cb1\",\n      \"roleId\":
-                \"68b3fa147a03b547a3ec7cb2\"\n    }\n  ]\n}"
+              type: object
+              example:
+                data:
+                  - userId: 68b3fa147a03b547a3ec7cb1
+                    roleId: 68b3fa147a03b547a3ec7cb2
       security:
         - bearerAuth: []
       parameters:
@@ -8123,19 +8529,31 @@ paths:
       summary: findAlluserRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"query\": {},\n  \"options\": {\n    \"select\": [\n     
-                \"field 1\",\n      \"field 2\"\n    ],\n    \"collation\":
-                \"\",\n    \"sort\": \"\",\n    \"populate\": \"\",\n   
-                \"projection\": \"\",\n    \"lean\": false,\n    \"leanWithId\":
-                true,\n    \"offset\": 0,\n    \"page\": 1,\n    \"limit\":
-                10,\n    \"pagination\": true,\n    \"useEstimatedCount\":
-                false,\n    \"useCustomCountFn\": false,\n    \"forceCountFn\":
-                false,\n    \"read\": {},\n    \"options\": {}\n  },\n 
-                \"isCountOnly\": false\n}"
+              type: object
+              example:
+                query: {}
+                options:
+                  select:
+                    - field 1
+                    - field 2
+                  collation: ''
+                  sort: ''
+                  populate: ''
+                  projection: ''
+                  lean: false
+                  leanWithId: true
+                  offset: 0
+                  page: 1
+                  limit: 10
+                  pagination: true
+                  useEstimatedCount: false
+                  useCustomCountFn: false
+                  forceCountFn: false
+                  read: {}
+                  options: {}
+                isCountOnly: false
       security:
         - bearerAuth: []
       parameters:
@@ -8186,10 +8604,12 @@ paths:
       summary: getuserRoleCount
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"where\": {\n    \"isActive\": true\n  }\n}"'
+              type: object
+              example:
+                where:
+                  isActive: true
       security:
         - bearerAuth: []
       parameters:
@@ -8222,10 +8642,13 @@ paths:
       summary: deleteManyuserRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isWarning\": true,\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                isWarning: true
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -8258,12 +8681,14 @@ paths:
       summary: updateBulkuserRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"filter\": {\n    \"isActive\": true\n  },\n  \"data\":
-                {\n    \"isDeleted\": false\n  }\n}"
+              type: object
+              example:
+                filter:
+                  isActive: true
+                data:
+                  isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -8296,10 +8721,12 @@ paths:
       summary: softDeleteManyuserRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"ids\": [\n    \":id\"\n  ]\n}"'
+              type: object
+              example:
+                ids:
+                  - ':id'
       security:
         - bearerAuth: []
       parameters:
@@ -8332,10 +8759,10 @@ paths:
       summary: softDeleteuserRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{}"'
+              type: object
+              example: {}
       security:
         - bearerAuth: []
       parameters:
@@ -8373,10 +8800,12 @@ paths:
       summary: partialupdateuserRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: '"{\n  \"isActive\": true,\n  \"isDeleted\": false\n}"'
+              type: object
+              example:
+                isActive: true
+                isDeleted: false
       security:
         - bearerAuth: []
       parameters:
@@ -8420,12 +8849,12 @@ paths:
       summary: updateuserRole
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
-              type: string
-              example: >-
-                "{\n  \"userId\": \"68b3fa147a03b547a3ec7cb1\",\n  \"roleId\":
-                \"68b3fa147a03b547a3ec7cb2\"\n}"
+              type: object
+              example:
+                userId: 68b3fa147a03b547a3ec7cb1
+                roleId: 68b3fa147a03b547a3ec7cb2
       security:
         - bearerAuth: []
       parameters:

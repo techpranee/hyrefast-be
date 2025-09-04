@@ -156,6 +156,7 @@ schema.pre("save", async function (next) {
 });
 
 schema.post('findOneAndUpdate', async function (doc) {
+  console.log('📄 Application document updated:', doc);
   // Update the updatedAt field
   if (doc && doc.status === 'interview_completed' && !doc.credit_deduction_reference) {
     try {
@@ -177,6 +178,8 @@ schema.post('findOneAndUpdate', async function (doc) {
       doc.credit_deduction_reference = credit_deduction.credit_record_id;
       await doc.save();
 
+      console.log('📄 Credit Deduction:', credit_deduction);
+
       //  start the AI analysis
       if (credit_deduction.success) {
         // Queue analysis task using worker thread manager
@@ -187,6 +190,8 @@ schema.post('findOneAndUpdate', async function (doc) {
             workspaceId: workspaceId,
             priority: 'normal'
           });
+
+          console.log('📄 Analysis task queued:', queueResult);
 
           if (queueResult.success) {
             console.log(`✅ Analysis task queued for application ${doc._id}: ${queueResult.taskId}`);
