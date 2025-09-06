@@ -75,7 +75,7 @@ const schema = new Schema(
 );
 schema.pre('save', async function (next) {
     this.isDeleted = false;
-    this.isActive = true;
+    // this.isActive = true;
     if (this.password) {
         this.password = await bcrypt.hash(this.password, 8);
     }

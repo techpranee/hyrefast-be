@@ -297,11 +297,18 @@ const resetPassword = async (user, newPassword) => {
 const sendLoginOTP = async (username, password) => {
     try {
         let where = { 'email': username };
-        where.isActive = true; where.isDeleted = false; let user = await dbService.findOne(User, where);
+        where.isDeleted = false; let user = await dbService.findOne(User, where);
         if (!user) {
             return {
                 flag: true,
                 data: 'User not found'
+            };
+        }
+        if (user.isActive === false) {
+            await sendEmailForLoginOtp(user);
+            return {
+                flag: true,
+                data: 'Your account is not active. Please verify your email to activate your account.'
             };
         }
         if (user.loginRetryLimit >= MAX_LOGIN_RETRY_LIMIT) {
